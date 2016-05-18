@@ -1,0 +1,66 @@
+UTest({
+	'should parse defines' : {
+		'should parse single amd' () {
+			return parse(`define(["foo"], function(){})`, {
+				amd: [ {type: 'js', url: 'foo'} ]
+			});
+		},
+		'should parse with id' () {
+			return parse(`define('my', ["./foo"], function(){})`, {
+				amd: [
+					{type: 'js', url: './foo'},
+				]
+			});
+		},
+		'should parse empty deps' () {
+			return parse(`define('my', function(){})`, {
+				amd: [ ]
+			});
+		},
+		'should parse css dep' () {
+			return parse(`define(["main.less"], function(){})`, {
+				amd: [ { type: 'css', url: 'main.less'} ]
+			});
+		},
+	},
+	'should parse require': {
+		'should parse single amd' () {
+			return parse(`require(["foo"], function(){})`, {
+				amd: [ {type: 'js', url: 'foo'} ]
+			});
+		},
+		'should parse with id' () {
+			return parse(`require('my', ["./foo"], function(){})`, {
+				amd: [
+					{type: 'js', url: './foo'},
+				]
+			});
+		},
+		'should parse empty deps' () {
+			return parse(`require('my', function(){})`, {
+				amd: [ ]
+			});
+		},
+		'should not parse commonjs require' () {
+			return parse(`require('foo'); require('fs');`, {
+				amd: [ ]
+			});
+		},
+	}
+});
+
+function parse (code, expect) {
+	var dfr = new Class.Deferred();
+	Bundler.Parser.getDependencies(code).then(deps => {
+
+		for(var key in expect) {
+			var resources = deps[key].resources;
+			var arr = expect[key];
+
+			eq_(resources.length, arr.length);
+			has_(resources, arr);
+		}
+		dfr.resolve();
+	});
+	return dfr;
+}

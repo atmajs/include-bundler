@@ -1,0 +1,56 @@
+UTest({
+	'should parse single include' () {
+		return parse(`include.js("foo")`, {
+			include: [ {type: 'js', url: 'foo'} ]
+		});
+	},
+	'should parse multiple includes' () {
+		return parse(`include.js("foo", "bar.js")`, {
+			include: [
+				{type: 'js', url: 'foo'},
+				{type: 'js', url: 'bar.js'}
+			]
+		});
+	},
+	'should parse single include array' () {
+		return parse(`include.js(["foo", "bar.js", "qux.js"])`, {
+			include: [
+				{type: 'js', url: 'foo'},
+				{type: 'js', url: 'bar.js'},
+				{type: 'js', url: 'qux.js'}
+			]
+		});
+	},
+	'should parse single script, css and mask' () {
+		var code = `
+			include
+				.js( 'baz.js')
+				.mask('my.mask')
+				.css('main.less')
+				.done()
+		`;
+		return parse(code, {
+			include: [
+				{type: 'js', url: 'baz.js'},
+				{type: 'mask', url: 'my.mask'},
+				{type: 'css', url: 'main.less'}
+			]
+		});
+	}
+});
+
+function parse (code, expect) {
+	var dfr = new Class.Deferred();
+	Bundler.Parser.getDependencies(code).then(deps => {
+
+		for(var key in expect) {
+			var resources = deps[key].resources;
+			var arr = expect[key];
+
+			eq_(resources.length, arr.length);
+			has_(resources, arr);
+		}
+		dfr.resolve();
+	});
+	return dfr;
+}

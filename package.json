@@ -1,0 +1,56 @@
+{
+  "name": "includejs-bundler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atmajs/includejs-bundler.git"
+  },
+  "keywords": [
+    "module",
+    "commonjs",
+    "includejs",
+    "bundle",
+    "build",
+    "package"
+  ],
+  "author": "Alex Kit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atmajs/includejs-bundler/issues"
+  },
+  "homepage": "https://github.com/atmajs/includejs-bundler#readme",
+  "dependencies": {
+    "atma-io": "^0.2.16",
+    "cheerio": "^0.20.0",
+    "includejs": "^0.9.16",
+    "uglify-js": "^2.6.2"
+  },
+  "atma": {
+    "plugins": [
+      "atma-loader-babel"
+    ],
+    "settings": {
+      "atma-loader-babel": {}
+    },
+    "tasks": {
+      "watch": {
+        "files": "src/**",
+        "actions": [
+          "import"
+        ]
+      },
+      "import": {
+        "files": "src/exports.js",
+        "output": "lib/bundler.js"
+      }
+    }
+  },
+  "devDependencies": {
+    "atma-utils": "^0.1.6"
+  }
+}
