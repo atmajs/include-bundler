@@ -27,7 +27,7 @@
   "dependencies": {
     "atma-io": "^0.2.16",
     "cheerio": "^0.20.0",
-    "includejs": "^0.9.16",
+    "includejs": "^0.9.17",
     "uglify-js": "^2.6.2"
   },
   "atma": {

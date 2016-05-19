@@ -82,4 +82,5 @@ var Include;
 	};
 
 	Include.groupByType = res_groupByType;
+	Include.PathResolver = PathResolver;
 }());

@@ -1,0 +1,51 @@
+UTest({
+	'should parse single commonjs' () {
+		return parse(`require("foo")`, {
+			commonjs: [ {type: 'js', url: 'foo'} ]
+		});
+	},
+	'should parse with multiple require' () {
+		return parse(`
+			(function(){
+				var foo = require('./foo');
+				var foo = require('./folder/qux.js');
+				var foo = require('../baz');
+			}());
+		`, {
+			commonjs: [
+				{type: 'js', url: './foo'},
+				{type: 'js', url: './folder/qux.js'},
+				{type: 'js', url: '../baz'},
+			]
+		});
+	},
+	'should parse AMD and CommonJS at same time' () {
+		return parse(`
+			var fs = require('fs');
+			require(['./some'], function(){});
+		`, {
+			amd: [
+				{type: 'js', url: './some'}
+			],
+			commonjs: [
+				{type: 'js', url: 'fs'},
+			]
+		});
+	},
+});
+
+function parse (code, expect) {
+	var dfr = new Class.Deferred();
+	Bundler.Parser.getDependencies(code).then(deps => {
+
+		for(var key in expect) {
+			var resources = deps[key].resources;
+			var arr = expect[key];
+
+			eq_(resources.length, arr.length);
+			has_(resources, arr);
+		}
+		dfr.resolve();
+	});
+	return dfr;
+}

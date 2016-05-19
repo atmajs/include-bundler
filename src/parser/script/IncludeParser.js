@@ -75,7 +75,7 @@ var IncludeParser;
 			case 'apply':
 				break;
 			default:
-				logger.log('getIncludes: Unknown function call', node.expression);
+				console.warn('getIncludes: Unknown function call', node.expression);
 				break;
 			}
 		});

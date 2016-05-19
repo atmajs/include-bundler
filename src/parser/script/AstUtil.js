@@ -253,11 +253,35 @@ var AstUtil;
 					if (args.length > 1) {
 						return true;
 					}
-					if (AstUtil.is.type(args[0], 'AST_String') === true) {
+					if (AstUtil.is.string(args[0])) {
 						// is commonjs require
 						return false;
 					}
 					return true;
+				}
+				return false;
+			},
+			commonJsFunction: function(node) {
+				if (node instanceof UglifyJS.AST_Call === false) {
+					return false;
+				}
+				if (node.start == null) {
+					return false;
+				}
+				var name = node.start.value;
+				var args = node.args;
+				if (args.length === 0) {
+					return false;
+				}
+				if (name === 'require') {
+					if (args.length !==  1) {
+						return false;
+					}
+
+					if (AstUtil.is.string(args[0])) {
+						// is commonjs require
+						return true;
+					}
 				}
 				return false;
 			},
@@ -272,6 +296,9 @@ var AstUtil;
 				}
 
 				return obj instanceof UglifyJS[type];
+			},
+			string (node) {
+				return node instanceof UglifyJS.AST_Node && node.TYPE === 'String';
 			}
 		},
 	};

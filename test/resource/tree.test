@@ -1,0 +1,52 @@
+var Files =  {
+	'foo-include.js': `
+		include.js('./folder/bar-commonjs.js');
+	`,
+	'folder/bar-commonjs.js': `
+		require('../qux.js');
+	`,
+	'main-amd.js': `
+		require(["./foo-include"], function(){});
+	`,
+	'qux.js': `
+		console.log('Wow');
+	`
+};
+
+UTest({
+	$before () {
+		io.File.disableCache();
+		Object.keys(Files).forEach(key => {
+			var rgx = new RegExp(key, 'i');
+			var Factory = io.File.getFactory();
+			Factory.unregisterHandler(rgx);
+			Factory.registerHandler(rgx, Class({
+				exists () { return true },
+				read () { return Files[key] }
+			}));
+		});
+	},
+	'should get resource tree from files' () {
+		return Bundler.getResourceTree('main-amd.js').done(resource => {
+			eq_(resource.url, 'main-amd.js');
+			eq_(resource.resources.length, 1);
+			eq_(resource.resources[0].url, 'foo-include.js');
+
+			eq_(resource.resources[0].resources.length, 1);
+			eq_(resource.resources[0].resources[0].url, 'folder/bar-commonjs.js');
+
+			eq_(resource.resources[0].resources[0].resources.length, 1);
+			eq_(resource.resources[0].resources[0].resources[0].url, 'qux.js');
+
+			eq_(resource.resources[0].resources[0].resources[0].resources.length, 0);
+		})
+	},
+	'!should get flatterned resources' () {
+		return Bundler.getResources('main-amd.js').done(resources => {
+			logger.log(resources);
+			has_(resources[0], {
+				url: 'qux.js'
+			});
+		})
+	}
+});
