@@ -1,5 +1,6 @@
 var MaskParser;
 (function(){
+	var _mask;
 	MaskParser = {
 		getDependencies (content, opts) {
 				var mask = _mask || (_mask = require('maskjs'));

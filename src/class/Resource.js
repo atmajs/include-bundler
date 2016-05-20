@@ -35,6 +35,17 @@ var Resource = class_create({
 		this.url = path_toRelative(this.filename, solution.base);
 		this.location = path_getDir(this.url);
 	},
+	toOutputResource () {
+		var folder = solution.getOutputFolder(this.type);
+		var url = path_combine(folder, this.url);
+		var filename = path_combine(solution.outputBase, url);
+		var resource = new Resource(this.type);
+		resource.filename = filename;
+		resource.directory = path_getDir(filename);
+		resource.url = url;
+		resource.location = path_getDir(url);
+		return resource;
+	},
 	toJSON (deep) {
 		return {
 			type: this.type,

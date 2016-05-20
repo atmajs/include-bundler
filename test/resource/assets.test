@@ -1,0 +1,21 @@
+var Files =  {
+	'main.js': `
+		require('./styles/icons.less');
+	`,
+	'styles/icons.less': `
+		.gear { background: url("icons/grear.png") center; }
+		.user { background: url("/styles/icons/user.png") center; }
+	`,
+};
+UTest({
+	$before () {
+		TestHelper.registerFiles(Files);
+	},
+	'should get resource tree from files' () {
+		return Bundler.getResources('main.js').done(resource => {
+
+			var assets = Bundler.AssetsManager.getAssets();
+			logger.log(assets);
+		})
+	}
+});

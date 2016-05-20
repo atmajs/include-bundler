@@ -12,7 +12,7 @@ var CommonJsParser;
 				return true;
 			});
 
-			return new Promise(resolve => resolve(info));
+			return new class_Dfr().resolve(info);
 		}
 	};
 

@@ -4,7 +4,9 @@ var Loader;
 	Loader = {
 		load (type, path, opts) {
 			var includeData = { type: type, url: path };
-			return ResourceLoader.load(includeData, null, opts).then(loader => loader.resource);
+			return ResourceLoader
+				.load(includeData, null, opts)
+				.then(loader => loader.resource);
 		}
 	};
 
@@ -17,7 +19,6 @@ var Loader;
 				if (loader) {
 					return loader;
 				}
-
 				loader = __loaders[resource.filename] = new TreeLoader(resource, opts);
 				loader.process();
 				return loader;
@@ -31,22 +32,21 @@ var Loader;
 			process () {
 				io.File.readAsync(this.resource.filename, this.opts).done(content => {
 					this.resource.content = content;
-					this.processChildren();
+					this.processChildren()
 				}).fail(error => this.reject(error));
 			},
 			processChildren () {
 				var content = this.resource.content;
-				var opts = {
-					filename: this.resource.filename
-				};
+				var opts = this.opts;
 				Parser
-					.getDependencies(this.resource.type, content, opts)
-					.fail(error => this.reject(error))
-					.done(deps => this.loadChildren(deps));
+					.getDependencies(this.resource, content, opts)
+					.then(deps => this.loadChildren(deps), error => this.reject(error));
 			},
-			loadChildren (deps) {
+			loadChildren: function (deps) {
 				async_map(deps, dep => {
-					return ResourceLoader.load(dep, this, this.opts).then(loader => loader.resource);
+					return ResourceLoader
+						.load(dep, this.resource, this.opts)
+						.then(loader => loader.resource);
 				})
 				.fail(error => this.reject(error))
 				.done(resources => {

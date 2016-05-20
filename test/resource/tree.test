@@ -12,41 +12,38 @@ var Files =  {
 		console.log('Wow');
 	`
 };
-
 UTest({
 	$before () {
-		io.File.disableCache();
-		Object.keys(Files).forEach(key => {
-			var rgx = new RegExp(key, 'i');
-			var Factory = io.File.getFactory();
-			Factory.unregisterHandler(rgx);
-			Factory.registerHandler(rgx, Class({
-				exists () { return true },
-				read () { return Files[key] }
-			}));
-		});
+		TestHelper.registerFiles(Files);
 	},
 	'should get resource tree from files' () {
 		return Bundler.getResourceTree('main-amd.js').done(resource => {
-			eq_(resource.url, 'main-amd.js');
-			eq_(resource.resources.length, 1);
-			eq_(resource.resources[0].url, 'foo-include.js');
 
-			eq_(resource.resources[0].resources.length, 1);
-			eq_(resource.resources[0].resources[0].url, 'folder/bar-commonjs.js');
-
-			eq_(resource.resources[0].resources[0].resources.length, 1);
-			eq_(resource.resources[0].resources[0].resources[0].url, 'qux.js');
-
-			eq_(resource.resources[0].resources[0].resources[0].resources.length, 0);
+			var expect = {
+				url: 'main-amd.js',
+				resources: [{
+					url: 'foo-include.js',
+					resources: [{
+						url: 'folder/bar-commonjs.js',
+						resources: [{
+							url: 'qux.js',
+							resources: []
+						}]
+					}]
+				}]
+			};
+			has_(resource, expect);
 		})
 	},
-	'!should get flatterned resources' () {
+	'should flattern tree' () {
 		return Bundler.getResources('main-amd.js').done(resources => {
-			logger.log(resources);
-			has_(resources[0], {
-				url: 'qux.js'
-			});
+			var urls = resources.map(x => x.url);
+			deepEq_(urls, [
+				'qux.js',
+				'folder/bar-commonjs.js',
+				'foo-include.js',
+				'main-amd.js',
+			]);
 		})
 	}
 });

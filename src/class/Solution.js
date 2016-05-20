@@ -1,7 +1,8 @@
 var solution = null;
 var Solution = null;
 (function(){
-
+	// import ./SolutionOpts.js
+	
 	Solution = class_create({
 		constructor: function(path, opts){
 			if (opts == null) {
@@ -9,16 +10,24 @@ var Solution = null;
 			}
 
 			this.path = path;
-			this.base = getBase(opts);
+			this.base = path_toAbsolute(opts.base || path_resolveCurrent());
+			this.output = new Output(this, opts);
+		},
 
-			this.directory = opts.directory;
-			this.outputMain = opts.outputMain;
-			this.outputAssets = opts.outputAssets;
+		toTargetAsset: function(resource) {
+			var resource = new Resource(resource.type);
+			resource.filename = path_combine(opts.outputMain, opts.outputAssets, resource.url);
+			resource.directory = path_getDir(this.filename);
 		}
 	});
 
-	function getBase(opts) {
-		var base = opts.base;
+	var Output = class_create({
+		constructor: function(solution, opts){
+			this.base = path_toAbsolute(opts.outputBase || path_resolveCurrent());
+		}
+	});
+
+	function getBase(base) {
 		if (base == null) {
 			return path_resolveCurrent();
 		}

@@ -26,9 +26,8 @@ var ScriptParser;
 			var a = IncludeParser.parse(ast).then(includeInfo => info.include = includeInfo);
 			var b = AmdParser.parse(ast).then(amdInfo => info.amd = amdInfo);
 			var c = CommonJsParser.parse(ast).then(commonJsInfo => info.commonjs = commonJsInfo);
-			var dfr = new class_Dfr;
-			Promise.all([a, b, c]).then(x => dfr.resolve(info), error => dfr.reject(error));
-			return dfr;
+
+			return async_whenAll(a, b, c).then(x => info);
 		},
 		flatternDependencyInfos (info) {
 			var arr = [];

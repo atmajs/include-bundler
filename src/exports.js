@@ -8,6 +8,8 @@
 // import ./class/Include.js
 // import ./class/Solution.js
 
+// import ./assets/AssetsManager.js
+
 // import ./parser/ScriptParser.js
 // import ./parser/MaskParser.js
 // import ./parser/Parser.js
@@ -39,5 +41,6 @@ module.exports = {
 		getDependencies (content, type = 'js') {
 			return ScriptParser.getDependencies(content);
 		}
-	}
+	},
+	AssetsManager: AssetsManager
 };
