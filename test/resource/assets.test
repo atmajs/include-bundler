@@ -12,10 +12,14 @@ UTest({
 		TestHelper.registerFiles(Files);
 	},
 	'should get resource tree from files' () {
-		return Bundler.getResources('main.js').done(resource => {
-
+		return Bundler.getResources('main.js').done(resources => {
+			var urls = resources.map(x => x.url);
+			deepEq_(urls, [ "main.js", "styles/icons.less" ]);
+			logger.log(resources[1].content, "")
 			var assets = Bundler.AssetsManager.getAssets();
-			logger.log(assets);
+
+			var arr = assets.map(x => x.toTarget().toJSON())
+			logger.log(arr);
 		})
 	}
 });

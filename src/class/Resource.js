@@ -28,17 +28,17 @@ var Resource = class_create({
 		var url = Include.PathResolver.resolveBasic(includeData.url, includeData.type);
 
 		// System paths
-		this.filename = path_toAbsolute(url, parent && parent.directory, solution.base);
+		this.filename = path_toAbsolute(url, parent && parent.directory, solution.opts.base);
 		this.directory = path_getDir(this.filename);
 
 		// Application paths
-		this.url = path_toRelative(this.filename, solution.base);
+		this.url = path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
 	},
-	toOutputResource () {
-		var folder = solution.getOutputFolder(this.type);
+	toTarget () {
+		var folder = solution.opts.getOutputFolder(this.type);
 		var url = path_combine(folder, this.url);
-		var filename = path_combine(solution.outputBase, url);
+		var filename = path_combine(solution.opts.outputBase, url);
 		var resource = new Resource(this.type);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);

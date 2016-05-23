@@ -91,6 +91,19 @@ var path_getDir,
 		absolute_ = path_combine(absolute_, '/');
 		if (path_.toUpperCase().indexOf(absolute_.toUpperCase()) === 0) {
 			return path_.substring(absolute_.length);
+		} else {
+			var sub = '../';
+			while (true) {
+				var folder = absolute_.replace(/[^\/]+\/?$/, '');
+				if (folder === '' || folder === absolute_) {
+					break;
+				}
+				absolute_ = folder;
+				if (path_.toUpperCase().indexOf(absolute_.toUpperCase()) === 0) {
+					return path_combine(sub, path_.substring(absolute_.length));
+				}
+				sub += '../'
+			}
 		}
 		return path;
 	};

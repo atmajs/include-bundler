@@ -24,7 +24,7 @@ module.exports = {
 	getResources (path, opts) {
 		solution = new Solution(path, opts);
 		return Loader.load('js', path, opts).then(resource => {
-			return res_flattern(resource).map(x => x.toJSON(false));
+			return res_flattern(resource).map(x => x);
 		});
 	},
 	build (resource, targetDir) {
@@ -42,5 +42,6 @@ module.exports = {
 			return ScriptParser.getDependencies(content);
 		}
 	},
-	AssetsManager: AssetsManager
+	AssetsManager: AssetsManager,
+	Resource: Resource
 };
