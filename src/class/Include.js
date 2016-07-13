@@ -24,7 +24,8 @@ var Include;
 					type: type,
 					url: net.Uri.combine(this.base, route.path),
 					route: route,
-					namespace: namespace
+					namespace: namespace,
+					module: 'include'
 				});
 			});
 

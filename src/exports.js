@@ -17,6 +17,11 @@
 // import ./loader/Loader.js
 
 module.exports = {
+	clearCache() {
+		Loader.clearCache();
+		AssetsManager.clearCache();
+		return this;
+	},
 	getResourceTree (path, opts) {
 		solution = new Solution(path, opts);
 		return Loader.load('js', path, opts).then(x => x.toJSON());

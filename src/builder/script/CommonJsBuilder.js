@@ -1,0 +1,5 @@
+var CommonJsBuilder = {
+	writeHeader () {
+		without
+	}
+}

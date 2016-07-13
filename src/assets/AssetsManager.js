@@ -21,6 +21,9 @@ var AssetsManager;
 		},
 		getAssets () {
 			return assets;
+		},
+		clearCache () {
+			assets = [];
 		}
 	};
 

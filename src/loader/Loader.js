@@ -7,6 +7,10 @@ var Loader;
 			return ResourceLoader
 				.load(includeData, null, opts)
 				.then(loader => loader.resource);
+		},
+		clearCache () {
+			ResourceLoader.clearCache();
+			return this;
 		}
 	};
 
@@ -22,6 +26,10 @@ var Loader;
 				loader = __loaders[resource.filename] = new TreeLoader(resource, opts);
 				loader.process();
 				return loader;
+			},
+			clearCache () {
+				__loaders = {};
+				return ResourceLoader;
 			}
 		};
 		var TreeLoader = class_create(class_Dfr, {
