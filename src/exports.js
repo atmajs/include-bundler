@@ -10,11 +10,10 @@
 
 // import ./assets/AssetsManager.js
 
-// import ./parser/ScriptParser.js
-// import ./parser/MaskParser.js
 // import ./parser/Parser.js
 
 // import ./loader/Loader.js
+// import ./builder/Builder.js
 
 module.exports = {
 	clearCache() {
@@ -23,24 +22,25 @@ module.exports = {
 		return this;
 	},
 	getResourceTree (path, opts) {
-		solution = new Solution(path, opts);
-		return Loader.load('js', path, opts).then(x => x.toJSON());
+		var solution = new Solution(path, opts);
+		var type = Loader.getTypeFromPath(path);
+		return Loader.load(type, path, opts, solution).then(x => x.toJSON());
 	},
 	getResources (path, opts) {
-		solution = new Solution(path, opts);
-		return Loader.load('js', path, opts).then(resource => {
+		var solution = new Solution(path, opts);
+		var type = Loader.getTypeFromPath(path);
+		return Loader.load(type, path, opts, solution).then(resource => {
 			return res_flattern(resource).map(x => x);
 		});
 	},
-	build (resource, targetDir) {
-		return new Promise(resolve => {
-			resolve({
-				script: '',
-				style: '',
-				html: '',
-				resourceManager: null
-			});
-		});
+	build (path, opts) {
+		var solution = new Solution(path, opts);
+		var type = Loader.getTypeFromPath(path);
+		return Loader
+			.load(type, path, opts, solution)
+			.then(resource => res_flattern(resource).map(x => x))
+			.then(resources => Builder.build(resources, solution))
+			;
 	},
 	Parser: {
 		getDependencies (content, type = 'js') {

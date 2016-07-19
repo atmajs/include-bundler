@@ -7,12 +7,6 @@ var ScriptParser;
 	// import ./script/IncludeReducer.js
 
 	ScriptParser = {
-		getIncludesInfo (resource, directory, variables) {
-			var ast = AstUtil.parse(resource.content, {
-				filename: path_toLocalFile(resource.filename)
-			});
-			return IncludeParser.parse(ast, resource);
-		},
 		getDependencies (content, opts) {
 			opts = opts || {
 				filename: ''

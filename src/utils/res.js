@@ -39,7 +39,7 @@ var res_groupByType,
 			'less': 'css',
 			'scss': 'css',
 			'json': 'ajax',
-			'mask': 'mask',
+			'mask': 'mask'
 		};
 
 	}());
@@ -52,8 +52,9 @@ var res_groupByType,
 			for (var i = 0; i < stack.length; i++) {
 				for (var j = i + 1; j < stack.length; j++) {
 					if (stack[i].url === stack[j].url) {
+						takeModuleDescriptions(stack[i], stack[j]);
 						stack.splice(j, 1);
-						j--;
+						j--;						
 					}
 				}
 			}
@@ -64,6 +65,16 @@ var res_groupByType,
 			out[method](resource);
 			resource.resources.forEach(x => toArray(x, out));
 			return out;
+		}
+		function takeModuleDescriptions (resA, resB) {
+			if (resB.asModule == null || resB.asModule.length === 0) {
+				return;
+			}
+
+			resB
+				.asModule
+				.filter(name => resA.asModule.indexOf(name) === -1)
+				.forEach(name => resA.asModule.push(name));
 		}
 	}());
 }());

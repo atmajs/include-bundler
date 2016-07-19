@@ -15,17 +15,26 @@ var Resource = class_create({
 	bundle: 'index',
 	module: '',
 
-	constructor: function (includeData, parent) {
+	constructor: function (includeData, parent, solution) {
 		this.resources = [];
 
 		if (includeData == null || includeData.url == null) {
-			includeData = { type: solution.type, url: solution.path };
+			includeData = { type: solution.type };
 		}
 
 		this.parent = parent;
 		this.type = includeData.type;
 		this.content = includeData.content;
 		this.namespace = includeData.namespace;
+		this.asModule = [];
+
+		if (includeData.module) {
+			this.asModule = [ includeData.module ];
+		}
+
+		if (includeData.url == null) {
+			return;
+		}
 
 		var url = Include
 			.PathResolver
@@ -39,11 +48,11 @@ var Resource = class_create({
 		this.url = path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
 	},
-	toTarget () {
+	toTarget (solution) {
 		var folder = solution.opts.getOutputFolder(this.type);
 		var url = path_combine(folder, this.url);
 		var filename = path_combine(solution.opts.outputBase, url);
-		var resource = new Resource(this.type);
+		var resource = new Resource({ type: this.type }, this, solution);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);
 		resource.url = url;
@@ -59,6 +68,7 @@ var Resource = class_create({
 			directory: this.directory,
 			url: this.url,
 			location: this.location,
+			asModule: this.asModule,
 			resources: deep === false ? void 0 : this.resources.map(x => x.toJSON())
 		};
 	},

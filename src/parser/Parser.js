@@ -1,17 +1,22 @@
 var Parser;
 (function(){
+	
+	// import ./ScriptParser.js
+	// import ./MaskParser.js
+	// import ./HtmlParser.js
+
 	Parser = {
-		getDependencies (resource, content, opts) {
+		getDependencies (resource, content, opts, solution) {
 			var fn = Types[resource.type];
 			if (fn == null) {
 				return new class_Dfr().resolve([]);
 			}
-			return fn(resource, opts);
+			return fn(resource, opts, solution);
 		}
 	};
 
 	var Types = {
-		js (resource) {
+		js (resource, opts, solution) {
 			var opts = {
 				filename: resource.filename
 			};
@@ -27,6 +32,9 @@ var Parser;
 			return MaskParser.getDependencies(resource.content, opts).then(info => {
 				return MaskParser.flatternDependencies(info);
 			});
+		},
+		html (resource, opts) {
+			return HtmlParser.getDependencies(resource.content, opts);
 		},
 		load: null,
 		ajax: null,

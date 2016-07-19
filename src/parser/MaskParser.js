@@ -33,7 +33,7 @@ var MaskParser;
 	}
 	function toIncludeDataSingle(path, key) {
 		var type = maskTypeToIncludeType(key);
-		return { type: type, url: path };
+		return { type: type, url: path, asModule: [ 'mask' ] };
 	}
 
 	var mapping = { mask: 'mask', data: 'load', script: 'js', style: 'css' };

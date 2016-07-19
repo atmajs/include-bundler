@@ -9,6 +9,13 @@ var SolutionOpts;
 			outputMain: '{filename}.{build}.{ext}',
 			outputSources: 'build/{build}',
 			outputAssets: 'build/{build}/assets',
+			package: {
+				module: 'commonjs', 
+				modules: ['commonjs', 'includejs', 'global'],
+
+				type: 'module',
+				types: [ 'module', 'bundle']
+			}
 		},
 		resolvers: {
 			base (basePath) {
@@ -24,6 +31,13 @@ var SolutionOpts;
 			outputMain: prepairPath,
 			outputSources: prepairPath,
 			outputAssets: prepairPath,
+			package: function(packageOpts) {
+				if (packageOpts == null) {
+					return this.package;
+				}
+				var opts = Object.create(this.package);
+				return Object.assign(opts, packageOpts);
+			}
 		},
 		constructor: function(solution, opts_){
 			this.paths = [ solution.path ];
@@ -41,7 +55,7 @@ var SolutionOpts;
 				return this.outputAssets;
 			}
 			return this.outputSources;
-		},
+		},		
 		isSameBase () {
 			return this.base === this.outputBase;
 		}
