@@ -5,12 +5,10 @@ var Solution = null;
 
 	Solution = class_create({
 		constructor: function(path, opts){
-			if (opts == null) {
-				opts = {};
-			}
-
+					
 			this.path = path;
-			this.opts = new SolutionOpts(this, opts);
+			this.opts = new SolutionOpts(this, opts || {});
+			this.assetsManager = new AssetsManager(this);
 		}
 	});
 

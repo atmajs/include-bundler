@@ -32,7 +32,7 @@ var ScriptBuilder;
 			body += '\n' + main.content;
 		}
 
-		var content = template.wrapBundle(body);
+		var content = template.wrapBundle(body, resources);
 		if (main == null) {
 			main = arr.pop();
 		}

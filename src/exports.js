@@ -7,6 +7,7 @@
 // import ./class/Resource.js
 // import ./class/Include.js
 // import ./class/Solution.js
+// import ./class/Middlewares.js
 
 // import ./assets/AssetsManager.js
 
@@ -18,7 +19,6 @@
 module.exports = {
 	clearCache() {
 		Loader.clearCache();
-		AssetsManager.clearCache();
 		return this;
 	},
 	getResourceTree (path, opts) {
@@ -38,9 +38,12 @@ module.exports = {
 		var type = Loader.getTypeFromPath(path);
 		return Loader
 			.load(type, path, opts, solution)
-			.then(resource => res_flattern(resource).map(x => x))
+			.then(resource => res_flattern(resource))
 			.then(resources => Builder.build(resources, solution))
 			;
+	},
+	defineMiddleware (name, fn) {
+		_middlewares.define(name, fn);
 	},
 	Parser: {
 		getDependencies (content, type = 'js') {

@@ -1,29 +1,33 @@
 var AssetsManager;
 (function(){
-	var assets = [];
+	
 	//import ./CssAssets.js
 
-	AssetsManager = {
+	AssetsManager = class AssetsManager {
+		constructor (solution) {
+			this.assets = [];
+			this.solution = solution;
+		}
 		rewriteCss (resource, opts) {
 			var arr = CssAssets.rewrite(resource, opts);
 			if (arr) {
-				assets.push(...arr);
+				this.assets.push(...arr);
 			}
-		},
+		}
 		shouldCopy (href, parent) {
-			if (solution.opts.isSameBase() === false) {
+			if (this.solution.opts.isSameBase() === false) {
 				return true;
 			}
 			if (hrefIsAbsolute(href)) {
 				return false;
 			}
 			return true;
-		},
+		}
 		getAssets () {
-			return assets;
-		},
+			return this.assets;
+		}
 		clearCache () {
-			assets = [];
+			this.assets = [];
 		}
 	};
 

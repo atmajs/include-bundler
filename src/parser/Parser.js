@@ -24,8 +24,8 @@ var Parser;
 				return ScriptParser.flatternDependencyInfos(info);
 			});
 		},
-		css (resource, opts) {
-			AssetsManager.rewriteCss(resource, opts);
+		css (resource, opts, solution) {
+			solution.assetsManager.rewriteCss(resource, opts);
 			return new class_Dfr().resolve([]);
 		},
 		mask (resource, opts) {
