@@ -58,14 +58,13 @@ var Loader;
 			process () {
 				io.File.readAsync(this.resource.filename, this.opts).done(content => {
 					this.resource.content = content;
-					this.processChildren()
+					this.processChildren();
 				}).fail(error => this.reject(error));
 			},
 			processChildren () {
-				var content = this.resource.content;
 				var opts = this.opts;
 				Parser
-					.getDependencies(this.resource, content, opts, solution)
+					.getDependencies(this.resource, opts, solution)
 					.then(deps => this.loadChildren(deps), error => this.reject(error));
 			},
 			loadChildren: function (deps) {

@@ -6,14 +6,44 @@ var Parser;
 	// import ./HtmlParser.js
 
 	Parser = {
-		getDependencies (resource, content, opts, solution) {
-			var fn = Types[resource.type];
-			if (fn == null) {
-				return new class_Dfr().resolve([]);
-			}
-			return fn(resource, opts, solution);
+		getDependencies (resource, opts, solution) {
+			var dfr = new class_Dfr;
+			
+			getDependenciesInternal(resource, opts, solution)
+				.done(_runMiddlewares)
+				.fail(error => dfr.reject(error))
+				;
+
+			function _runMiddlewares (deps) {
+				getDependenciesExternal(deps, resource, opts, solution)
+					.done(deps => dfr.resolve(deps))
+					.fail(error => dfr.reject(error))
+					;
+			}			
+			return dfr;
 		}
 	};
+
+	function getDependenciesInternal(resource, opts, solution) {
+		var fn = Types[resource.type];
+		if (fn == null) {
+			return new class_Dfr().resolve([]);
+		}
+		return fn(resource, opts, solution);
+	}
+	function getDependenciesExternal(deps, resource, opts, solution) {
+		var dfr = new class_Dfr;
+		_middlewares
+			.run('parseDependencies', resource, opts, solution)
+			.done(arr => {
+				if (arr) deps.push(...arr);
+				dfr.resolve(arr)
+			})
+			.fail(error => dfr.reject(error))
+			;
+
+		return dfr;
+	}
 
 	var Types = {
 		js (resource, opts, solution) {

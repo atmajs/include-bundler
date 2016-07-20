@@ -1,9 +1,19 @@
 class Middlewares {
 	constructor () {
 		this.runners = {};
+
+		this.supports = {
+			'parseDependencies': function(resource, opts, solution){
+				return new Promise();
+			}
+		}
 	}
 
 	define (name, fn) {
+		if (this.supports[name] === void 0) {
+			throw new Error('Unsupported middleware name: ' + name);
+		}
+
 		var fns = this.runners[name];
 		if (fns == null) {
 			fns = this.runners[name] = [];
@@ -13,6 +23,10 @@ class Middlewares {
 	}
 
 	run (name, ...args) {
+		if (this.supports[name] === void 0) {
+			throw new Error('Unsupported middleware name: ' + name);
+		}
+		
 		var dfr = new class_Dfr;
 		var fns = this.runners[name];
 		if (fns == null || fns.length === 0) {
