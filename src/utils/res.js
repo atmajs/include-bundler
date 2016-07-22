@@ -53,6 +53,7 @@ var res_groupByType,
 				for (var j = i + 1; j < stack.length; j++) {
 					if (stack[i].url === stack[j].url) {
 						takeModuleDescriptions(stack[i], stack[j]);
+						takePageDefinitions(stack[i], stack[j]);
 						stack.splice(j, 1);
 						j--;						
 					}
@@ -67,14 +68,22 @@ var res_groupByType,
 			return out;
 		}
 		function takeModuleDescriptions (resA, resB) {
-			if (resB.asModule == null || resB.asModule.length === 0) {
+			if (resB.asModules == null || resB.asModules.length === 0) {
 				return;
 			}
-
 			resB
-				.asModule
-				.filter(name => resA.asModule.indexOf(name) === -1)
-				.forEach(name => resA.asModule.push(name));
+				.asModules
+				.filter(name => resA.asModules.indexOf(name) === -1)
+				.forEach(name => resA.asModules.push(name));
+		}
+		function takeModuleDescriptions (resA, resB) {
+			if (resB.inPages == null || resB.inPages.length === 0) {
+				return;
+			}
+			resB
+				.inPages
+				.filter(name => resA.inPages.indexOf(name) === -1)
+				.forEach(name => resA.inPages.push(name));
 		}
 	}());
 }());

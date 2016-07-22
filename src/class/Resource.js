@@ -26,10 +26,22 @@ var Resource = class_create({
 		this.type = includeData.type;
 		this.content = includeData.content;
 		this.namespace = includeData.namespace;
-		this.asModule = [];
+		this.asModules = [];
+		this.inPages = [];
 
 		if (includeData.module) {
-			this.asModule = [ includeData.module ];
+			this.asModules = [ includeData.module ];
+		}
+		if (includeData.page) {
+			this.inPages = [ includeData.page ];	
+		} else {
+			var owner = parent;
+			while(owner != null && owner.inPages.length !== 0) {
+				owner = owner.parent;
+			}
+			if (owner != null) {
+				this.inPages = [ ...owner.inPages ];
+			}
 		}
 
 		if (includeData.url == null) {

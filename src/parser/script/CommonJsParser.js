@@ -2,27 +2,29 @@ var CommonJsParser;
 (function() {
 
 	CommonJsParser = {
-		parse: function parseIncludes(ast, resource) {
+		parse: function parseIncludes(ast, parentResource) {
 			var info = {
 				resources: []
 			};
 			AstUtil.each(ast, AstUtil.is.commonJsFunction, function(node, descend) {
 				var scope = node.scope || ast;
-				process(info, node, scope, resource);
+				process(info, node, scope, parentResource);
 				return true;
 			});
+
+			info.resources.forEach(x => x.module = 'commonjs');
 
 			return new class_Dfr().resolve(info);
 		}
 	};
 
-	function process(info, node, scope, currentResource) {
+	function process(info, node, scope, parentResource) {
 		if (node.args.length !== 1) {
 			return;
 		}
 
 		var args = AstUtil.getArguments(node.args, scope);
-		var include = new Include(currentResource);
+		var include = new Include(parentResource);
 		var path = args[0];
 		if (typeof path !== 'string') {
 			throw new Error('Path should be a string: ' + path);

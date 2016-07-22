@@ -8,7 +8,7 @@ var Parser;
 	Parser = {
 		getDependencies (resource, opts, solution) {
 			var dfr = new class_Dfr;
-			
+
 			getDependenciesInternal(resource, opts, solution)
 				.done(_runMiddlewares)
 				.fail(error => dfr.reject(error))
@@ -35,9 +35,9 @@ var Parser;
 		var dfr = new class_Dfr;
 		_middlewares
 			.run('parseDependencies', resource, opts, solution)
-			.done(arr => {
+			.done(arr => {							
 				if (arr) deps.push(...arr);
-				dfr.resolve(arr)
+				dfr.resolve(deps);				
 			})
 			.fail(error => dfr.reject(error))
 			;

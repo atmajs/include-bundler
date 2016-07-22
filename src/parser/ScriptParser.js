@@ -20,7 +20,6 @@ var ScriptParser;
 			var a = IncludeParser.parse(ast).then(includeInfo => info.include = includeInfo);
 			var b = AmdParser.parse(ast).then(amdInfo => info.amd = amdInfo);
 			var c = CommonJsParser.parse(ast).then(commonJsInfo => info.commonjs = commonJsInfo);
-
 			return async_whenAll(a, b, c).then(x => info);
 		},
 		flatternDependencyInfos (info) {

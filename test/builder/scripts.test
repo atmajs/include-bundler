@@ -18,7 +18,7 @@ UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
 	},
-	'should bundle commonjs scripts' () {
+	'!should bundle commonjs scripts' () {
 		return Bundler.clearCache().build('main.js', { 
 			type: 'module',
 			module: 'commonjs',
@@ -34,11 +34,20 @@ UTest({
 			deepEq_(module.exports.letters, ['a', 'b']);
 		});
 	},
-	'!should get resources for html' () {
-		return Bundler.clearCache().getResources('index.html').done(resources => {
-			
-			logger.log(resources.map(x => x.toJSON(false)));
-		});
+	'should get resources for html' () {
+		return Bundler
+			.clearCache()
+			.getResources('index.html')
+			.then(arr => arr.map(x => x.toJSON(false)))
+			.done(arr => {			
+				eq_(arr.length, 3);
+
+				var paths = arr.map(x => x.url);
+				deepEq_(paths, ['data/icons.js', 'main.js', 'index.html']);
+
+				var asModule = arr.map(x => x.asModule);
+				deepEq_(asModule, [['commonjs'], ['global'], ['root']]);
+			});
 	},
 	'should bundle scripts in html page' () {
 		return Bundler.clearCache().build('index.html', {
