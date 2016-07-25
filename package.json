@@ -1,14 +1,14 @@
 {
-  "name": "includejs-bundler",
-  "version": "1.0.0",
+  "name": "app-bundler",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/bundler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "atma test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atmajs/includejs-bundler.git"
+    "url": "git+https://github.com/atmajs/app-bundler.git"
   },
   "keywords": [
     "module",
@@ -16,14 +16,15 @@
     "includejs",
     "bundle",
     "build",
-    "package"
+    "package",
+    "compiler"
   ],
   "author": "Alex Kit",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/atmajs/includejs-bundler/issues"
+    "url": "https://github.com/atmajs/app-bundler/issues"
   },
-  "homepage": "https://github.com/atmajs/includejs-bundler#readme",
+  "homepage": "https://github.com/atmajs/app-bundler",
   "dependencies": {
     "atma-io": "^0.2.16",
     "cheerio": "^0.20.0",
@@ -51,6 +52,7 @@
     }
   },
   "devDependencies": {
-    "atma-utils": "^0.1.6"
+    "atma-utils": "^0.1.6",
+    "atma": "latest"
   }
 }
