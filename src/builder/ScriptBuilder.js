@@ -3,17 +3,10 @@ var ScriptBuilder;
 	ScriptBuilder = {
 		buildDependencies (resources, ctx, solution) {		
 			var arr = resources.filter(x => x.type === 'js');
-			var bundleHash = arr.reduce((aggr, x) => {
-				aggr[x.bundle] = 1;
-				return aggr;
-			}, {});
-
-			return Object.keys(bundleHash).map(name => {
-
-				var _ctx = Object.create(ctx);
-				_ctx.bundle = name;
-				return buildDependencies(arr.filter(x => x.bundle === name), _ctx, solution);
-			});
+			if (arr.length === 0) {
+				return null;
+			}
+			return buildDependencies(arr, ctx, solution);
 		},
 		canBuildRoot (resource) {
 			return resource.type === 'js';
@@ -34,7 +27,7 @@ var ScriptBuilder;
 			return template.wrapModule(res, ctx, solution);
 		});
 		
-		var resourceUrl = `${ctx.page}_${ctx.bundle}.js`;
+		var resourceUrl = `${ctx.current.page}_${ctx.current.bundle}.js`;
 		var resource = new Resource({type: 'js', url: resourceUrl}, null, solution);
 		var output = resource.toTarget(solution);
 

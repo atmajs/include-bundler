@@ -4,45 +4,65 @@ var Builder;
 		build (resources, solution) {
 
 			var pages = res_groupByPage(resources);
+			var ctx = {
+				current: {
+					page: '',
+					bundle: '',
+				}
+			};
 
 			function buildPage(name, resources) {
-				var ctx = { page: name };
+
 				var arr = resources.slice();
 				var main = arr.pop();
 
-				return async_map(builders, builder => builder.buildDependencies(arr, ctx, solution))
+				ctx.current = Object.create(ctx.current);
+				ctx.current.page = name;
+
+				var bundles = res_groupByBundle(arr);				
+				return async_map(Object.keys(bundles), bundleName => {
+					ctx.current = Object.create(ctx.current);
+					ctx.current.bundle = bundleName;
+
+					return buildBundle(ctx, bundles[bundleName]);
+				}).then(resources => {
+					return buildPageRoot(main, resources)
+				});
+			}
+
+			function buildBundle (ctx, resources) {
+
+				return async_map(builders, builder => builder.buildDependencies(resources, ctx, solution))
 					// flattern
-					.then(results => {
-						var dependencies = results
-							.filter(x => x != null)
-							.reduce((aggr, x) => aggr.concat(x), []);
+					.then(arr_flattern);
+			}
 
-						var builder = builders.find(x => x.canBuildRoot(main));
-						if (builder == null) {
-							throw new Error('RootBuilder is not found for a resource ' + main.url);
-						}
+			function buildPageRoot (main, resources) {
+				var dependencies = arr_flattern(resources);
+				var builder = builders.find(x => x.canBuildRoot(main));
+				if (builder == null) {
+					throw new Error('RootBuilder is not found for a resource ' + main.url);
+				}
+				
 
-						return builder.buildRoot(main, dependencies, ctx, solution);
-					});
-			}			
+				return builder.buildRoot(main, dependencies, ctx, solution);
+			}
 			
-			var promises = Object.keys(pages).map(name => {
-				return buildPage(name, pages[name]);
-			});
-
-			return async_whenAll(promises).then((results) => {
-				return arr_flattern(results);
-			});
+			return async_map(Object.keys(pages), pageName => {
+				return buildPage(pageName, pages[pageName]);
+			}).then(arr_flattern);
 		}
 	};
 
 	// import ./templates/exports.js
 	// import ./ScriptBuilder.js
+	// import ./MaskBuilder.js
 	// import ./HtmlBuilder.js
 	// import ./CssBuilder.js
 
 	var builders = [
 		ScriptBuilder,
+		MaskBuilder,
 		HtmlBuilder,
 		CssBuilder
 	];

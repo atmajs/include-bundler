@@ -17,33 +17,33 @@ var HtmlBuilder;
 			/* css */
 			var css = serializeMany(dependencies, x => x.type === 'css', solution);
 			if (css) {
-				var container = $('head');
-				if (container.length !== 0) {
-					container.append(css);
-				} else {
-					$.append(css);
-				}
+				add($, 'head', css);
 			}
 
 			var html = serializeMany(dependencies, x => x.type !== 'css' && x.type !== 'js', solution);
 			if (html) {
-				$('body').append(html);
+				add($, 'body', html);
 			}
 
 			var js = serializeMany(dependencies, x => x.type === 'js', solution);
 			if (js) {				
-				$('body').append(js);				
+				add($, 'body', js);
 			}
 
 			var output = resource.toTarget(solution);
 			output.content = $.html();
-			logger.log($.html().bold);
-
 			return [...dependencies, output];
 		}
 	};
 
-	
+	function add($, selector, html) {
+		var container = $(selector);
+		if (container.length !== 0) {
+			container.append(html);
+		} else {
+			$.root().append(html);
+		}
+	}
 
 	function removeDependencies ($) {
 		$('script[src]')

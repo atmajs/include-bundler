@@ -6,7 +6,7 @@ var Parser;
 	// import ./HtmlParser.js
 
 	Parser = {
-		getDependencies (resource, opts, solution) {
+		getDependencies (resource, opts = {}, solution) {
 			var dfr = new class_Dfr;
 
 			getDependenciesInternal(resource, opts, solution)

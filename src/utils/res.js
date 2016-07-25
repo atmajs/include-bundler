@@ -1,4 +1,6 @@
 var res_groupByType,
+	res_groupByPage,
+	res_groupByBundle,
 	res_flattern;
 (function(){
 
@@ -22,6 +24,15 @@ var res_groupByType,
 				append(pages, name, resource);
 			}
 			return pages;
+		};
+		res_groupByBundle = function(arr){
+			var bundles = {}, imax = arr.length, i = -1;
+			while (++i < imax) {
+				var resource = arr[i];
+				var name = resource.bundle;
+				append(bundles, name, resource);
+			}
+			return bundles;
 		};
 
 		var rgxExt = /\.([\w]+)($|\?|:)/

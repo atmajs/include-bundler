@@ -7,7 +7,7 @@ var MaskParser;
 				var dfr = new class_Dfr;
 				mask
 					.Module
-					.getDependencies(content, opts.filename, {deep: false})
+					.getDependencies(content, opts.filename || '', {deep: false})
 					.done(list => dfr.resolve(list));
 				return dfr;
 		},

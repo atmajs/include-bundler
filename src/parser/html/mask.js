@@ -17,9 +17,9 @@ class MaskContentReader {
 	read (node, arr) {
 		var mask = _mask || (_mask = require('maskjs'));
 		var content = mask.jmask(node).text();
-		
-		return MaskParser.getDependencies(content).then(list => {
-			var resources = MaskParser.flatternDependencies(list);
+
+		return MaskParser.getDependencies(content, {}).then(list => {
+			var resources = MaskParser.flatternDependencies(list);			
 			arr.push(...resources);
 		});
 	}

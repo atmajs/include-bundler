@@ -1,47 +1,54 @@
 var Files =  {
-	'main.js': `
-		module.exports = {
-			letters: require('./data/icons.js')
-		};
+	'main.mask': `
+		import Letter from './compos/Letter';
+		Letter;
 	`,
-	'data/icons.js': `
-		module.exports = ['a', 'b'];
-	`,
-	'global.js': `
-		var data = require('main.js');
-		function getData () {
-			return data;
+	'compos/Letter.mask': `
+		define Letter {
+			h4 > 'I am an A';
 		}
 	`,
+	'global.mask': `
+		import from './main';
+		i > 'Lorem'
+	`,
 	'index.html': `
-		<!doctype html>
-		
-		<script src='jquery.js' data-bundler='ignore'></script>
-		<script src='global.js'></script>
-	`
+		<!doctype html>		
+		<script type='text/mask' data-run='auto'>
+			import from 'global.mask';
+		</script>
+		`
 };
 
+var Bundler, mask;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+
+		mask = require('maskjs');
+		Bundler = require('../../lib/bundler.js');
+
 	},
-	'should bundle commonjs scripts' () {
-		return Bundler.clearCache().build('main.js', { 
+	'should bundle mask' () {
+		return Bundler.clearCache().build('main.mask', { 
 			type: 'module',
 			module: 'commonjs',
 		}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
+			
+			eq_(main.type, 'mask'); 
+			eq_(main.url, 'build/release/main.mask');
 
-			eq_(main.url, 'build/release/main.js');
+			var load = assert.avoid('Should not load the dependency');
+			mask.cfg('getFile', load);
 
-			io.File.write('test.js', main.content);
-			var module = {};
-			eval(main.content);			
-			deepEq_(module.exports.letters, ['a', 'b']);
+			var  html = mask.render(main.content)
+			has_(html, 'I am an A</h4>')
+			mask.cfg('getFile', null)
 		});
 	},
-	'should get script resources for html' () {
+	'!should get mask resources for html' () {
 		return Bundler
 			.clearCache()
 			.getResources('index.html')
@@ -49,11 +56,12 @@ UTest({
 			.done(arr => {			
 				eq_(arr.length, 4);
 
+				//logger.log(arr);
 				var paths = arr.map(x => x.url);
-				deepEq_(paths, ['data/icons.js', 'main.js', 'global.js', 'index.html']);
+				deepEq_(paths, ['compos/Letter.mask', 'main.mask', 'global.mask', 'index.html']);
 
 				var asModules = arr.map(x => x.asModules);
-				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
+				deepEq_(asModules, [[], [], [], ['root']]);
 			});
 	},
 	'should bundle scripts in html page' () {

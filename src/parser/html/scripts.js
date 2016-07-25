@@ -4,7 +4,7 @@ class ScriptReader {
 		if (tagName == null || tagName.toLowerCase() !== 'script') {
 			return false;
 		}
-		if (node.attr['src'] == null && node.attr['data-bundler-src']) {
+		if (node.attr['src'] == null && node.attr['data-bundler-src'] == null) {
 			return false;
 		}
 		if (node.attr['data-bundler'] === 'ignore') {
