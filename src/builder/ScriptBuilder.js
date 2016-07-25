@@ -1,45 +1,45 @@
 var ScriptBuilder;
 (function(){
 	ScriptBuilder = {
-		build (resources, solution) {
+		buildDependencies (resources, ctx, solution) {		
 			var arr = resources.filter(x => x.type === 'js');
 			var bundleHash = arr.reduce((aggr, x) => {
 				aggr[x.bundle] = 1;
 				return aggr;
 			}, {});
 
-			
-			return Object.keys(bundleHash).map(name => {				
-				return build(name, arr.filter(x => x.bundle === name), solution);
+			return Object.keys(bundleHash).map(name => {
+
+				var _ctx = Object.create(ctx);
+				_ctx.bundle = name;
+				return buildDependencies(arr.filter(x => x.bundle === name), _ctx, solution);
 			});
+		},
+		canBuildRoot (resource) {
+			return resource.type === 'js';
+		},
+		buildRoot (resource, dependencies, ctx, solution) {
+			var template = Templates.resolveForType('js', solution);
+			
+			return template.buildRoot(resource, dependencies, ctx, solution);			
 		}
 	};
 
-	function build(bundleName, resources, solution) {
-		var template = Templates.resolveForType('js', solution);
-		var arr = resources.slice();
-		var main;
+	// ctx: {bundle, page}
+	function buildDependencies(resources, ctx, solution) {
 
-		if (solution.opts.package.type === 'module') {
-			main = arr.pop();
-		}
+		var out = resources.map(res => {
+			var template = Templates.resolveForResource(res, solution);
 
-		var body = arr.map(resource => {
-			return template.wrapModule(resource.url, resource.content);
-		}).join('\n');
+			return template.wrapModule(res, ctx, solution);
+		});
+		
+		var resourceUrl = `${ctx.page}_${ctx.bundle}.js`;
+		var resource = new Resource({type: 'js', url: resourceUrl}, null, solution);
+		var output = resource.toTarget(solution);
 
-		if (main != null) {
-			body += '\n' + main.content;
-		}
-
-		var content = template.wrapBundle(body, resources);
-		if (main == null) {
-			main = arr.pop();
-		}
-
-		var resource = main.toTarget(solution);
-		resource.content = content;
-		return resource;
+		output.content = out.join('\n');		
+		return output;
 	}
 
 

@@ -1,30 +1,69 @@
 (function(){
 
-
 Templates['commonjs'] = class CommonJs extends ITemplate {
-	wrapBundle (str) {
-		return Bundle
-			.replace('%BUNDLE%', () => str)
-			;
+	
+	buildDependencies (resources, ctx, solution) {
+		var body = resources.map(resource => {
+			return wrapModule(resource);
+		}).join('\n');
+
+		var resourceUrl = `${ctx.page}_${ctx.bundle}.js`;
+		var resource = new Resource({type: 'js', url: resourceUrl}, null, solution);
+		var output = resource.toTarget(solution);
+
+		output.content = body;
+		return output;
 	}
 
-	wrapModule (path, str) {
-		return Module
-			.replace('%MODULE_PATH%', () => path)
-			.replace('%MODULE%', () => str)
-			;
+	wrapModule (resource, ctx, solution) {
+		if (ctx.commonjs == null) {
+			ctx.commonjs = {
+				addHeading: true,
+				hasHeading: false
+			}
+		};
+
+		var body = '';
+
+		if (ctx.commonjs.hasHeading === false && ctx.commonjs.addHeading === true) {
+			ctx.commonjs.hasHeading = true;
+			body = Heading;
+		}
+
+
+		return body + wrapModule(resource);
+	}
+
+	buildRoot (resource, dependencies, ctx, solution) {
+		
+		var body = dependencies.map(x => x.content).join('\n');
+		body += '\n' + resource.content;
+
+		var output = resource.toTarget(solution);
+		output.content = wrapRootModule(body);
+		return output;
 	}
 };
 
-let Utils = [
-	// import:string ./utils/path.js
-][0];
+function wrapRootModule (str, resources) {
+	return RootModule.replace('%BUNDLE%', () => str);
+}
 
-let Bundle = `
-(function () {
-	var __register, __require;
+function wrapModule (resource) {
+	var {url, content} = resource;
+	return Module
+		.replace('%MODULE_PATH%', () => url)
+		.replace('%MODULE%', () => content)
+		;
+}
+
+let Heading = `
+	var __register, __require, require;
 
 	(function(){
+
+		// import ./utils/path.js
+
 		var __global = typeof global !== 'undefined' && global ? global : window;
 		var __nativeRequire = __global.require;
 		var __originalRequire = function (path_) {
@@ -32,45 +71,57 @@ let Bundle = `
 			var path = path_resolveUrl(path_, location);
 
 			if (modules[path]) {
-				return modules[path].exports;
+				return modules[path].runOnce();
 			}
 
 			return __nativeRequire(path_);
 		};
 
 		__register = function (path, factory) {
-			var __filename = path_resolveUrl(path),
-				__dirname = path_getDir(__filename),
-				module = new Module(__filename),
-				require = __originalRequire.bind({ location: __dirname }),
-				exports = module.exports;
-
-			factory(
-				require, 
-				module, 
-				exports, 
-				__filename, 
-				__dirname);
+			var filename = path_resolveUrl(path);			
+			modules[filename] = new Module(filename, factory);			
 		};
 
-		__require = __originalRequire.bind({ location: 'file://' + __dirname });
+		__require =__originalRequire.bind({ location: path_resolveCurrent() });
 
 		var modules = {};
-		var Module = function(path){
-			modules[path] = this;
-			this.exports = {};
+		var Module = function(filename, factory){	
+			this.filename = filename;
+			this.dirname = path_getDir(filename);
+			this.factory = factory;
+			this.exports = null;
 		};
+		Module.prototype.runOnce = function(){
+			if (this.exports != null) {
+				return this.exports;
+			}
+			var require = __originalRequire.bind({ 
+				location: this.dirname 
+			});
+			this.exports = {};
+			this.factory(
+				require, 
+				this, 
+				this.exports, 
+				this.filename, 
+				this.dirname
+			);
+			return this.exports;
+		};
+		
+		require = __require;
 
-		// import ./utils/path.js
-
+		if (__nativeRequire == null) {
+			global.require = __require;
+		}
 	}());
+`
 
+let RootModule = `
+(function(){
+	
+	%BUNDLE%
 
-	(function(require){
-
-		%BUNDLE%
-
-	}(__require));
 }());
 `;
 

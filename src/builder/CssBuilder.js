@@ -1,8 +1,16 @@
 var CssBuilder;
 (function(){
 	CssBuilder = {
-		build (resources, solution) {
+		buildDependencies (resources, ctx, solution) {
 			
+		},
+
+		canBuildRoot (resource) {
+			return resource.type === 'css';
+		},
+
+		buildRoot(resource, dependencies, ctx, solution) {
+
 		}
 	}
 }());

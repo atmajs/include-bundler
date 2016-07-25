@@ -9,6 +9,14 @@ var Solution = null;
 			this.path = path;
 			this.opts = new SolutionOpts(this, opts || {});
 			this.assetsManager = new AssetsManager(this);
+		},
+
+		getOptionsForResource (resource) {
+			var files = this.opts.files;
+			if (files == null) {
+				return null;
+			}
+			// @TODO support settings for a resource
 		}
 	});
 

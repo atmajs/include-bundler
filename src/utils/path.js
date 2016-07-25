@@ -72,9 +72,7 @@ var path_getDir,
 			return url;
 
 		if (url.charCodeAt(0) === 47 /*/*/) {
-			if (__cfg.base) {
-				return path_combine(__cfg.base, url);
-			}
+			
 		}
 		return url;
 	};
@@ -137,7 +135,7 @@ var path_getDir,
 			path = path_normalize(path);
 			if (path_isRelative(path) === false) {
 				return path;
-			}
+			}			
 			if (path[0] === '/') {
 				if (rootLocation == null) {
 					rootLocation = path_resolveCurrent();

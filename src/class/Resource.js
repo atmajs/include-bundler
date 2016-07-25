@@ -59,17 +59,22 @@ var Resource = class_create({
 		// Application paths
 		this.url = path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
+
 	},
 	toTarget (solution) {
 		var folder = solution.opts.getOutputFolder(this.type);
 		var url = path_combine(folder, this.url);
 		var filename = path_combine(solution.opts.outputBase, url);
 		var resource = new Resource({ type: this.type }, this, solution);
-		resource.filename = filename;
-		resource.directory = path_getDir(filename);
+
+		resource.type = this.type;
 		resource.url = url;
 		resource.location = path_getDir(url);
+		resource.filename = filename;
+		resource.directory = path_getDir(filename);
 
+		resource.content = this.content;
+		
 		return resource;
 	},
 	toJSON (deep) {
@@ -80,7 +85,7 @@ var Resource = class_create({
 			directory: this.directory,
 			url: this.url,
 			location: this.location,
-			asModule: this.asModule,
+			asModules: this.asModules,
 			resources: deep === false ? void 0 : this.resources.map(x => x.toJSON())
 		};
 	},

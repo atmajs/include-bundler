@@ -7,10 +7,17 @@ var Files =  {
 	'data/icons.js': `
 		module.exports = ['a', 'b'];
 	`,
+	'global.js': `
+		var data = require('main.js');
+		function getData () {
+			return data;
+		}
+	`,
 	'index.html': `
 		<!doctype html>
-		<script src='jquery.js' data-bundler='ignore' />
-		<script src='main.js' />
+		
+		<script src='jquery.js' data-bundler='ignore'></script>
+		<script src='global.js'></script>
 	`
 };
 
@@ -18,7 +25,7 @@ UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
 	},
-	'!should bundle commonjs scripts' () {
+	'should bundle commonjs scripts' () {
 		return Bundler.clearCache().build('main.js', { 
 			type: 'module',
 			module: 'commonjs',
@@ -28,9 +35,9 @@ UTest({
 
 			eq_(main.url, 'build/release/main.js');
 
-
+			io.File.write('test.js', main.content);
 			var module = {};
-			eval(main.content);
+			eval(main.content);			
 			deepEq_(module.exports.letters, ['a', 'b']);
 		});
 	},
@@ -40,25 +47,35 @@ UTest({
 			.getResources('index.html')
 			.then(arr => arr.map(x => x.toJSON(false)))
 			.done(arr => {			
-				eq_(arr.length, 3);
+				eq_(arr.length, 4);
 
 				var paths = arr.map(x => x.url);
-				deepEq_(paths, ['data/icons.js', 'main.js', 'index.html']);
+				deepEq_(paths, ['data/icons.js', 'main.js', 'global.js', 'index.html']);
 
-				var asModule = arr.map(x => x.asModule);
-				deepEq_(asModule, [['commonjs'], ['global'], ['root']]);
+				var asModules = arr.map(x => x.asModules);
+				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
 			});
 	},
-	'should bundle scripts in html page' () {
+	'!should bundle scripts in html page' () {
 		return Bundler.clearCache().build('index.html', {
 			type: 'module',
 			module: 'commonjs',
 		}).done(resources => {
-			eq_(resources.length, 1);
-			var main = resources[0];
+			
+			eq_(resources.length, 2);
+			eq_(resources[0].type, 'js');
+			var script = resources[0];
+
+			eval(script.content);
+			eq_(typeof getData, 'function');
+			deepEq_(getData(), {
+				letters: ['a', 'b']
+			});
 
 
-			logger.log(resources.length);
+			eq_(resources[1].type, 'html');
+			logger.log(resources[1].content);
+			
 		});
 	}
 })

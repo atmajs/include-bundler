@@ -1,13 +1,13 @@
 (function(){
 
-	Templates['mask'] = class CommonJs extends ITemplate {
+	Templates['html'] = class CommonJs extends ITemplate {
 		wrapBundle (str) {
 			return str
 		}
 
-		wrapModule (resource, ctx, solution) {
+		wrapModule (path, str) {
 			return Module
-				.replace('%MODULE_PATH%', resource.url)
+				.replace('%MODULE_PATH%', path)
 				.replace('%MODULE%', str)
 				;
 		}

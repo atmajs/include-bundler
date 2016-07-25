@@ -14,6 +14,16 @@ var res_groupByType,
 			return pckg;
 		};
 
+		res_groupByPage = function(arr){
+			var pages = {}, imax = arr.length, i = -1;
+			while (++i < imax) {
+				var resource = arr[i];
+				var name = getPage(resource);
+				append(pages, name, resource);
+			}
+			return pages;
+		};
+
 		var rgxExt = /\.([\w]+)($|\?|:)/
 		function getExt(path) {
 			var match = rgxExt.exec(path);
@@ -25,12 +35,25 @@ var res_groupByType,
 		function getType (ext) {
 			return _types[ext] || 'load';
 		}
-		function append(pckg, type, path) {
-			var arr = pckg[type];
-			if (arr == null) {
-				arr = pckg[type] = [];
+		function getPage(resource) {
+			var pages = resource.inPages;
+			if (pages == null || pages.length === 0)
+				return 'main';
+
+			if (pages.length === 1) {
+				return pages[0];
 			}
-			arr.push(path);
+			if (pages.indexOf('main') !== -1) {
+				return 'main';
+			}
+			return pages.sort().join('-');
+		}
+		function append(pckg, name, x) {
+			var arr = pckg[name];
+			if (arr == null) {
+				arr = pckg[name] = [];
+			}
+			arr.push(x);
 		}
 		var _types = {
 			'js': 'js',

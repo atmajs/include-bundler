@@ -7,4 +7,8 @@ class ITemplate {
 	wrapModule(path, str) {
 		
 	}
+
+	build (resources, ctx, solution) {
+
+	}
 }
