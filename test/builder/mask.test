@@ -30,10 +30,7 @@ UTest({
 
 	},
 	'should bundle mask' () {
-		return Bundler.clearCache().build('main.mask', { 
-			type: 'module',
-			module: 'commonjs',
-		}).done(resources => {
+		return Bundler.clearCache().build('main.mask', {}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
 			
@@ -48,7 +45,7 @@ UTest({
 			mask.cfg('getFile', null)
 		});
 	},
-	'!should get mask resources for html' () {
+	'should get mask resources for html' () {
 		return Bundler
 			.clearCache()
 			.getResources('index.html')
@@ -56,34 +53,70 @@ UTest({
 			.done(arr => {			
 				eq_(arr.length, 4);
 
-				//logger.log(arr);
 				var paths = arr.map(x => x.url);
 				deepEq_(paths, ['compos/Letter.mask', 'main.mask', 'global.mask', 'index.html']);
 
 				var asModules = arr.map(x => x.asModules);
-				deepEq_(asModules, [[], [], [], ['root']]);
+				deepEq_(asModules, [['mask'], ['mask'], ['mask'], ['root']]);
 			});
 	},
-	'should bundle scripts in html page' () {
-		return Bundler.clearCache().build('index.html', {
-			type: 'module',
-			module: 'commonjs',
-		}).done(resources => {
+	'should bundle mask in html page' () {
+		return Bundler.clearCache().build('index.html').done(resources => {
 			
-			eq_(resources.length, 2);
-			eq_(resources[0].type, 'js');
-			var script = resources[0];
+			eq_(resources.length, 1);
+			eq_(resources[0].type, 'html');
+			var main = resources[0];
+			eq_(main.url, 'build/release/index.html');
 
-			eval(script.content);
-			eq_(typeof getData, 'function');
-			deepEq_(getData(), {
-				letters: ['a', 'b']
-			});
+			['compos/Letter.mask', 'main.mask', 'global.mask']
+				.forEach(path => has_(main.content, `module path="${path}"`));
 
-
-			eq_(resources[1].type, 'html');
-			has_(resources[1].content, 'src="build/release/main_index.js"');
-			
 		});
+	},
+	'!should test mask sync module loading' (done) {
+
+		var Files = {
+			'MyComponents.mask': `
+				module path='A.mask' {
+					h1 > 'A'
+				}
+				module path='B.mask' {
+					h1 > 'B'
+				}
+				module path='C.mask' {
+					h1 > 'C'
+				}
+			`,
+			'MyNumber.mask': `
+				import * as Template from './B';
+				Template;
+			`
+		};
+		var _queue = [];
+		mask.cfg('getFile', (path) => {
+			var dfr = new mask.class.Deferred();
+			var name = path.substring(path.lastIndexOf('/') + 1);
+			var str = Files[name];			
+			is_(str, 'String');
+			_queue.push(name);
+			if (name === 'MyComponents.mask') {
+				setTimeout(() => dfr.resolve(str), 200);
+				return dfr;
+			}
+			return dfr.resolve(str);
+		});
+
+		mask
+		.renderAsync(`
+			import sync from './MyComponents';
+			import Number from './MyNumber';
+		`)
+		.done(x => {
+			mask.cfg('getFile', null);
+			deepEq_(_queue, ['MyComponents.mask', 'MyNumber.mask']);
+			done();
+		})
+		
+
 	}
 })

@@ -12,17 +12,27 @@ var HtmlBuilder;
 		buildRoot(resource, dependencies, ctx, solution) {
 
 			var $ = createDoc(resource.content);
-			removeDependencies($);
 
+			removeDependencies($);
 			/* css */
 			var css = serializeMany(dependencies, x => x.type === 'css', solution);
 			if (css) {
 				add($, 'head', css);
 			}
 
-			var html = serializeMany(dependencies, x => x.type !== 'css' && x.type !== 'js', solution);
+			var html = serializeMany(dependencies, x => x.type !== 'css' && x.type !== 'js' && x.type !== 'mask', solution);
 			if (html) {
 				add($, 'body', html);
+			}
+
+			var mask = serializeMany(dependencies, x => x.type === 'mask', solution);
+			if (mask) {				
+				var anchor = $.root().find('script[type="text/mask"]');
+				if (anchor.length !== 0) {
+					anchor.before(mask);
+				} else {
+					$.root().append(mask);
+				}
 			}
 
 			var js = serializeMany(dependencies, x => x.type === 'js', solution);
@@ -45,7 +55,7 @@ var HtmlBuilder;
 		}
 	}
 
-	function removeDependencies ($) {
+	function removeDependencies ($) {		
 		$('script[src]')
 			.filter(function(i, x){
 				return x.attribs['data-bundler'] !== 'ignore';
@@ -64,7 +74,7 @@ var HtmlBuilder;
 	function serializeMany (dependencies, filter, solution) {
 		return dependencies
 			.filter(filter)
-			.map(x => serializeSingle(x, solution))
+			.map(x => serializeSingle(x, dependencies, solution))
 			.join('\n');
 	}
 
@@ -78,16 +88,20 @@ var HtmlBuilder;
 			return serializer(resource, solution);
 		};
 		var Serializers = {
-			js (resource, solution) {
+			js (resource, resources, solution) {
 				var href = getUrl(resource, solution);
 				return `<script src='${href}' type='text/javascript'></script>`;
 			},
-			css (resource, solution) {
+			css (resource, resources, solution) {
 				var href = getUrl(resource, solution);
 				return `<link href='${href}' rel='stylesheet' />`;
 			},
-			html (resource, solution) {
-				return resource.content;
+			html (resource, resources, solution) {
+				return getEmbeddedContent(resource, resources);
+			},
+			mask (resource, resources, solution) {
+				var template = getEmbeddedContent(resource, resources);
+				return `<script type='text/mask' data-run='auto'>\n${template}\n</script>`
 			}
 		};
 
@@ -98,6 +112,14 @@ var HtmlBuilder;
 				return path;
 			}
 			return path + '?v=' + v;
+		}
+		function getEmbeddedContent(resource, resources, solution) {
+			var i = resources.indexOf(resource);
+			if (i === -1)
+				throw new Error('Embedded resource is not found in many: ' + resource.url);
+
+			resources.splice(i, 1);
+			return resource.content;
 		}
 	}()); 
 
@@ -112,4 +134,5 @@ var HtmlBuilder;
 		};
 		var _cheerio;
 	}()); 
+
 }());
