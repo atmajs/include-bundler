@@ -1,40 +1,27 @@
 var ScriptBuilder;
 (function(){
 	ScriptBuilder = {
-		buildDependencies (resources, ctx, solution) {		
-			var arr = resources.filter(x => x.type === 'js');
-			if (arr.length === 0) {
-				return null;
-			}
-			return buildDependencies(arr, ctx, solution);
+		buildDependencies (outputItem, solution) {
+			return buildDependencies(outputItem.resource, outputItem.resources, solution);
 		},
-		canBuildRoot (resource) {
-			return resource.type === 'js';
-		},
-		buildRoot (resource, dependencies, ctx, solution) {
+		rewriteRoot (root, dependencies, solution) {
 			var template = Templates.resolveForType('js', solution);
 			
-			return template.buildRoot(resource, dependencies, ctx, solution);			
+			return template.rewriteRoot(root, dependencies, solution);			
 		}
 	};
 
 	// ctx: {bundle, page}
-	function buildDependencies(resources, ctx, solution) {
+	function buildDependencies(resource, resources, solution) {
 
 		var out = resources.map(res => {
 			var template = Templates.resolveForResource(res, solution);
 
-			return template.wrapModule(res, ctx, solution);
+			return template.wrapModule(res, solution);
 		});
 		
-		var resourceUrl = `${ctx.current.page}_${ctx.current.bundle}.js`;
-		var resource = new Resource({type: 'js', url: resourceUrl}, null, solution);
-		var output = resource.toTarget(solution);
-
-		output.content = out.join('\n');		
-		return output;
+		resource.content = out.join('\n');
+		return resource;		
 	}
 
-
-	var MAIN_BUNDLE = 'index';
 }());

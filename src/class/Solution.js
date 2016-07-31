@@ -2,6 +2,7 @@ var solution = null;
 var Solution = null;
 (function(){
 	// import ./SolutionOpts.js
+	// import ./OutputResources.js
 
 	Solution = class_create({
 		constructor: function(path, opts){
@@ -9,6 +10,7 @@ var Solution = null;
 			this.path = path;
 			this.opts = new SolutionOpts(this, opts || {});
 			this.assetsManager = new AssetsManager(this);
+			this.outputResources = new OutputResources(this);
 		},
 
 		getOptionsForResource (resource) {

@@ -1,8 +1,9 @@
 UTest({
 	'should parse single commonjs' () {
-		return parse(`require("foo")`, {
-			commonjs: [ {type: 'js', url: 'foo'} ]
-		});
+		return parse(`require("foo")`,
+			[ {type: 'js', url: 'foo', module: 'commonjs'} ]
+		);
+
 	},
 	'should parse with multiple require' () {
 		return parse(`
@@ -11,40 +12,32 @@ UTest({
 				var foo = require('./folder/qux.js');
 				var foo = require('../baz');
 			}());
-		`, {
-			commonjs: [
-				{type: 'js', url: './foo'},
-				{type: 'js', url: './folder/qux.js'},
-				{type: 'js', url: '../baz'},
-			]
-		});
+		`, [
+				{type: 'js', url: './foo', module: 'commonjs'},
+				{type: 'js', url: './folder/qux.js', module: 'commonjs'},
+				{type: 'js', url: '../baz', module: 'commonjs'},
+		]);
 	},
 	'should parse AMD and CommonJS at same time' () {
 		return parse(`
 			var fs = require('fs');
 			require(['./some'], function(){});
-		`, {
-			amd: [
-				{type: 'js', url: './some'}
-			],
-			commonjs: [
-				{type: 'js', url: 'fs'},
-			]
-		});
+		`, [
+				{type: 'js', url: 'fs', module: 'commonjs'},
+				{type: 'js', url: './some', module: 'amd'}
+		]);
 	},
 });
 
 function parse (code, expect) {
 	var dfr = new Class.Deferred();
 	Bundler.Parser.getDependencies(code).then(deps => {
+		eq_(deps.length, expect.length)
 
-		for(var key in expect) {
-			var resources = deps[key].resources;
-			var arr = expect[key];
+		deps.forEach((x, index) => {
+			has_(x, expect[index]);
+		})
 
-			eq_(resources.length, arr.length);
-			has_(resources, arr);
-		}
 		dfr.resolve();
 	});
 	return dfr;

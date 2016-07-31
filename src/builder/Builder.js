@@ -3,54 +3,52 @@ var Builder;
 	Builder = {
 		build (resources, solution) {
 
-			var pages = res_groupByPage(resources);
-			var ctx = {
-				current: {
-					page: '',
-					bundle: '',
-				}
-			};
+			return _middlewares
+				.run('buildResources', resources, solution)
+				.then(arr => {							
+					resources = arr || resources;
 
-			function buildPage(name, resources) {
+					solution.outputResources.prepair(resources);
 
-				var arr = resources.slice();
-				var main = arr.pop();
-
-				ctx.current = Object.create(ctx.current);
-				ctx.current.page = name;
-
-				var bundles = res_groupByBundle(arr);				
-				return async_map(Object.keys(bundles), bundleName => {
-					ctx.current = Object.create(ctx.current);
-					ctx.current.bundle = bundleName;
-
-					return buildBundle(ctx, bundles[bundleName]);
-				}).then(resources => {
-					return buildPageRoot(main, resources)
+					return _middlewares
+						.run('rewriteDependencies', resources, solution)
+						.then(buildOutputItems)
+						.then(rewriteRoot)
+						.then(() => solution.outputResources.getAll());
 				});
+
+			function buildOutputItems () {
+				var items = solution.outputResources.items;
+				return async_map(items, buildBundle);
 			}
-
-			function buildBundle (ctx, resources) {
-
-				return async_map(builders, builder => builder.buildDependencies(resources, ctx, solution))
-					// flattern
-					.then(arr_flattern);
+			function buildBundle (outputItem) {
+				return _middlewares
+					.run('buildBundle', outputItem)
+					.then(buildBundleInternal)
 			}
-
-			function buildPageRoot (main, resources) {
-				var dependencies = arr_flattern(resources);
-				var builder = builders.find(x => x.canBuildRoot(main));
-				if (builder == null) {
-					throw new Error('RootBuilder is not found for a resource ' + main.url);
+			function buildBundleInternal (outputItem) {
+				if (outputItem.resource.content) {
+					return;
 				}
-				
+				var builder = Builders[outputItem.type];
+				if (builder == null)
+					throw Error(`Unknown builder for type ${outputItem.type}`)
 
-				return builder.buildRoot(main, dependencies, ctx, solution);
+				return builder.buildDependencies(outputItem, solution);
 			}
-			
-			return async_map(Object.keys(pages), pageName => {
-				return buildPage(pageName, pages[pageName]);
-			}).then(arr_flattern);
+			function rewriteRoot () {
+				var main = solution.outputResources.root;
+				var dependencies = solution.outputResources.getForPage(solution.opts.mainPage);
+				var builder = Builders[main.type];
+				if (builder == null) {
+					builder = Builders[path_getExtension(main.url)];
+				}
+				if (builder == null || builder.rewriteRoot == null) {
+					throw new Error(`RootBuilder is not found for a resource ${main.url} and type ${main.type}`);
+				}
+							
+				return builder.rewriteRoot(main, dependencies, solution);
+			}					
 		}
 	};
 
@@ -60,11 +58,11 @@ var Builder;
 	// import ./HtmlBuilder.js
 	// import ./CssBuilder.js
 
-	var builders = [
-		ScriptBuilder,
-		MaskBuilder,
-		HtmlBuilder,
-		CssBuilder
-	];
+	var Builders = {
+		js: ScriptBuilder,
+		mask: MaskBuilder,
+		css: CssBuilder,
+		html: HtmlBuilder
+	};
 
 }());

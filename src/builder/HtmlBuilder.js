@@ -1,15 +1,11 @@
 var HtmlBuilder;
 (function(){
 	HtmlBuilder = {
-		buildDependencies (resources, ctx, solution) {
+		buildDependencies (resources, solution) {
 			
 		},
 
-		canBuildRoot (resource) {
-			return resource.type === 'html';
-		},
-
-		buildRoot(resource, dependencies, ctx, solution) {
+		rewriteRoot (resource, dependencies, solution) {
 
 			var $ = createDoc(resource.content);
 
@@ -40,9 +36,7 @@ var HtmlBuilder;
 				add($, 'body', js);
 			}
 
-			var output = resource.toTarget(solution);
-			output.content = $.html();
-			return [...dependencies, output];
+			resource.content = $.html();			
 		}
 	};
 
@@ -74,34 +68,39 @@ var HtmlBuilder;
 	function serializeMany (dependencies, filter, solution) {
 		return dependencies
 			.filter(filter)
-			.map(x => serializeSingle(x, dependencies, solution))
+			.map(x => serializeSingle(x, solution))
 			.join('\n');
 	}
 
 	var serializeSingle;
 	(function(){
 		serializeSingle = function(resource, solution){
+
 			var serializer = Serializers[resource.type];
+			if (serializer == null) {
+				serializer = Serializers[path_getExtension(resource.url)];
+			}
 			if (serializer == null)
 				throw new Error('Unknown html serializer for type ' + resource.type);
 
 			return serializer(resource, solution);
 		};
 		var Serializers = {
-			js (resource, resources, solution) {
+			js (resource, solution) {
 				var href = getUrl(resource, solution);
 				return `<script src='${href}' type='text/javascript'></script>`;
 			},
-			css (resource, resources, solution) {
+			css (resource,solution) {
 				var href = getUrl(resource, solution);
 				return `<link href='${href}' rel='stylesheet' />`;
 			},
-			html (resource, resources, solution) {
-				return getEmbeddedContent(resource, resources);
+			html (resource, solution) {
+				resource.embed = true;
+				return resource.content;
 			},
-			mask (resource, resources, solution) {
-				var template = getEmbeddedContent(resource, resources);
-				return `<script type='text/mask' data-run='auto'>\n${template}\n</script>`
+			mask (resource, solution) {
+				resource.embed = true;
+				return `<script type='text/mask' data-run='auto'>\n${resource.content}\n</script>`
 			}
 		};
 
@@ -112,15 +111,7 @@ var HtmlBuilder;
 				return path;
 			}
 			return path + '?v=' + v;
-		}
-		function getEmbeddedContent(resource, resources, solution) {
-			var i = resources.indexOf(resource);
-			if (i === -1)
-				throw new Error('Embedded resource is not found in many: ' + resource.url);
-
-			resources.splice(i, 1);
-			return resource.content;
-		}
+		}		
 	}()); 
 
 

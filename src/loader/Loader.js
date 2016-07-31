@@ -62,9 +62,8 @@ var Loader;
 				}).fail(error => this.reject(error));
 			},
 			processChildren () {
-				var opts = this.opts;
 				Parser
-					.getDependencies(this.resource, opts, solution)
+					.getDependencies(this.resource, this.solution)
 					.then(deps => this.loadChildren(deps), error => this.reject(error));
 			},
 			loadChildren: function (deps) {

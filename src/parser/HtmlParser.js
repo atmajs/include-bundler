@@ -3,41 +3,41 @@ var HtmlParser;
 	var _mask;
 
 	HtmlParser = {
-		getDependencies (content, opts) {
-				var mask = _mask || (_mask = require('maskjs'));
-				var dfr = new class_Dfr;
-				
-				var ast = mask.parseHtml(content);
-				var queue = [];
-				var resources = [];
-				mask.TreeWalker.walk(ast, node => {
-					var reader = ResourceReaders.find(reader => reader.canHandle(node));
-					if (reader) {
-
-						queue.push({
-							node: node,
-							reader: reader
-						});
-					}
-				});
-
-				function process () {					
-					if (queue.length === 0) {
-						dfr.resolve(resources);
-						return;
-					}
-					var x = queue.shift();
-					var promise = x.reader.read(x.node, resources);
-					if (promise == null) {
-						process();
-						return;
-					}
-					promise.then(process, process);
+		getDependencies (resource, opts) {
+			var content = resource.content;
+			var mask = _mask || (_mask = require('maskjs'));
+			var dfr = new class_Dfr;
+			
+			var ast = mask.parseHtml(content);
+			var queue = [];
+			var resources = [];
+			mask.TreeWalker.walk(ast, node => {
+				var reader = ResourceReaders.find(reader => reader.canHandle(node));
+				if (reader) {
+					queue.push({
+						node: node,
+						reader: reader
+					});
 				}
-				
-				process();
+			});
 
-				return dfr;
+			function process () {					
+				if (queue.length === 0) {
+					dfr.resolve(resources);
+					return;
+				}
+				var x = queue.shift();
+				var promise = x.reader.read(x.node, resources);
+				if (promise == null) {
+					process();
+					return;
+				}
+				promise.then(process, process);
+			}
+			
+			process();
+
+			return dfr;
 		}		
 	};
 

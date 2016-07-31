@@ -7,19 +7,19 @@ var ScriptParser;
 	// import ./script/IncludeReducer.js
 
 	ScriptParser = {
-		getDependencies (content, opts) {
-			opts = opts || {
-				filename: ''
+		getDependencies (resource, solution) {
+			var opts = {
+				filename: resource.filename
 			};
-			var ast = AstUtil.parse(content, opts);
+			var ast = AstUtil.parse(resource.content, opts);
 			var info = {
 				commonjs: null,
 				include: null,
 				amd: null,
-			};
-			var a = IncludeParser.parse(ast).then(includeInfo => info.include = includeInfo);
-			var b = AmdParser.parse(ast).then(amdInfo => info.amd = amdInfo);
-			var c = CommonJsParser.parse(ast).then(commonJsInfo => info.commonjs = commonJsInfo);
+			};			
+			var a = IncludeParser.parse(ast, solution).then(includeInfo => info.include = includeInfo);
+			var b = AmdParser.parse(ast, solution).then(amdInfo => info.amd = amdInfo);
+			var c = CommonJsParser.parse(ast, solution).then(commonJsInfo => info.commonjs = commonJsInfo);
 			return async_whenAll(a, b, c).then(x => info);
 		},
 		flatternDependencyInfos (info) {

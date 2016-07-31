@@ -2,14 +2,13 @@ var MaskParser;
 (function(){
 	var _mask;
 	MaskParser = {
-		getDependencies (content, opts) {
-				var mask = _mask || (_mask = require('maskjs'));
-				var dfr = new class_Dfr;
-				mask
-					.Module
-					.getDependencies(content, opts.filename || '', {deep: false})
-					.done(list => dfr.resolve(list));
-				return dfr;
+		getDependencies (resource, solution) {
+			var mask = _mask || (_mask = require('maskjs'));
+			var content = resource.content;
+			return mask
+				.Module
+				.getDependencies(content, '', {deep: false})
+				.then(list => list);
 		},
 		flatternDependencies (depsInfo) {
 			var out = [];

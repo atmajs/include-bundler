@@ -45,11 +45,7 @@ var Templates = {};
 					Ctor = Templates[solution.opts.package.module];
 					break;
 				}
-				var opts = solution.getOptionsForResource(resource);
-				if (opts != null && opts.module) {
-					Ctor = Templates[opts.module];
-					break;
-				}
+				
 				if (modules.length === 1) {
 					Ctor = Templates[modules[0]];
 					break;	

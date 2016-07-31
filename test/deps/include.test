@@ -1,25 +1,21 @@
 UTest({
 	'should parse single include' () {
-		return parse(`include.js("foo")`, {
-			include: [ {type: 'js', url: 'foo'} ]
-		});
+		return parse(`include.js("foo")`, [ 
+			{type: 'js', url: 'foo', module: 'include'} 
+		]);
 	},
 	'should parse multiple includes' () {
-		return parse(`include.js("foo", "bar.js")`, {
-			include: [
-				{type: 'js', url: 'foo'},
-				{type: 'js', url: 'bar.js'}
-			]
-		});
+		return parse(`include.js("foo", "bar.js")`, [
+			{type: 'js', url: 'foo', module: 'include'},
+			{type: 'js', url: 'bar.js', module: 'include'}
+		]);
 	},
 	'should parse single include array' () {
-		return parse(`include.js(["foo", "bar.js", "qux.js"])`, {
-			include: [
-				{type: 'js', url: 'foo'},
-				{type: 'js', url: 'bar.js'},
-				{type: 'js', url: 'qux.js'}
-			]
-		});
+		return parse(`include.js(["foo", "bar.js", "qux.js"])`, [
+			{type: 'js', url: 'foo', module: 'include'},
+			{type: 'js', url: 'bar.js', module: 'include'},
+			{type: 'js', url: 'qux.js', module: 'include'}
+		]);
 	},
 	'should parse single script, css and mask' () {
 		var code = `
@@ -29,27 +25,23 @@ UTest({
 				.css('main.less')
 				.done()
 		`;
-		return parse(code, {
-			include: [
-				{type: 'js', url: 'baz.js'},
-				{type: 'mask', url: 'my.mask'},
-				{type: 'css', url: 'main.less'}
-			]
-		});
+		return parse(code, [
+			{type: 'js', url: 'baz.js', module: 'include'},
+			{type: 'mask', url: 'my.mask', module: 'include'},
+			{type: 'css', url: 'main.less', module: 'include'}
+		]);
 	}
 });
 
 function parse (code, expect) {
 	var dfr = new Class.Deferred();
 	Bundler.Parser.getDependencies(code).then(deps => {
+		eq_(deps.length, expect.length)
 
-		for(var key in expect) {
-			var resources = deps[key].resources;
-			var arr = expect[key];
+		deps.forEach((x, index) => {
+			has_(x, expect[index]);
+		})
 
-			eq_(resources.length, arr.length);
-			has_(resources, arr);
-		}
 		dfr.resolve();
 	});
 	return dfr;

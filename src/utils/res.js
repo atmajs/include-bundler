@@ -1,26 +1,29 @@
 var res_groupByType,
 	res_groupByPage,
 	res_groupByBundle,
+	res_groupByPageAndBundles,
+	res_groupResourcesByType,
+	res_getPage,
 	res_flattern;
 (function(){
 
 	(function(){
-		res_groupByType = function(arr){
+		res_groupByType = function(arr, opts){
 			var pckg = {}, imax = arr.length, i = -1;
 			while (++i < imax) {
 				var path = arr[i];
-				var ext = getExt(path);
-				var type = getType(ext);
+				var ext = path_getExtension(path);
+				var type = opts.getTypeForExt(ext);
 				append(pckg, type, path);
 			}
 			return pckg;
 		};
 
-		res_groupByPage = function(arr){
+		res_groupByPage = function(arr, opts){
 			var pages = {}, imax = arr.length, i = -1;
 			while (++i < imax) {
 				var resource = arr[i];
-				var name = getPage(resource);
+				var name = res_getPage(resource, opts);
 				append(pages, name, resource);
 			}
 			return pages;
@@ -34,31 +37,37 @@ var res_groupByType,
 			}
 			return bundles;
 		};
-
-		var rgxExt = /\.([\w]+)($|\?|:)/
-		function getExt(path) {
-			var match = rgxExt.exec(path);
-			if (match == null) {
-				return 'js';
+		res_groupByPageAndBundles = function (arr, opts) {
+			var pages = res_groupByPage(arr, opts);
+			for(var key in pages) {
+				pages[key] = res_groupByBundle(pages[key], opts);
 			}
-			return match[1];
-		}
-		function getType (ext) {
-			return _types[ext] || 'load';
-		}
-		function getPage(resource) {
+			return pages;
+		};
+		res_groupResourcesByType = function (arr) {
+			var out = {}, imax = arr.length, i = -1;
+			while (++i < imax) {
+				var resource = arr[i];
+				var type = resource.type;
+				append(out, type, resource);
+			}
+			return out;
+		};
+		res_getPage = function(resource, opts) {
 			var pages = resource.inPages;
 			if (pages == null || pages.length === 0)
-				return 'main';
+				return opts.mainPage;
 
 			if (pages.length === 1) {
 				return pages[0];
 			}
-			if (pages.indexOf('main') !== -1) {
-				return 'main';
+			if (pages.indexOf(opts.mainPage) !== -1) {
+				return opts.mainPage;
 			}
 			return pages.sort().join('-');
-		}
+		};
+
+		
 		function append(pckg, name, x) {
 			var arr = pckg[name];
 			if (arr == null) {
@@ -66,16 +75,6 @@ var res_groupByType,
 			}
 			arr.push(x);
 		}
-		var _types = {
-			'js': 'js',
-			'es6': 'js',
-			'css': 'css',
-			'less': 'css',
-			'scss': 'css',
-			'json': 'ajax',
-			'mask': 'mask'
-		};
-
 	}());
 
 	(function(){
@@ -110,7 +109,7 @@ var res_groupByType,
 				.filter(name => resA.asModules.indexOf(name) === -1)
 				.forEach(name => resA.asModules.push(name));
 		}
-		function takeModuleDescriptions (resA, resB) {
+		function takePageDefinitions (resA, resB) {
 			if (resB.inPages == null || resB.inPages.length === 0) {
 				return;
 			}

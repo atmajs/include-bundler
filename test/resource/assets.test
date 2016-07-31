@@ -10,34 +10,46 @@ var Files =  {
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+		Bundler.clearCache();
+	},
+	$teardown () {
+		Bundler.clearCache();
 	},
 	'should get resource tree from files for same bases' () {
-		return Bundler.clearCache().getResources('main.js').done(resources => {
+		var bundler = new Bundler('main.js');
+
+		return bundler.getResources().done((resources) => {
+			var solution = bundler.solution;			
 			var urls = resources.map(x => x.url);
+
 			deepEq_(urls, [ "main.js", "styles/icons.less" ]);
 
 			var css = resources[1].content;
 			has_(css, '"../assets/styles/foodir/gear.png"');
 			has_(css, '"/styles/foodir/user.png"', 'Absolute path by same bases is not rewritten');
 
-			var assets = Bundler.AssetsManager.getAssets();
-			var arr = assets.map(x => x.toTarget().toJSON());
+			var assets = solution.assetsManager.getAssets();
+			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 1, 'Only when asset with relative path in less should be copied')
 			eq_(arr[0].url, 'build/release/assets/styles/foodir/gear.png')
 		});
 	},
 	'should get resource tree from files for different bases' () {
-		return Bundler.clearCache().getResources('main.js', { outputBase: 'dist' }).done(resources => {
+		var bundler = new Bundler('main.js', { outputBase: 'dist' });
+
+		return bundler.getResources().done(resources => {
+			var solution = bundler.solution;
 			var urls = resources.map(x => x.url);
+
 			deepEq_(urls, [ "main.js", "styles/icons.less" ]);
 
 			var css = resources[1].content;
 			has_(css, '"../assets/styles/foodir/gear.png"');
 			has_(css, '"../assets/styles/foodir/user.png"');
 
-			var assets = Bundler.AssetsManager.getAssets();
+			var assets = solution.assetsManager.getAssets();
 
-			var arr = assets.map(x => x.toTarget().toJSON());
+			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 2, 'Only when asset with relative path in less should be copied')
 			eq_(arr[0].url, 'build/release/assets/styles/foodir/gear.png')
 		});

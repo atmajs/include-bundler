@@ -8,8 +8,8 @@ var AssetsManager;
 			this.assets = [];
 			this.solution = solution;
 		}
-		rewriteCss (resource, opts) {
-			var arr = CssAssets.rewrite(resource, opts);
+		rewriteCss (resource, solution) {
+			var arr = CssAssets.rewrite(resource, solution);
 			if (arr) {
 				this.assets.push(...arr);
 			}

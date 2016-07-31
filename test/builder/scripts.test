@@ -24,10 +24,10 @@ var Files =  {
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+		Bundler.clearCache();
 	},
 	'should bundle commonjs scripts' () {
-		return Bundler.clearCache().build('main.js', { 
-			type: 'module',
+		return Bundler.build('main.js', { 
 			module: 'commonjs',
 		}).done(resources => {
 			eq_(resources.length, 1);
@@ -43,7 +43,6 @@ UTest({
 	},
 	'should get script resources for html' () {
 		return Bundler
-			.clearCache()
 			.getResources('index.html')
 			.then(arr => arr.map(x => x.toJSON(false)))
 			.done(arr => {			
@@ -56,9 +55,8 @@ UTest({
 				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
 			});
 	},
-	'should bundle scripts in html page' () {
+	'!should bundle scripts in html page' () {
 		return Bundler.clearCache().build('index.html', {
-			type: 'module',
 			module: 'commonjs',
 		}).done(resources => {
 			
@@ -66,7 +64,8 @@ UTest({
 			eq_(resources[0].type, 'js');
 			var script = resources[0];
 
-			eval(script.content);
+			io.File.write('test.js', script.content);
+			eval(script.content);			
 			eq_(typeof getData, 'function');
 			deepEq_(getData(), {
 				letters: ['a', 'b']

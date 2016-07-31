@@ -1,7 +1,7 @@
 var CssAssets;
 (function(){
 	CssAssets = {
-		rewrite (resource, opts) {
+		rewrite (resource, solution) {
 			var regexp = /url[\s]*\(('|")?([^)'"]+)('|")?\)/gi,
 				assets = [],
 				hash = {},
@@ -13,11 +13,11 @@ var CssAssets;
 				if (href === '') {
 					continue;
 				}
-				if (AssetsManager.shouldCopy(href) === false) {
+				if (solution.assetsManager.shouldCopy(href) === false) {
 					continue;
 				}
 
-				var asset = new Resource({ type: 'asset', url: href }, resource);
+				var asset = new Resource({ type: 'asset', url: href }, resource, solution);
 				if (asset.filename in hash === false) {
 					assets.push(asset);
 					hash[asset.filename] = 1;
@@ -26,8 +26,8 @@ var CssAssets;
 				var before = content.substring(0, match.index),
 					after = content.substring(match.index + match[0].length);
 
-				var assetUrl = asset.toTarget().url;
-				var styleUrl = resource.toTarget().url;
+				var assetUrl = asset.toTarget(solution).url;
+				var styleUrl = resource.toTarget(solution).url;
 				var relUrl = path_toRelative(assetUrl, styleUrl, "/");
 				var entry = match[0].replace(href, relUrl);
 				content = before + entry + after;

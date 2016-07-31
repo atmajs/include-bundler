@@ -5,6 +5,11 @@ var SolutionOpts;
 			build: 'release',
 			type: '',
 			base: '',
+			version: null,
+			
+			mainPage: 'main',
+			mainBundle: '',
+
 			outputBase: '',
 			outputMain: '{filename}.{build}.{ext}',
 			outputSources: 'build/{build}',
@@ -15,6 +20,27 @@ var SolutionOpts;
 
 				type: 'module',
 				types: [ 'module', 'bundle']
+			},
+			extensions: {
+				'': { type: 'js'},
+				
+				'js': { type: 'js' },
+				'es6': { type: 'js' },
+				'jsx': { type: 'js' },
+
+				'mask': { type: 'mask' },
+
+				'css': { type: 'css' },
+				'less': { type: 'css' },
+				'scss': { type: 'css' },
+				'sass': { type: 'css' },
+
+				'html': { type: 'load' },
+				'json': { type: 'data' },
+
+				'jpg': { type: 'asset' },
+				'png': { type: 'asset' },
+				'mp4': { type: 'asset' },
 			}
 		},
 		resolvers: {
@@ -49,6 +75,9 @@ var SolutionOpts;
 			for (var key in this.resolvers) {
 				this[key] = this.resolvers[key].call(this, this[key], this);
 			}
+			if (this.type === '' && solution.path) {
+				this.type = this.getTypeForExt(path_getExtension(solution.path));
+			}
 		},
 		getOutputFolder (type) {
 			if (type === 'asset') {
@@ -58,6 +87,26 @@ var SolutionOpts;
 		},		
 		isSameBase () {
 			return this.base === this.outputBase;
+		},
+		getExtForType (type) {
+			var match = Object
+				.keys(this.extensions)
+				.map(ext => {
+					return { ext, type: this.extensions[ext].type }
+				})
+				.find(x => x.type === type);
+
+			if (match == null) 
+				throw new Error('Type is not supported: ' + type);
+
+			return match.ext;
+		},
+		getTypeForExt (ext) {			
+			var match = this.extensions[ext];
+			if (match == null) 
+				throw new Error('Extension is not configurated: ' + ext);
+
+			return match.type;
 		}
 	});
 
@@ -73,6 +122,9 @@ var SolutionOpts;
 			switch (name) {
 				case 'filename':
 					var path = opts.paths[0];
+					if (path === '') 
+						return opts.mainPage;
+
 					var match = /([^/\\]+)\.\w+$/.exec(path);
 					if (match) {
 						return match[0];
@@ -80,6 +132,9 @@ var SolutionOpts;
 					throw new Error('Filename can`t be parsed from: ' + opts.paths.join(','));
 				case 'ext':
 					var path = opts.paths[0];
+					if (path === '') 
+						return opts.type;
+
 					var match = /\.(\w+)$/.exec(path);
 					if (match) {
 						return match[0];

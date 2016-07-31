@@ -15,11 +15,20 @@ var Resource = class_create({
 	bundle: 'index',
 	module: '',
 
+	embed: false,
+
 	constructor: function (includeData, parent, solution) {
 		this.resources = [];
 
-		if (includeData == null || includeData.url == null) {
+		if (includeData == null) {
 			includeData = { type: solution.type };
+		}
+		if (includeData.type == null) {
+			if (includeData.url) {
+				includeData.type = solution.opts.getTypeForExt(path_getExtension(includeData.url));
+			} else {
+				includeData.type = solution.type;
+			}
 		}
 
 		this.parent = parent;
@@ -28,6 +37,10 @@ var Resource = class_create({
 		this.namespace = includeData.namespace;
 		this.asModules = [];
 		this.inPages = [];
+
+		if (includeData.bundle) {
+			this.bundle = includeData.bundle;
+		}
 
 		if (includeData.module) {
 			this.asModules = [ includeData.module ];

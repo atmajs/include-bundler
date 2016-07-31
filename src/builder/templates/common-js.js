@@ -2,22 +2,9 @@
 
 Templates['commonjs'] = class CommonJs extends ITemplate {
 	
-	buildDependencies (resources, ctx, solution) {
-		var body = resources.map(resource => {
-			return wrapModule(resource);
-		}).join('\n');
-
-		var resourceUrl = `${ctx.page}_${ctx.bundle}.js`;
-		var resource = new Resource({type: 'js', url: resourceUrl}, null, solution);
-		var output = resource.toTarget(solution);
-
-		output.content = body;
-		return output;
-	}
-
-	wrapModule (resource, ctx, solution) {
-		if (ctx.commonjs == null) {
-			ctx.commonjs = {
+	wrapModule (resource, solution) {
+		if (solution.opts.commonjs == null) {
+			solution.opts.commonjs = {
 				addHeading: true,
 				hasHeading: false
 			}
@@ -25,23 +12,23 @@ Templates['commonjs'] = class CommonJs extends ITemplate {
 
 		var body = '';
 
-		if (ctx.commonjs.hasHeading === false && ctx.commonjs.addHeading === true) {
-			ctx.commonjs.hasHeading = true;
+		if (solution.opts.commonjs.hasHeading === false && solution.opts.commonjs.addHeading === true) {			
+			solution.opts.commonjs.hasHeading = true;
 			body = Heading;
 		}
-
 
 		return body + wrapModule(resource);
 	}
 
-	buildRoot (resource, dependencies, ctx, solution) {
+	rewriteRoot (root, dependencies, solution) {
 		
-		var body = dependencies.map(x => x.content).join('\n');
-		body += '\n' + resource.content;
+		var body = dependencies
+			.map(x => x.content)
+			.concat([ root.content ])
+			.join('\n');
 
-		var output = resource.toTarget(solution);
-		output.content = wrapRootModule(body);
-		return output;
+		dependencies.forEach(x => x.embed = true);
+		root.content = wrapRootModule(body);		
 	}
 };
 

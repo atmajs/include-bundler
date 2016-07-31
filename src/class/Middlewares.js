@@ -6,9 +6,20 @@ var _middlewares;
 			this.runners = {};
 
 			this.supports = {
-				'parseDependencies': function(resource, opts, solution){
+				'parseDependencies': function(resource, deps, opts, solution){
+					return new Promise();
+				},
+				'buildResources': function (resources, solution) {
+					return new Promise();
+				},
+				'rewriteDependencies': function (resources, solution) {
+					var outputItems = solution.outputResources.items;
+					return new Promise();
+				},
+				'buildBundle': function (outputItem) {
 					return new Promise();
 				}
+				
 			}
 		}
 
@@ -33,23 +44,36 @@ var _middlewares;
 			var dfr = new class_Dfr;
 			var fns = this.runners[name];
 			if (fns == null || fns.length === 0) {
-				return dfr.resolve();
+				return dfr.resolve(...args);
 			}
 
 			var arr = fns.slice();
-			function next () {
+			function next (...transformedArgs) {
+				var nextArgs = transformedArgs.length === 0 ? args : transformedArgs;
 				if (arr.length === 0) {
-					dfr.resolve();
+					dfr.resolve(...(nextArgs || []));
 					return;
 				}
+				args = nextArgs;
+
 				var fn = arr.shift();
 				var result = fn.call(null, ...args);
-				if (result && result.then) {
-					result.then(next, next);
-					return;
+				if (result != null) {
+					if (result.then) {
+						result.then(next, error => dfr.reject(error));
+						return;
+					}
+					if (Array.isArray(result)) {
+						args = result;
+					} else {
+						args = [ result ];
+					}
 				}
+
 				next();
 			}
+			
+			next();
 			return dfr;
 		}
 	}

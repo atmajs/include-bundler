@@ -2,7 +2,7 @@ var IncludeParser;
 (function() {
 
 	IncludeParser = {
-		parse: function parseIncludes(ast, resource) {
+		parse: function parseIncludes(ast, solution) {
 
 			var info = {
 				resources: [],
@@ -16,7 +16,7 @@ var IncludeParser;
 					return AstUtil.is.type(node, 'AST_SymbolRef') && node.name == 'include';
 				}
 				var scope = AstUtil.findNode(node, isIncludeSymbolRef).scope || ast;
-				processInclude(info, node, scope, resource);
+				processInclude(info, node, scope, solution);
 				return true;
 			});
 
@@ -28,7 +28,7 @@ var IncludeParser;
 		}
 	};
 
-	function processInclude(info, node, scope, currentResource) {
+	function processInclude(info, node, scope, solution) {
 
 		var arr = [];
 		function isIncludeMethodCall (node) {
@@ -80,7 +80,7 @@ var IncludeParser;
 			}
 		});
 
-		var include = new Include(currentResource);
+		var include = new Include();
 		arr.forEach(function(x) {
 			include[x.type].apply(include, x.args);
 		});
