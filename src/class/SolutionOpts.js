@@ -41,6 +41,12 @@ var SolutionOpts;
 				'jpg': { type: 'asset' },
 				'png': { type: 'asset' },
 				'mp4': { type: 'asset' },
+			},
+			defaultExtensions: {
+				'js': 'js',
+				'mask': 'mask',
+				'css': 'css',
+				'load': 'html'
 			}
 		},
 		resolvers: {
@@ -89,17 +95,11 @@ var SolutionOpts;
 			return this.base === this.outputBase;
 		},
 		getExtForType (type) {
-			var match = Object
-				.keys(this.extensions)
-				.map(ext => {
-					return { ext, type: this.extensions[ext].type }
-				})
-				.find(x => x.type === type);
-
+			var match = this.defaultExtensions[type];
 			if (match == null) 
 				throw new Error('Type is not supported: ' + type);
 
-			return match.ext;
+			return match;
 		},
 		getTypeForExt (ext) {			
 			var match = this.extensions[ext];

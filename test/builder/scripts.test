@@ -24,6 +24,8 @@ var Files =  {
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+	},
+	$teardown () {
 		Bundler.clearCache();
 	},
 	'should bundle commonjs scripts' () {
@@ -35,7 +37,6 @@ UTest({
 
 			eq_(main.url, 'build/release/main.js');
 
-			io.File.write('test.js', main.content);
 			var module = {};
 			eval(main.content);			
 			deepEq_(module.exports.letters, ['a', 'b']);
@@ -55,8 +56,8 @@ UTest({
 				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
 			});
 	},
-	'!should bundle scripts in html page' () {
-		return Bundler.clearCache().build('index.html', {
+	'should bundle scripts in html page' () {
+		return Bundler.build('index.html', {
 			module: 'commonjs',
 		}).done(resources => {
 			
@@ -72,7 +73,7 @@ UTest({
 			});
 
 
-			eq_(resources[1].type, 'html');
+			eq_(resources[1].type, 'load');
 			has_(resources[1].content, 'src="build/release/main_index.js"');
 			
 		});
