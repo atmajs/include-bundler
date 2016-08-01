@@ -1,21 +1,19 @@
 var HtmlParser;
 (function(){
-	var _mask;
-
+	
 	HtmlParser = {
 		getDependencies (resource, opts) {
-			var content = resource.content;
-			var mask = _mask || (_mask = require('maskjs'));
-			var dfr = new class_Dfr;
-			
-			var ast = mask.parseHtml(content);
+			var $ = createDoc(resource.content);
+			var dfr = new class_Dfr;			
 			var queue = [];
 			var resources = [];
-			mask.TreeWalker.walk(ast, node => {
-				var reader = ResourceReaders.find(reader => reader.canHandle(node));
+
+			$('*').each((index, node) => {
+				var $el = $(node);
+				var reader = ResourceReaders.find(reader => reader.canHandle($el));
 				if (reader) {
 					queue.push({
-						node: node,
+						node: $el,
 						reader: reader
 					});
 				}
@@ -67,4 +65,15 @@ var HtmlParser;
 		new ScriptReader, 
 		new MaskContentReader
 	];
+
+	var createDoc;
+	(function(){
+		createDoc = function(html){
+			if (_cheerio == null) 
+				_cheerio = require('cheerio');
+				
+			return _cheerio.load(html);
+		};
+		var _cheerio;
+	}()); 
 }());

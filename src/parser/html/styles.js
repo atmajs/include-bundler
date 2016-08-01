@@ -1,24 +1,25 @@
 class StyleReader {
-	canHandle (node) {
-		var tagName = node.tagName;
+	canHandle (el) {
+		var tagName = el.prop('tagName');
 		if (tagName == null || tagName.toLowerCase() !== 'link') {
 			return false;
 		}
-		if (node.attr['href'] == null) {
+		if (el.attr('href') == null) {
 			return false;
 		}
 
-		var rel = node.attr['rel'];
+		var rel = el.attr('rel');
 		if (rel == null || rel.toLowerCase() !== 'stylesheet') 
 			return false;
 
 		return true
 	}
 
-	read (node, arr) {
+	read (el, arr) {
 		var resource = {
 			type: 'css',
-			url: node.attr.href
+			url: el.attr('href'),
+			module: 'global'
 		};
 		arr.push(resource);
 	}

@@ -1,5 +1,8 @@
 (function () {
 
+	var mask = require('maskjs');
+			
+
 	// import ../node_modules/atma-utils/lib/utils.embed.js
 
 	// import ./utils/res.js

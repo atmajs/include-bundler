@@ -3,23 +3,15 @@ var MaskParser;
 	var _mask;
 	MaskParser = {
 		getDependencies (resource, solution) {
-			var mask = _mask || (_mask = require('maskjs'));
-			var content = resource.content;
-			return mask
-				.Module
-				.getDependencies(content, '', {deep: false})
-				.then(list => list);
+
+			return class_Dfr.run(resolve => {
+				var deps = getDependencies(resource);
+
+				resolve(deps);
+			});
 		},
 		flatternDependencies (depsInfo) {
-			var out = [];
-			for (var key in depsInfo) {
-				var arr = depsInfo[key];
-				if (arr.length === 0) {
-					continue;
-				}
-				out = out.concat(toIncludeData(arr, key));
-			}
-			return out;
+			return arr_flattern(depsInfo);
 		}
 	};
 
@@ -39,4 +31,47 @@ var MaskParser;
 	function maskTypeToIncludeType(key) {
 		return mapping[key];
 	}
+
+
+	function getDependencies (resource){
+
+		var content = resource.content;
+		var ast = mask.parse(content);
+		var out = [];
+
+		mask.TreeWalker.walk(ast, function (node) {
+			if (node.tagName !== 'import') {
+				return;
+			}
+
+			var path = node.path;
+			if (path_getExtension(path) === '') {
+				path += '.mask';
+			}
+
+			var type = mask.Module.getType(new mask.Module.Endpoint(node.path, node.contentType))
+			var includeData = {
+				url: path,
+				type: maskTypeToIncludeType(type),
+				module: 'mask',
+				page: null
+			};			
+			out.push(includeData);
+
+			var owner = node.parent;
+			if (owner != null && owner.tagName === 'imports') {
+				owner = owner.parent;
+			}
+			if (owner == null || owner.type === mask.Dom.FRAGMENT) {
+				return;
+			}
+			var page = owner.attr['data-bundler-page'] || owner.attr.page || owner.attr.id || owner.attr.name;
+			if (page == null) {
+				throw Error('Nested import found, but the container has no `page`, `id` or `name` in attributes');
+			}
+			includeData.page = page;
+		});
+
+		return out;
+1	}
 }());

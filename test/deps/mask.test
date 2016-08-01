@@ -1,0 +1,31 @@
+UTest({
+	'should parse imports' : {
+		'should parse mask, js and css imports' () {
+
+			return parse(`import from './foo'; import Bar from '/compos/bar.js'; import from '/main.less'`, [ 
+				{type: 'mask', url: './foo.mask', module: 'mask'},
+				{type: 'js', url: '/compos/bar.js', module: 'mask'},
+				{type: 'css', url: '/main.less', module: 'mask'}
+			]);
+		},
+		'should parse with page' () {
+			return parse(`View name='about' { import from './my'; }`, [ 
+				{page: 'about', type: 'mask', url: './my.mask', module: 'mask'}
+			]);
+		}
+	}
+});
+
+function parse (code, expect) {
+	var dfr = new Class.Deferred();
+	Bundler.Parser.getDependencies(code, 'mask').then(deps => {
+		eq_(deps.length, expect.length)
+
+		deps.forEach((x, index) => {
+			has_(x, expect[index]);
+		})
+
+		dfr.resolve();
+	});
+	return dfr;
+}

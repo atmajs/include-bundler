@@ -1,24 +1,28 @@
 class ScriptReader {
-	canHandle (node) {
-		var tagName = node.tagName;
+	canHandle (el) {
+		var tagName = el.prop('tagName');
 		if (tagName == null || tagName.toLowerCase() !== 'script') {
 			return false;
 		}
-		if (node.attr['src'] == null && node.attr['data-bundler-src'] == null) {
+		if (this.getSource(el) == null) {
 			return false;
 		}
-		if (node.attr['data-bundler'] === 'ignore') {
+		if (el.attr('data-bundler') === 'ignore') {
 			return false;
 		}
 		return true
 	}
 
-	read (node, arr) {
+	read (el, arr) {
 		var resource = {
 			type: 'js',
-			url: node.attr['src'] || node.attr['data-bundler-src'],
+			url: this.getSource(el),
 			module: 'global'
 		};		
 		arr.push(resource);
+	}
+
+	getSource (el) {
+		return el.attr('src') || el.attr('data-bundler-src')
 	}
 }

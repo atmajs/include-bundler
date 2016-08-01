@@ -21,9 +21,11 @@ var Files =  {
 	`
 };
 
+var Bundler;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+		Bundler = require('../../lib/bundler.js');
 	},
 	$teardown () {
 		Bundler.clearCache();
@@ -65,7 +67,6 @@ UTest({
 			eq_(resources[0].type, 'js');
 			var script = resources[0];
 
-			io.File.write('test.js', script.content);
 			eval(script.content);			
 			eq_(typeof getData, 'function');
 			deepEq_(getData(), {
