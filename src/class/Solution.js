@@ -4,14 +4,15 @@ var Solution = null;
 	// import ./SolutionOpts.js
 	// import ./OutputResources.js
 
-	Solution = class_create({
-		constructor: function(path, opts){
-					
+	Solution = class Solution extends class_EventEmitter {
+		constructor (path, opts) {
+			super();
+
 			this.path = path;
 			this.opts = new SolutionOpts(this, opts || {});
 			this.assetsManager = new AssetsManager(this);
 			this.outputResources = new OutputResources(this);
-		},
+		}
 
 		getOptionsForResource (resource) {
 			var files = this.opts.files;
@@ -20,6 +21,6 @@ var Solution = null;
 			}
 			// @TODO support settings for a resource
 		}
-	});
+	};
 
 }());

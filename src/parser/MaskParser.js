@@ -5,7 +5,7 @@ var MaskParser;
 		getDependencies (resource, solution) {
 
 			return class_Dfr.run(resolve => {
-				var deps = getDependencies(resource);
+				var deps = getDependencies(resource, solution);
 
 				resolve(deps);
 			});
@@ -33,45 +33,62 @@ var MaskParser;
 	}
 
 
-	function getDependencies (resource){
+	function getDependencies (resource, solution){
 
 		var content = resource.content;
 		var ast = mask.parse(content);
 		var out = [];
 
 		mask.TreeWalker.walk(ast, function (node) {
+			if (node.tagName === 'imports') {
+				logger.log('imports'.green, node.nodes.length)
+			}
+			logger.log(node.tagName, '<'.cyan);
 			if (node.tagName !== 'import') {
 				return;
 			}
+			var dependency = convertImportNodeToIncludeData(node);
+			if (dependency.page != null) {
 
-			var path = node.path;
-			if (path_getExtension(path) === '') {
-				path += '.mask';
 			}
+			out.push(dependency);
+		});
 
-			var type = mask.Module.getType(new mask.Module.Endpoint(node.path, node.contentType))
-			var includeData = {
-				url: path,
-				type: maskTypeToIncludeType(type),
-				module: 'mask',
-				page: null
-			};			
-			out.push(includeData);
+		var hasPage = out.some(x => x.page != null);
 
-			var owner = node.parent;
-			if (owner != null && owner.tagName === 'imports') {
-				owner = owner.parent;
-			}
-			if (owner == null || owner.type === mask.Dom.FRAGMENT) {
-				return;
-			}
-			var page = owner.attr['data-bundler-page'] || owner.attr.page || owner.attr.id || owner.attr.name;
-			if (page == null) {
-				throw Error('Nested import found, but the container has no `page`, `id` or `name` in attributes');
-			}
-			includeData.page = page;
+		solution.on('rewriteDependencies', (resources, solution) => {
+
 		});
 
 		return out;
-1	}
+	}
+
+	function convertImportNodeToIncludeData(node) {
+		var path = node.path;
+		if (path_getExtension(path) === '') {
+			path += '.mask';
+		}
+
+		var type = mask.Module.getType(new mask.Module.Endpoint(node.path, node.contentType))
+		var dependency = {
+			url: path,
+			type: maskTypeToIncludeType(type),
+			module: 'mask',
+			page: null
+		};
+
+		var owner = node.parent;
+		if (owner != null && owner.tagName === 'imports') {
+			owner = owner.parent;
+		}
+		if (owner == null || owner.type === mask.Dom.FRAGMENT) {
+			return dependency;
+		}
+		var page = owner.attr['data-bundler-page'] || owner.attr.page || owner.attr.id || owner.attr.name;
+		if (page == null) {
+			throw Error('Nested import found, but the container has no `page`, `id` or `name` in attributes');
+		}
+		dependency.page = page;
+		return dependency;
+	}
 }());

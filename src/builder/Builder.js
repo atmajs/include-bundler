@@ -10,6 +10,7 @@ var Builder;
 
 					solution.outputResources.prepair(resources);
 
+					solution.emit('rewriteDependencies', resources, solution);					
 					return _middlewares
 						.run('rewriteDependencies', resources, solution)
 						.then(buildOutputItems)

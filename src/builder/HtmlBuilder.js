@@ -10,7 +10,7 @@ var HtmlBuilder;
 			var $ = createDoc(resource.content);
 
 			removeDependencies($);
-			/* css */
+			
 			var css = serializeMany(dependencies, x => x.type === 'css', solution);
 			if (css) {
 				add($, 'head', css);
