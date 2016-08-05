@@ -1,4 +1,4 @@
-MaskHandller.Parser = class MaskParser extends BaseParser {
+MaskHandler.Parser = class MaskParser extends BaseParser {
 
 	constructor () {
 		super(...arguments);
@@ -7,8 +7,8 @@ MaskHandller.Parser = class MaskParser extends BaseParser {
 	getDependencies (content, ownerResource) {
 		var ast = this._parse(content, ownerResource);
 		var arr = [];
-		forEachImports(ast, imports => arr.push(...imports));
-		return arr;
+		this._forEachImports(ast, imports => arr.push(...imports));
+		return async_resolve({ dependencies: arr });
 	}
 
 	accepts (type) {
@@ -19,13 +19,14 @@ MaskHandller.Parser = class MaskParser extends BaseParser {
 		mask.off('error');
 		mask.off('warn');
 
+		var reporter = this.solution.reporter;
 		mask.on('error', error => reporter.error(resource && resource.url, error));
 		mask.on('warn', warning => reporter.warn(resource && resource.url, warning));
 
 		return mask.parse(content);
 	}
 
-	_forEachImports (content, cb) {
+	_forEachImports (ast, cb) {
 		mask.TreeWalker.walk(ast,  node => {
 			if (node.tagName !== 'imports') {
 				return;
@@ -34,7 +35,7 @@ MaskHandller.Parser = class MaskParser extends BaseParser {
 			var imports = Array
 				.from(node.nodes)
 				.filter(x => x.tagName === 'import')
-				.map(x => this._getDependencyFromNode(node));
+				.map(x => this._getDependencyFromNode(x));
 
 			cb(imports);
 		});

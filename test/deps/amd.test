@@ -1,6 +1,6 @@
 UTest({
 	'should parse defines' : {
-		'should parse single amd' () {
+		'!should parse single amd' () {
 			return parse(`define(["foo"], function(){})`, [ 
 				{type: 'js', url: 'foo', module: 'amd'}
 			]);
@@ -44,7 +44,9 @@ UTest({
 
 function parse (code, expect) {
 	var dfr = new Class.Deferred();
-	Bundler.Parser.getDependencies(code).then(deps => {
+	Bundler.Parser.getDependencies(code).then(result => {
+		var deps = result.dependencies;
+		
 		eq_(deps.length, expect.length)
 
 		deps.forEach((x, index) => {

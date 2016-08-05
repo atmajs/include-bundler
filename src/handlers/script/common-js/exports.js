@@ -1,10 +1,10 @@
-var MaskHandler;
+var CommonJsHandler;
 
 (function(){
 
-	// import ./MaskHandler.js
-	// import ./Parser.js
-	// import ./Rewriter.js
-	// import ./Builder.js
+	// import ./CommonJsHandler.js
+	// import ./CommonJsParser.js
+	// import ./CommonJsRewriter.js
+	// import ./CommonJsBuilder.js
 
 }());

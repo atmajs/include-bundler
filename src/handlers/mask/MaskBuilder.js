@@ -6,7 +6,7 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 
 	buildRoot (resource, dependencies) {
 
-	},
+	}
 
 	accepts (type) {
 		return type === 'mask';

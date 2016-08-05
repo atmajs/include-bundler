@@ -1,4 +1,4 @@
-ScriptHandller.Parser = class ScriptParser extends BaseParserComposed {
+ScriptHandler.Parser = class ScriptParser extends BaseParser {
 
 	constructor () {
 		super(...arguments);
@@ -6,9 +6,9 @@ ScriptHandller.Parser = class ScriptParser extends BaseParserComposed {
 	
 	getDependencies (content, ownerResource) {
 		var many = [
-			new CommonJsParser(this.solution),
-			new AmdJsParser(this.solution),
-			new IncludeJsParser(this.solution),
+			new CommonJsHandler.Parser(this.solution),
+			new AmdJsHandler.Parser(this.solution),
+			new IncludeJsHandler.Parser(this.solution),
 		];
 
 		var opts = {
@@ -17,6 +17,10 @@ ScriptHandller.Parser = class ScriptParser extends BaseParserComposed {
 		var ast = AstUtil.parse(content, opts);
 
 		var dfrs = many.map(parser => parser.getDependencies(ast, ownerResource));
-		return async_whenAll(dfrs).then(results => arr_flatter(results));		
+		return async_whenAll(dfrs).then(results => ResourceInfo.merge(...arr_flattern(results)));
+	}
+
+	accepts (type) {
+		return type === 'js';
 	}
 };

@@ -1,6 +1,7 @@
 (function () {
 
 	var mask = require('maskjs');
+	var assert = require('assert');
 			
 
 	// import ../node_modules/atma-utils/lib/utils.embed.js
@@ -11,8 +12,10 @@
 	// import ./utils/async.js
 
 	// import ./class/Resource.js
+	// import ./class/ResourceInfo.js
 	// import ./class/Include.js
 	// import ./class/Solution.js
+	// import ./class/Resource.js
 	// import ./class/Middlewares.js
 
 	// import ./assets/AssetsManager.js
@@ -21,6 +24,7 @@
 
 	// import ./loader/Loader.js
 	// import ./builder/Builder.js
+	// import ./handlers/
 
 	module.exports = class Bundler {
 		static clearCache() {

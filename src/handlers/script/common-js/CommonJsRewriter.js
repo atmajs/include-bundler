@@ -1,4 +1,4 @@
-class CommonJsRewriter extends BaseRewriter {
+CommonJsHandler.Rewriter = class CommonJsRewriter extends BaseRewriter {
 
 	constructor () {
 		super(...arguments);
@@ -10,7 +10,7 @@ class CommonJsRewriter extends BaseRewriter {
 
 	rewriteResource (resource) {
 
-	},
+	}
 
 	accepts (type) {
 		return type === 'mask';

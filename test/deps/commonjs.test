@@ -31,7 +31,8 @@ UTest({
 
 function parse (code, expect) {
 	var dfr = new Class.Deferred();
-	Bundler.Parser.getDependencies(code).then(deps => {
+	Bundler.Parser.getDependencies(code).then(result => {
+		var deps = result.dependencies;
 		eq_(deps.length, expect.length)
 
 		deps.forEach((x, index) => {

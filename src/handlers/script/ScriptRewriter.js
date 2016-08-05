@@ -1,4 +1,4 @@
-Mask.Rewriter = class MaskRewriter extends BaseRewriter {
+ScriptHandler.Rewriter = class ScriptRewriter extends BaseRewriter {
 
 	constructor () {
 		super(...arguments);
@@ -10,7 +10,7 @@ Mask.Rewriter = class MaskRewriter extends BaseRewriter {
 
 	rewriteResource (resource) {
 
-	},
+	}
 
 	accepts (type) {
 		return type === 'mask';

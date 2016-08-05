@@ -1,5 +1,6 @@
 class BaseBuilder {
 	constructor (solution) {
+		assert(solution instanceof Solution, 'Solution expected for the Builder');
 		this.solution = solution;
 	}
 	

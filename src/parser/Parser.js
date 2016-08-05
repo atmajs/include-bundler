@@ -29,16 +29,27 @@ var Parser;
 		}
 	};
 
-	function getDependenciesInternal(resource, solution) {		
-		var fn = Types[resource.type];
-		if (fn == null) {
-			fn = Types[path_getExtension(resource.url)];
-		}
-		if (fn == null) {
+	function getDependenciesInternal(resource, solution) {
+		assert(typeof resource.url === 'string', 'Path is expected');
+
+		var ext = path_getExtension(resource.url);
+		var handler = solution.handlers.find(x => x.parser.accepts(resource.type) || x.parser.accepts(ext))
+		if (handler == null) {
 			console.warn('GetDependenciesInternal: Skip uknown resource type', resource.type);
-			return new class_Dfr().resolve([]);
+			return async_resolve({dependencies: []});
 		}
-		return fn(resource, solution);
+
+		return handler.parser.getDependencies(resource.content, resource);
+
+		// var fn = Types[resource.type];
+		// if (fn == null) {
+		// 	fn = Types[path_getExtension(resource.url)];
+		// }
+		// if (fn == null) {
+		// 	console.warn('GetDependenciesInternal: Skip uknown resource type', resource.type);
+		// 	return new class_Dfr().resolve([]);
+		// }
+		// return fn(resource, solution);
 	}
 	function getDependenciesExternal(deps, resource, solution) {
 		return _middlewares

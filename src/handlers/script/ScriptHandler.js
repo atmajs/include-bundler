@@ -1,4 +1,4 @@
-MaskHandler = class MaskHandler extends BaseHandler {
+ScriptHandler = class ScriptHandler extends BaseHandler {
 	constructor () {
 		super(...arguments);
 	}

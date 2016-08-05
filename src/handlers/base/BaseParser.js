@@ -1,6 +1,7 @@
 class BaseParser {
 
 	constructor (solution) {
+		assert(solution instanceof Solution, 'Solution expected for Parser');		
 		this.solution = solution;
 	}
 

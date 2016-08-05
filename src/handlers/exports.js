@@ -1,4 +1,4 @@
-var Handlers = [];
+var Handlers;
 
 (function(){
 	
@@ -9,5 +9,12 @@ var Handlers = [];
 	// import mask/
 	// import css/
 	// import html/
+
+	Handlers = [
+		MaskHandler,
+		ScriptHandler,
+		CssHandler,
+		HtmlHandler
+	];
 
 }());

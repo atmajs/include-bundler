@@ -64,9 +64,14 @@ var Loader;
 			processChildren () {
 				Parser
 					.getDependencies(this.resource, this.solution)
-					.then(deps => this.loadChildren(deps), error => this.reject(error));
+					.then(result => this.loadChildren(result), error => this.reject(error));
 			},
-			loadChildren: function (deps) {
+			loadChildren: function (result) {
+				assert(Array.isArray(result.dependencies), `Expects array of dependencies for ${this.resource.url}`);
+				
+				this.resource.meta = result.meta;
+
+				var deps = result.dependencies;
 				async_map(deps, dep => {
 					return ResourceLoader
 						.load(dep, this.resource, this.opts, this.solution)

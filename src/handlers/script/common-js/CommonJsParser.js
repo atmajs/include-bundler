@@ -1,4 +1,4 @@
-class CommonJsParser extends BaseParser {
+CommonJsHandler.Parser = class CommonJsParser extends BaseParser {
 
 	constructor () {
 		super(...arguments);
@@ -6,18 +6,21 @@ class CommonJsParser extends BaseParser {
 	
 	getDependencies (ast, ownerResource) {
 		
-		var resources = [];
+		var info = {
+			dependencies: []
+		};
+
 		AstUtil.each(ast, AstUtil.is.commonJsFunction, (node, descend) => {
 			var scope = node.scope || ast;
 			var deps = this._process(node, scope);
 			if (deps) {
-				resources.push(...deps);
+				info.dependencies.push(...deps);
 			}
 			return true;
 		});
 
-		arr.forEach(x => x.module = 'commonjs');
-		return new class_Dfr().resolve(arr);
+		info.dependencies.forEach(x => x.module = 'commonjs');
+		return new class_Dfr().resolve(info);
 	}
 
 	_process (node, scope) {
@@ -31,7 +34,7 @@ class CommonJsParser extends BaseParser {
 		if (typeof path !== 'string') {
 			throw new Error('Path should be a string: ' + path);
 		}
-		var groups = Include.groupByType([ path ], solution.opts);
+		var groups = Include.groupByType([ path ], this.solution.opts);
 		for(var type in groups) {
 			include[type].apply(include, groups[type]);
 		}

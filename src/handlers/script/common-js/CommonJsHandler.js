@@ -1,4 +1,4 @@
-class CommonJsHandler extends BaseHandler {
+CommonJsHandler = class CommonJsHandler extends BaseHandler {
 	constructor () {
 		super(...arguments);
 	}
