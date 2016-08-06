@@ -6,10 +6,11 @@ class ScriptLinkReader {
 		}
 		if (this.getSource(el) == null) {
 			return false;
-		}
-		if (el.attr('data-bundler') === 'ignore') {
+		}		
+		var type = el.attr('type');
+		if (type && type.toLowerCase().indexOf('javascript') === -1) {
 			return false;
-		}
+		}						
 		return true
 	}
 
@@ -17,7 +18,8 @@ class ScriptLinkReader {
 		var resource = {
 			type: 'js',
 			url: this.getSource(el),
-			module: 'global'
+			module: 'global',
+			bundle: el.attr('data-bundler-bundle')
 		};		
 		return [ resource ];
 	}

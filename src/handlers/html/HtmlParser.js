@@ -8,9 +8,9 @@ HtmlHandler.Parser = class HtmlParser extends BaseParser {
 		super(...arguments);
 
 		this.readers = [
-			new MaskContentReader,
-			new StyleLinkReader,
-			new ScriptLinkReader
+			new MaskContentReader(this.solution),
+			new StyleLinkReader(this.solution),
+			new ScriptLinkReader(this.solution)
 		];
 	}
 	
@@ -21,6 +21,10 @@ HtmlHandler.Parser = class HtmlParser extends BaseParser {
 		
 		$('*').each((index, node) => {
 			var $el = $(node);
+			if ($el.attr('data-bundler') === 'ignore') {
+				return;
+			}
+
 			var reader = this.readers.find(reader => reader.canHandle($el));
 			if (reader) {
 				queue.push({

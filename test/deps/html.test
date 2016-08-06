@@ -1,0 +1,54 @@
+UTest({
+	'should parse imports' : {
+		'should parse script and styles from html' () {
+			var html = `
+				<script src='./foo.js'></script>
+				<script src =      "bar.js" type='text/javascript' data-bundler-bundle='vendor'></script>
+				
+				<!-- 
+					<script src='./foo-no.js'></script>				
+				-->
+
+				<script src = "no.coffee" type='text/coffee'></script>
+				<script src = "no.js" data-bundler='ignore'></script>
+
+				<link hreF= '/main.less' rel='stYLESheet' />				
+			`;
+			return parse(html, [ 
+				{type: 'js', url: './foo.js', module: 'global'},
+				{type: 'js', url: 'bar.js', module: 'global', bundle: 'vendor'},
+				{type: 'css', url: '/main.less', module: 'global'}
+			]);
+		},
+		'should parse mask deps' () {
+			var html = `
+				<script type='text/mask'>
+					import Foo from './foo';
+					import from 'Controller.x2' is js;
+
+					View name='about' { import from './my'; }
+				</script>
+			`;
+			return parse(html, [ 
+				{type: 'mask', url: './foo.mask', module: 'mask'},
+				{type: 'js', url: 'Controller.x2', module: 'mask'},
+				{page: 'about', type: 'mask', url: './my.mask', module: 'mask'}
+			]);
+		}
+	}
+});
+
+function parse (code, expect) {
+	var dfr = new Class.Deferred();
+	Bundler.Parser.getDependencies(code, 'html').then(result => {
+		var deps = result.dependencies;
+		eq_(deps.length, expect.length)
+
+		deps.forEach((x, index) => {
+			has_(x, expect[index]);
+		})
+
+		dfr.resolve();
+	});
+	return dfr;
+}

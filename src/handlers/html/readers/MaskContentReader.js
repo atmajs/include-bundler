@@ -2,6 +2,10 @@ var MaskContentReader;
 (function(){
 
 	MaskContentReader = class MaskContentReader {
+		constructor (solution) {
+			this.solution = solution;
+		}
+
 		canHandle (el) {
 			var tagName = el.prop('tagName');
 			if (tagName == null || tagName.toLowerCase() !== 'script') {
@@ -18,9 +22,10 @@ var MaskContentReader;
 
 		read (el) {
 			var content = el.text();
-			return MaskParser.getDependencies(content, {}).then(({dependencies}) => {
+			var handler = this.solution.handlers.find(x => x.parser.accepts('mask'));
+			return handler.parser.getDependencies(content, {}).then(({dependencies}) => {
 				
-				dependencies.forEach(x => x.module = 'global');
+				//dependencies.forEach(x => x.module = 'global');
 				return dependencies;
 			});
 		}
