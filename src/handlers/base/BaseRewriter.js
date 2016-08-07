@@ -1,6 +1,10 @@
 class BaseRewriter {
-	constructor (solution) {
+	constructor (solution, handler) {
+		assert(solution instanceof Solution, 'Solution expected for Rewriter');		
+		assert(handler instanceof BaseHandler, 'BaseHandler expected for the Rewriter');
+
 		this.solution = solution;
+		this.handler = handler;
 	}
 	
 	rewritePartial (content, ownerResource) {

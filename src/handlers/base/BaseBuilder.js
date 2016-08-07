@@ -1,7 +1,10 @@
 class BaseBuilder {
-	constructor (solution) {
+	constructor (solution, handler) {
 		assert(solution instanceof Solution, 'Solution expected for the Builder');
+		assert(handler instanceof BaseHandler, 'BaseHandler expected for the Builder');
+
 		this.solution = solution;
+		this.handler = handler;
 	}
 	
 	buildPage (resource, dependencies) {

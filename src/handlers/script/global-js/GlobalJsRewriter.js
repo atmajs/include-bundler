@@ -1,4 +1,4 @@
-ScriptHandler.Rewriter = class ScriptRewriter extends BaseRewriter {
+GlobalJsHandler.Rewriter = class GlobalJsRewriter extends BaseRewriter {
 
 	constructor () {
 		super(...arguments);
@@ -13,6 +13,6 @@ ScriptHandler.Rewriter = class ScriptRewriter extends BaseRewriter {
 	}
 
 	accepts (type) {
-		return type === 'js';
+		return type === 'mask';
 	}
 };

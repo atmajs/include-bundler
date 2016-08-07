@@ -58,7 +58,7 @@ UTest({
 				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
 			});
 	},
-	'!should bundle scripts in html page' () {
+	'should bundle scripts in html page' () {
 		return Bundler.build('index.html', {
 			module: 'commonjs',
 		}).done(resources => {

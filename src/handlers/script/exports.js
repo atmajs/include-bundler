@@ -7,6 +7,7 @@ var ScriptHandler;
 	// import ./amd-js/
 	// import ./common-js/
 	// import ./include-js/
+	// import ./global-js/
 
 	// import ./ScriptHandler.js
 	// import ./ScriptParser.js

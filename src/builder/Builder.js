@@ -9,14 +9,28 @@ var Builder;
 					resources = arr || resources;
 
 					solution.outputResources.prepair(resources);
-
-					solution.emit('rewriteDependencies', resources, solution);					
+	
 					return _middlewares
 						.run('rewriteDependencies', resources, solution)
+						.then(() => rewriteDependenciesInternal(resources))
 						.then(buildOutputItems)
 						.then(rewriteRoot)
 						.then(() => solution.outputResources.getAll());
 				});
+			
+			function rewriteDependenciesInternal (resources) {
+				var dfrs = resources.map(resource => {
+					var ext = path_getExtension(resource.url);
+					var handler = solution.handlers.find(x => 
+						x.rewriter.accepts(resource.type) || x.rewriter.accepts(ext)
+					);
+					if (handler == null) {
+						throw Error('Rewriter not found for the resource: ' + resource.url);
+					}
+					return handler.rewriter.rewriteResource(resource);
+				});
+				return async_whenAll(dfrs);
+			}
 
 			function buildOutputItems () {
 				var items = solution.outputResources.items;
@@ -31,39 +45,25 @@ var Builder;
 				if (outputItem.resource.content) {
 					return;
 				}
-				var builder = Builders[outputItem.type];
-				if (builder == null)
+				var ext = path_getExtension(outputItem.resource.url);
+				var handler = solution.handlers.find(x => x.builder.accepts(outputItem.type) || x.builder.accepts(ext))
+				if (handler == null)
 					throw Error(`Unknown builder for type ${outputItem.type}`)
 
-				return builder.buildDependencies(outputItem, solution);
+				return handler.builder.createModule(outputItem);
 			}
 			function rewriteRoot () {
 				var main = solution.outputResources.root;
 				var dependencies = solution.outputResources.getForPage(solution.opts.mainPage);
-				var builder = Builders[main.type];
-				if (builder == null) {
-					builder = Builders[path_getExtension(main.url)];
-				}
-				if (builder == null || builder.rewriteRoot == null) {
+				var ext = path_getExtension(main.url);
+				var handler = solution.handlers.find(x => x.builder.accepts(main.type) || x.builder.accepts(ext))				
+				if (handler == null || handler.builder.rewriteRoot == null) {
 					throw new Error(`RootBuilder is not found for a resource ${main.url} and type ${main.type}`);
 				}
 							
-				return builder.rewriteRoot(main, dependencies, solution);
+				return handler.builder.rewriteRoot(main, dependencies, solution);
 			}					
 		}
-	};
-
-	// import ./templates/exports.js
-	// import ./ScriptBuilder.js
-	// import ./MaskBuilder.js
-	// import ./HtmlBuilder.js
-	// import ./CssBuilder.js
-
-	var Builders = {
-		js: ScriptBuilder,
-		mask: MaskBuilder,
-		css: CssBuilder,
-		html: HtmlBuilder
 	};
 
 }());

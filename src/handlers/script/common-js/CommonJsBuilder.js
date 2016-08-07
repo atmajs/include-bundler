@@ -4,6 +4,17 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		super(...arguments);
 	}
 
+	accepts (resource) {
+		if (resource.type !== 'js') {
+			return false;
+		}
+		var module = resource.getModule();	
+		if (module == null || module === 'root') 
+			module = this.solution.opts.package.module;
+
+		return module === 'commonjs';
+	}
+
 	wrapModule (resource) {
 		var opts = this.solution.opts;
 		if (opts.commonjs == null) {
@@ -31,7 +42,7 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		return body + module;
 	}
 
-	rewriteRoot (root, dependencies, solution) {
+	rewriteRoot (root, dependencies) {
 		dependencies.forEach(x => x.embed = true);
 
 
@@ -40,15 +51,10 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 			.concat([ root.content ])
 			.join('\n');
 
-		body = RootModule.replace('%BUNDLE%', () => body);
+		body = Templates.RootModule.replace('%BUNDLE%', () => body);
 
 		root.content = body;
 	}
-
-	accepts (module) {
-		return module === 'commonjs';
-	}
-	
 };
 
 var Templates = {

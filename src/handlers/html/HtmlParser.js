@@ -1,6 +1,7 @@
 // import ./readers/MaskContentReader.js
 // import ./readers/StyleLinkReader.js
 // import ./readers/ScriptLinkReader.js
+// import ./readers/ScriptContentReader.js
 
 HtmlHandler.Parser = class HtmlParser extends BaseParser {
 
@@ -10,7 +11,8 @@ HtmlHandler.Parser = class HtmlParser extends BaseParser {
 		this.readers = [
 			new MaskContentReader(this.solution),
 			new StyleLinkReader(this.solution),
-			new ScriptLinkReader(this.solution)
+			new ScriptLinkReader(this.solution),
+			new ScriptContentReader(this.solution)
 		];
 	}
 	

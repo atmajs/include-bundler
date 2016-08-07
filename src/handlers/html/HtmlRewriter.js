@@ -13,6 +13,6 @@ HtmlHandler.Rewriter = class HtmlRewriter extends BaseRewriter {
 	}
 
 	accepts (type) {
-		return type === 'css';
+		return type === 'html';
 	}
 };

@@ -17,20 +17,50 @@ var Files =  {
 		<script type='text/mask' data-run='auto'>
 			import from 'global.mask';
 		</script>
-		`
+	`,
+	'about-a.mask': `
+		span > 'AboutA';
+	`,
+	'about-b.mask': `
+		span > 'AboutB';
+	`,
+	'info-a.mask': `
+		span > 'InfoA';
+	`,
+	'info-b.mask': `
+		span > 'InfoB';
+	`,
+	'pages.html': `
+		<!doctype html>		
+		<script type='text/mask' data-run='auto'>
+			ViewManager {
+				View page='about' {
+					import from './about-a'
+					import from './about-b';
+				}
+				View page='info' {
+					import from './info-a';
+					import from './info-b';
+				}
+			}
+		</script>
+	`
 };
 
-var Bundler, mask;
+var mask;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
 
 		mask = require('maskjs');
-		Bundler = require('../../lib/bundler.js');
-
+		
+	},
+	$teardown () {
+		Bundler.clearCache();
+		mask.Module.clearCache();
 	},
 	'should bundle mask' () {
-		return Bundler.clearCache().build('main.mask', {}).done(resources => {
+		return Bundler.build('main.mask', {}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
 			
@@ -47,7 +77,6 @@ UTest({
 	},
 	'should get mask resources for html' () {
 		return Bundler
-			.clearCache()
 			.getResources('index.html')
 			.then(arr => arr.map(x => x.toJSON(false)))
 			.done(arr => {			
@@ -61,10 +90,10 @@ UTest({
 			});
 	},
 	'should bundle mask in html page' () {
-		return Bundler.clearCache().build('index.html').done(resources => {
+		return Bundler.build('index.html').done(resources => {
 			
 			eq_(resources.length, 1);
-			eq_(resources[0].type, 'html');
+			eq_(resources[0].type, 'load');
 			var main = resources[0];
 			eq_(main.url, 'build/release/index.html');
 
@@ -73,8 +102,8 @@ UTest({
 
 		});
 	},
-	'!should test mask sync module loading' (done) {
-
+	'should test mask sync module loading' (done) {
+	
 		var Files = {
 			'MyComponents.mask': `
 				module path='A.mask' {
@@ -107,16 +136,70 @@ UTest({
 		});
 
 		mask
-		.renderAsync(`
-			import sync from './MyComponents';
-			import Number from './MyNumber';
-		`)
-		.done(x => {
-			mask.cfg('getFile', null);
-			deepEq_(_queue, ['MyComponents.mask', 'MyNumber.mask']);
-			done();
-		})
-		
+			.renderAsync(`
+				import sync from './MyComponents';
+				import Number from './MyNumber';
+			`)
+			.done(x => {
+				mask.cfg('getFile', null);
+				deepEq_(_queue, ['MyComponents.mask', 'MyNumber.mask']);
+				done();
+			})
+	},
+	'!should test pages in html page' (done) {
+		Bundler.build('pages.html').done(resources => {
+			
+			eq_(resources.length, 3);
+			var urls = resources.map(x => x.url);
+			deepEq_(urls, [
+				'build/release/info_index.mask',
+				'build/release/about_index.mask', 
+				'build/release/pages.html'
+			]);
 
-	}
+			var main = resources[2];
+
+			
+			urls
+				.slice(0, urls.length - 1)
+				.forEach(path => has_(main.content, `import sync from '${path}';`));
+
+
+			// mask.cfg('getFile', path => {
+			// 	logger.log(path.bold.cyan)
+			// 	var resource = resources.find(x => x.url === path);
+			// 	is_(resource, 'Object');
+			// });
+
+			var template = mask.j(main.content).find('script').text();
+			template = template.replace(/sync/g, '')
+			logger.log(template.bold)
+
+			mask.parse(`
+				View page='name' {
+					import sync from 'build/release/about_index.mask';
+					import from './about-a';
+					import from './about-b';
+				}
+				View page='name' {
+					import sync from 'build/release/info_index.mask';
+					import from './about-a';
+					import from './about-b';
+				}
+			`)
+			logger.log(mask.parse(template) == null);
+			done();
+			return;
+
+			template = mask.j(template).find('View').first().text();
+			logger.log(template.cyan)
+			mask
+				.renderAsync(template)
+				.done(html => {
+					
+
+					done();
+				})
+		});
+	},
 })

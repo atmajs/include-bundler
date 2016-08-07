@@ -1,3 +1,4 @@
+
 var Resource = class_create({
 
 	resources: null,
@@ -87,6 +88,12 @@ var Resource = class_create({
 		resource.directory = path_getDir(filename);
 
 		resource.content = this.content;
+		resource.asModules = this.asModules;
+		resource.inPages = this.inPages;
+
+		if (solution.opts.version) {
+			resource.url += '?v=' + solution.opts.version;
+		}
 		
 		return resource;
 	},
@@ -114,5 +121,23 @@ var Resource = class_create({
 	},
 	isModuleType (type) {
 		return this.module.indexOf(type) !== -1;
+	},
+
+	getModule (solution) {
+		var modules = this.asModules;
+		if (modules == null || modules.length === 0) {
+			return null;
+		}
+				
+		if (modules.length === 1) {
+			return modules[0];
+		}
+
+		var arr = ['global', 'commonjs', 'amd', 'includejs'];
+		var name = arr.find(name => modules.indexOf(name) !== -1);
+		if (name == null) {
+			name = modules[0];
+		}
+		return name;
 	}
 });

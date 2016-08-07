@@ -7,7 +7,9 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 	getDependencies (content, ownerResource) {
 		var ast = this._parse(content, ownerResource);
 		var arr = [];
-		this._forEachImports(ast, imports => arr.push(...imports));
+		this._forEachImports(ast, imports => {
+			arr.push(...imports);
+		});
 		return async_resolve({ dependencies: arr });
 	}
 
@@ -48,26 +50,30 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 		}
 
 		var type = mask.Module.getType(new mask.Module.Endpoint(node.path, node.contentType))
+		var page = this._getPageForNode(node);
 		var dependency = {
 			url: path,
 			type: MAPPING[type],
 			module: 'mask',
-			page: null
+			page: page
 		};
 
+		return dependency;
+	}
+
+	_getPageForNode (node) {
 		var owner = node.parent;
 		if (owner != null && owner.tagName === 'imports') {
 			owner = owner.parent;
 		}
 		if (owner == null || owner.type === mask.Dom.FRAGMENT) {
-			return dependency;
+			return null;
 		}
 		var page = owner.attr['data-bundler-page'] || owner.attr.page || owner.attr.id || owner.attr.name;
 		if (page == null) {
-			solution.reporter.warn('Nested import found, but the container has no "data-bundler-page", "page", "id" or "name" in attributes');
+			this.solution.reporter.warn('Nested import found, but the container has no "data-bundler-page", "page", "id" or "name" in attributes');
 		}
-		dependency.page = page;
-		return dependency;
+		return page;
 	}
 };
 
