@@ -44,6 +44,22 @@ var Files =  {
 				}
 			}
 		</script>
+	`,
+	'scripts.mask': `
+		import * as Provider from './Provider.js';
+
+		define Foo {
+			function onRenderStart () {
+				this.model = this.$scope('Provider').getName();
+			}
+			h4 > '~[.]';
+		}		
+		Foo;
+	`,
+	'Provider.js': `
+		module.exports = {
+			getName: function () { return 'IFoo' }
+		};
 	`
 };
 
@@ -58,12 +74,13 @@ UTest({
 	$teardown () {
 		Bundler.clearCache();
 		mask.Module.clearCache();
+		mask.cfg('getFile');
 	},
 	'should bundle mask' () {
 		return Bundler.build('main.mask', {}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
-			
+		
 			eq_(main.type, 'mask'); 
 			eq_(main.url, 'build/release/main.mask');
 
@@ -83,7 +100,7 @@ UTest({
 				eq_(arr.length, 4);
 
 				var paths = arr.map(x => x.url);
-				deepEq_(paths, ['compos/Letter.mask', 'main.mask', 'global.mask', 'index.html']);
+				deepEq_(paths, ['/compos/Letter.mask', '/main.mask', '/global.mask', '/index.html']);
 
 				var asModules = arr.map(x => x.asModules);
 				deepEq_(asModules, [['mask'], ['mask'], ['mask'], ['root']]);
@@ -98,7 +115,7 @@ UTest({
 			eq_(main.url, 'build/release/index.html');
 
 			['compos/Letter.mask', 'main.mask', 'global.mask']
-				.forEach(path => has_(main.content, `module path="${path}"`));
+				.forEach(path => has_(main.content, `module path="/${path}"`));
 
 		});
 	},
@@ -141,12 +158,11 @@ UTest({
 				import Number from './MyNumber';
 			`)
 			.done(x => {
-				mask.cfg('getFile', null);
 				deepEq_(_queue, ['MyComponents.mask', 'MyNumber.mask']);
 				done();
 			})
 	},
-	'!should test pages in html page' (done) {
+	'should test pages in html page' (done) {
 		Bundler.build('pages.html').done(resources => {
 			
 			eq_(resources.length, 3);
@@ -158,48 +174,63 @@ UTest({
 			]);
 
 			var main = resources[2];
-
-			
+ 
 			urls
 				.slice(0, urls.length - 1)
 				.forEach(path => has_(main.content, `import sync from '${path}';`));
 
 
-			// mask.cfg('getFile', path => {
-			// 	logger.log(path.bold.cyan)
-			// 	var resource = resources.find(x => x.url === path);
-			// 	is_(resource, 'Object');
-			// });
+			mask.cfg('getFile', path => {
+				var resource = resources.find(x => path.indexOf(x.url) > -1);
+				is_(resource, 'Object');
+				return (new mask.class.Deferred()).resolve(resource.content);
+			});
 
 			var template = mask.j(main.content).find('script').text();
-			template = template.replace(/sync/g, '')
-			logger.log(template.bold)
 
-			mask.parse(`
-				View page='name' {
-					import sync from 'build/release/about_index.mask';
-					import from './about-a';
-					import from './about-b';
-				}
-				View page='name' {
-					import sync from 'build/release/info_index.mask';
-					import from './about-a';
-					import from './about-b';
-				}
-			`)
-			logger.log(mask.parse(template) == null);
-			done();
-			return;
-
-			template = mask.j(template).find('View').first().text();
-			logger.log(template.cyan)
 			mask
 				.renderAsync(template)
 				.done(html => {
-					
-
+					is_(html, 'String');
 					done();
 				})
 		});
 	},
+	'!should test mask scripts' (done) {
+		Bundler.build('scripts.mask').done(resources => {
+			
+			eq_(resources.length, 2);
+			var urls = resources.map(x => x.url);
+			deepEq_(urls, [
+				'build/release/main_index.js',
+				'build/release/scripts.mask'
+			]);
+
+			
+			var main = resources[1];
+			urls
+				.slice(0, urls.length - 1)
+				.forEach(path => has_(main.content, `import sync from '${path}';`));
+
+
+			mask.cfg('getScript', assert.await(path => {
+				var resource = resources.find(x => path.indexOf(x.url) > -1);
+				is_(resource, 'Object');
+				
+				eval(resource.content);
+				
+				return (new mask.class.Deferred()).resolve();
+			}));
+			
+			var template = main.content
+			mask
+				.renderAsync(template, {}, {}, null, new mask.Compo())
+				.fail(console.error)
+				.done(html => {					
+					has_(html, 'IFoo</h4>');
+					done();
+				})
+				
+		});
+	}
 })

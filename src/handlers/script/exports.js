@@ -8,6 +8,7 @@ var ScriptHandler;
 	// import ./common-js/
 	// import ./include-js/
 	// import ./global-js/
+	// import ./mask-js/
 
 	// import ./ScriptHandler.js
 	// import ./ScriptParser.js

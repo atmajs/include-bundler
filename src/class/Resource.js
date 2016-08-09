@@ -71,7 +71,7 @@ var Resource = class_create({
 		this.directory = path_getDir(this.filename);
 
 		// Application paths
-		this.url = path_toRelative(this.filename, solution.opts.base);
+		this.url = '/' + path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
 
 	},
@@ -94,8 +94,12 @@ var Resource = class_create({
 		if (solution.opts.version) {
 			resource.url += '?v=' + solution.opts.version;
 		}
-		
+
 		return resource;
+	},
+	toRelative (resource) {
+		var url = path_toRelative(this.filename, resource.filename);
+		return url;
 	},
 	toJSON (deep) {
 		return {

@@ -29,7 +29,7 @@
     "atma-io": "^0.2.16",
     "cheerio": "^0.20.0",
     "includejs": "^0.10.28",
-    "maskjs": "^0.56.2",
+    "maskjs": "^0.56.3",
     "uglify-js": "^2.6.2"
   },
   "atma": {

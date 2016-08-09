@@ -7,7 +7,8 @@ ScriptHandler.Builder = class ScriptBuilder extends BaseBuilder {
 			new GlobalJsHandler.Builder(this.solution, this.handler),
 			new CommonJsHandler.Builder(this.solution, this.handler),
 			new AmdJsHandler.Builder(this.solution, this.handler),
-			new IncludeJsHandler.Builder(this.solution, this.handler)
+			new IncludeJsHandler.Builder(this.solution, this.handler),
+			new MaskJsHandler.Builder(this.solution, this.handler)
 		]
 	}
 
