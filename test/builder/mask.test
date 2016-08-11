@@ -196,7 +196,7 @@ UTest({
 				})
 		});
 	},
-	'!should test mask scripts' (done) {
+	'should test mask scripts' (done) {
 		Bundler.build('scripts.mask').done(resources => {
 			
 			eq_(resources.length, 2);
@@ -232,5 +232,83 @@ UTest({
 				})
 				
 		});
+	},
+	'should test mask with styles': {
+	 	$before () {
+	 		logger.log('B'.bold.green)
+			TestHelper.registerFiles({
+				'button.mask': `
+
+					import from './button.css';
+					import Clickable from './Clickable';
+					define Button extends Clickable {
+						h4 > '~[ $.getFoo() ]'
+					}
+				`,
+				'Clickable.mask': `
+					import from './clickable.css';
+					define Clickable {
+						function getFoo () {
+							return 42;
+						}
+					}
+				`,
+				'button.css': `
+					button { border: 0px; }
+				`,
+				'clickable.css': `{
+					button:hover { background: red}
+				}`
+			});
+		},
+
+		'!should test deps' (done) {
+			var bundler = new Bundler('button.mask');
+			bundler.getResources().then(result => {
+				logger.log(result.map(x => x.url));
+			})
+		},
+
+		'should test build' () {
+
+			Bundler.build('button.mask').done(resources => {
+
+				logger.log(resources.length);
+				return;
+				
+				eq_(resources.length, 2);
+				var urls = resources.map(x => x.url);
+				deepEq_(urls, [
+					'build/release/main_index.js',
+					'build/release/scripts.mask'
+				]);
+
+				
+				var main = resources[1];
+				urls
+					.slice(0, urls.length - 1)
+					.forEach(path => has_(main.content, `import sync from '${path}';`));
+
+
+				mask.cfg('getScript', assert.await(path => {
+					var resource = resources.find(x => path.indexOf(x.url) > -1);
+					is_(resource, 'Object');
+					
+					eval(resource.content);
+					
+					return (new mask.class.Deferred()).resolve();
+				}));
+				
+				var template = main.content
+				mask
+					.renderAsync(template, {}, {}, null, new mask.Compo())
+					.fail(console.error)
+					.done(html => {					
+						has_(html, 'IFoo</h4>');
+						done();
+					})
+					
+			});
+		}
 	}
 })

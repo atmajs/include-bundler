@@ -95,8 +95,7 @@ var res_groupByType,
 			return stack;
 		}
 		function toArray(resource, out) {
-			var method = resource.type === 'css' ? 'push' : 'unshift'
-			out[method](resource);
+			out['unshift'](resource);
 			resource.resources.forEach(x => toArray(x, out));
 			return out;
 		}
