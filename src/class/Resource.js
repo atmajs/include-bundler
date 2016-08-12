@@ -82,7 +82,7 @@ var Resource = class_create({
 		var resource = new Resource({ type: this.type }, this, solution);
 
 		resource.type = this.type;
-		resource.url = url;
+		resource.url = '/' + url;
 		resource.location = path_getDir(url);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);

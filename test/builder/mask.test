@@ -235,18 +235,18 @@ UTest({
 	},
 	'should test mask with styles': {
 	 	$before () {
-	 		logger.log('B'.bold.green)
 			TestHelper.registerFiles({
 				'button.mask': `
 
 					import from './button.css';
-					import Clickable from './Clickable';
+					import Clickable from '/compos/Clickable';
 					define Button extends Clickable {
 						h4 > '~[ $.getFoo() ]'
 					}
+					Button;
 				`,
-				'Clickable.mask': `
-					import from './clickable.css';
+				'compos/Clickable.mask': `
+					import from '../compos/clickable.css';
 					define Clickable {
 						function getFoo () {
 							return 42;
@@ -256,55 +256,53 @@ UTest({
 				'button.css': `
 					button { border: 0px; }
 				`,
-				'clickable.css': `{
+				'compos/clickable.css': `
 					button:hover { background: red}
-				}`
+				`
 			});
 		},
 
-		'!should test deps' (done) {
+		'should test deps' () {
 			var bundler = new Bundler('button.mask');
-			bundler.getResources().then(result => {
-				logger.log(result.map(x => x.url));
-			})
+			return bundler
+				.getResources()
+				.then(result => {
+					var urls = result.map(x => x.url);
+					deepEq_(urls, [
+						'/compos/clickable.css',
+						'/compos/Clickable.mask',
+						'/button.css',
+						'/button.mask'
+					]);
+				});
 		},
 
-		'should test build' () {
+		'!should test build' (done) {
 
 			Bundler.build('button.mask').done(resources => {
 
-				logger.log(resources.length);
-				return;
 				
 				eq_(resources.length, 2);
 				var urls = resources.map(x => x.url);
 				deepEq_(urls, [
-					'build/release/main_index.js',
-					'build/release/scripts.mask'
+					'/build/release/main_index.css',
+					'/build/release/button.mask'
 				]);
 
-				
-				var main = resources[1];
-				urls
-					.slice(0, urls.length - 1)
-					.forEach(path => has_(main.content, `import sync from '${path}';`));
+				var styles = [
+					io.File.read('button.css'),
+					io.File.read('compos/clickable.css')
+				].join('\n');
 
-
-				mask.cfg('getScript', assert.await(path => {
-					var resource = resources.find(x => path.indexOf(x.url) > -1);
-					is_(resource, 'Object');
-					
-					eval(resource.content);
-					
-					return (new mask.class.Deferred()).resolve();
-				}));
+				eq_(resources[0].content, styles);
 				
-				var template = main.content
+				var template = resources[1].content;
+				mask.cfg('getFile', assert.avoid());
 				mask
 					.renderAsync(template, {}, {}, null, new mask.Compo())
 					.fail(console.error)
 					.done(html => {					
-						has_(html, 'IFoo</h4>');
+						has_(html, '42</h4>');
 						done();
 					})
 					

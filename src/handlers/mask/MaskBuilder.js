@@ -4,14 +4,23 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 		super(...arguments);
 	}
 
-	createModule (outputItem) {
-		var out = outputItem.resources.map(resource => {
+	createModule (outputItem, otherOutputItems) {
+		var out = [], arr;
 
-			var url = resource.toRelative(outputItem.resource);
+		otherOutputItems.forEach(item => {
+			if (item.resource.type === 'css') {
+				var arr = this.registerStyles(item.resources);
+				out.push(...arr);
+			}
+		})
+
+		arr = outputItem.resources.map(resource => {
 			return `module path="${resource.url}" { 
 				${resource.content}
 			}`
 		});
+		out.push(...arr);
+
 		
 		outputItem.resource.content = out.join('\n');
 	}
@@ -23,20 +32,27 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 		maskDeps.forEach(x => x.embed = true);
 		
 		var body = maskDeps.map(x => x.content).join('\n');
-			body += '\n' + resource.content;
-
 		var imports = dependencies
 			.filter(x => x.type !== 'mask')
-			.map(x => `import sync from '${x.url}';`)
+			.map(x => {
+				var url = x.toRelative(resource);
+				return `import sync from '${url}';`;
+			})
 			.join('\n');
 
-		body = `${imports}\n${body}`;
+		body = `${body}\n${imports}\n${resource.content}`;
 
 		resource.content = body;
 	}
 
 	accepts (type) {
 		return type === 'mask';
+	}
+
+	registerStyles (resources) {
+		return resources.filter(x => x.getModule() === 'mask').map(resource => {
+			return `module path="${resource.url}";`
+		});
 	}
 	
 };

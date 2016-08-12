@@ -34,14 +34,22 @@ var Builder;
 
 			function buildOutputItems () {
 				var items = solution.outputResources.items;
-				return async_map(items, buildBundle);
+				return async_map(items, item => {
+					var otherOutputItems = items.filter(x => {
+						if (x === item) return false;
+						if (x.page != item.page) return false;
+						if (x.bundle != item.bundle) return false;
+						return true;
+					});
+					return buildBundle(item, otherOutputItems);
+				});
 			}
-			function buildBundle (outputItem) {
+			function buildBundle (outputItem, otherOutputItems) {
 				return _middlewares
-					.run('buildBundle', outputItem)
+					.run('buildBundle', outputItem, otherOutputItems)
 					.then(buildBundleInternal)
 			}
-			function buildBundleInternal (outputItem) {
+			function buildBundleInternal (outputItem, otherOutputItems) {
 				if (outputItem.resource.content) {
 					return;
 				}
@@ -50,7 +58,7 @@ var Builder;
 				if (handler == null)
 					throw Error(`Unknown builder for type ${outputItem.type}`)
 
-				return handler.builder.createModule(outputItem);
+				return handler.builder.createModule(outputItem, otherOutputItems);
 			}
 			function rewriteRoot () {
 				var main = solution.outputResources.root;
