@@ -1,7 +1,8 @@
 var async_map,
 	async_whenAll,
 	async_resolve,
-	async_reject;
+	async_reject,
+	async_await;
 (function(){
 	async_map = function(arr, mapper) {
 		var out = new Array(arr.length);
@@ -80,4 +81,17 @@ var async_map,
 	async_reject = function(...args){
 		return (new class_Dfr()).reject(...args);
 	};
+
+	async_run = function(fn) {
+		if (fn.length === 0) {
+			var result = fn();
+			if (result && result.then)
+				return result;
+
+			return async_resolve();
+		}
+		return class_Dfr.run((resolve, reject) => {
+			fn(resolve, reject);
+		});
+	}
 }());

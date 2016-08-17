@@ -38,30 +38,30 @@ UTest({
 		return Bundler.getResourceTree('root.js').done(resource => {
 
 			var expect = {
-				url: 'root.js',
+				url: '/root.js',
 				type: 'js',
 				resources: [{
-					url: 'templates/root.mask',
+					url: '/templates/root.mask',
 					type: 'mask',
 					resources: [{
-						url: 'styles/app.css',
+						url: '/styles/app.css',
 						type: 'css'
 					}, {
-						url: 'scripts/app.js',
+						url: '/scripts/app.js',
 						type: 'js',
 						resources: [{
-							url: 'scripts/helper.js',
+							url: '/scripts/helper.js',
 							type: 'js',
 						}]
 					}]
 				}, {
-					url: 'styles/reset.less',
+					url: '/styles/reset.less',
 					type: 'css'
 				}, {
-					url: 'styles/main.less',
+					url: '/styles/main.less',
 					type: 'css'
 				}, {
-					url: 'scripts/helper.js',
+					url: '/scripts/helper.js',
 					type: 'js'
 				}]
 			};
@@ -73,13 +73,13 @@ UTest({
 		return Bundler.getResources('root.js').done(resources => {
 			var arr = resources.map(x => x.url);
 			var expect = [
-				'scripts/helper.js',
-				'scripts/app.js',
-				'templates/root.mask',
-				'root.js',
-				'styles/app.css',
-				'styles/reset.less',
-				'styles/main.less',
+				'/scripts/helper.js',
+				'/styles/main.less',
+				'/styles/reset.less',
+				'/scripts/app.js',
+				'/styles/app.css',
+				'/templates/root.mask',
+				'/root.js'
 			];
 			deepEq_(arr, expect);
 		});

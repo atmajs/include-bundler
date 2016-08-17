@@ -82,17 +82,17 @@ UTest({
 			var main = resources[0];
 		
 			eq_(main.type, 'mask'); 
-			eq_(main.url, 'build/release/main.mask');
+			eq_(main.url, '/build/release/main.mask');
 
-			var load = assert.avoid('Should not load the dependency');
-			mask.cfg('getFile', load);
+			var avoid = assert.avoid('Should not load the dependency');
+			mask.cfg('getFile', avoid);
 
-			var  html = mask.render(main.content)
+			var  html = mask.render(main.content, null, { filename: main.url })
 			has_(html, 'I am an A</h4>')
-			mask.cfg('getFile', null)
 		});
 	},
 	'should get mask resources for html' () {
+		
 		return Bundler
 			.getResources('index.html')
 			.then(arr => arr.map(x => x.toJSON(false)))
@@ -112,7 +112,7 @@ UTest({
 			eq_(resources.length, 1);
 			eq_(resources[0].type, 'load');
 			var main = resources[0];
-			eq_(main.url, 'build/release/index.html');
+			eq_(main.url, '/build/release/index.html');
 
 			['compos/Letter.mask', 'main.mask', 'global.mask']
 				.forEach(path => has_(main.content, `module path="/${path}"`));
@@ -168,9 +168,9 @@ UTest({
 			eq_(resources.length, 3);
 			var urls = resources.map(x => x.url);
 			deepEq_(urls, [
-				'build/release/info_index.mask',
-				'build/release/about_index.mask', 
-				'build/release/pages.html'
+				'/build/release/info_index.mask',
+				'/build/release/about_index.mask', 
+				'/build/release/pages.html'
 			]);
 
 			var main = resources[2];
@@ -202,29 +202,28 @@ UTest({
 			eq_(resources.length, 2);
 			var urls = resources.map(x => x.url);
 			deepEq_(urls, [
-				'build/release/main_index.js',
-				'build/release/scripts.mask'
+				'/build/release/main_index.js',
+				'/build/release/scripts.mask'
 			]);
 
 			
 			var main = resources[1];
-			urls
-				.slice(0, urls.length - 1)
-				.forEach(path => has_(main.content, `import sync from '${path}';`));
+			has_(main.content, `import sync from 'main_index.js';`);
 
 
 			mask.cfg('getScript', assert.await(path => {
 				var resource = resources.find(x => path.indexOf(x.url) > -1);
-				is_(resource, 'Object');
+				notEq_(resource, null, 'Failed for path ' + path);
+
 				
 				eval(resource.content);
 				
 				return (new mask.class.Deferred()).resolve();
 			}));
 			
-			var template = main.content
+			var template = main.content;
 			mask
-				.renderAsync(template, {}, {}, null, new mask.Compo())
+				.renderAsync(template, {}, { filename: main.url }, null, new mask.Compo())
 				.fail(console.error)
 				.done(html => {					
 					has_(html, 'IFoo</h4>');
@@ -277,7 +276,7 @@ UTest({
 				});
 		},
 
-		'!should test build' (done) {
+		'should test build' (done) {
 
 			Bundler.build('button.mask').done(resources => {
 
@@ -296,10 +295,10 @@ UTest({
 
 				eq_(resources[0].content, styles);
 				
-				var template = resources[1].content;
+				var main = resources[1];
 				mask.cfg('getFile', assert.avoid());
 				mask
-					.renderAsync(template, {}, {}, null, new mask.Compo())
+					.renderAsync(main.content, {}, { filename: main.url}, null, new mask.Compo())
 					.fail(console.error)
 					.done(html => {					
 						has_(html, '42</h4>');

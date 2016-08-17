@@ -12,9 +12,10 @@ class OutputResources {
 
 	prepair (resources) {
 		
-		var rootResource = resources.pop();
-		this.root = rootResource.toTarget(this.solution);
-		this.root.content = rootResource.content;
+		
+		this.rootInput = resources.pop();
+		this.rootOutput = this.rootInput.toTarget(this.solution);
+		this.rootOutput.content = this.rootInput.content;
 
 		this.pagesInput = res_groupByPageAndBundles(resources, this.solution.opts);
 
@@ -48,8 +49,8 @@ class OutputResources {
 
 	getAll () {
 		var all = this.items.map(x => x.resource).filter(x => x.embed !== true);
-		if (this.root) {
-			all.push(this.root);
+		if (this.rootOutput) {
+			all.push(this.rootOutput);
 		}
 		return all;
 	}

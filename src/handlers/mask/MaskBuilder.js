@@ -25,7 +25,7 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 		outputItem.resource.content = out.join('\n');
 	}
 
-	rewriteRoot (resource, dependencies) {
+	buildRoot (resource, dependencies) {
 
 		var maskDeps = dependencies.filter(x => x.type === 'mask');
 
@@ -40,9 +40,9 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 			})
 			.join('\n');
 
-		body = `${body}\n${imports}\n${resource.content}`;
-
-		resource.content = body;
+		
+		
+		resource.content = `${body}\n${imports}\n${resource.content}`;
 	}
 
 	accepts (type) {

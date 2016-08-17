@@ -13,8 +13,9 @@ var Builder;
 					return _middlewares
 						.run('rewriteDependencies', resources, solution)
 						.then(() => rewriteDependenciesInternal(resources))
-						.then(buildOutputItems)
 						.then(rewriteRoot)
+						.then(buildOutputItems)
+						.then(buildRoot)
 						.then(() => solution.outputResources.getAll());
 				});
 			
@@ -30,6 +31,23 @@ var Builder;
 					return handler.rewriter.rewriteResource(resource);
 				});
 				return async_whenAll(dfrs);
+			}
+
+			function rewriteRoot () {
+				return async_run(() => {
+					var input = solution.outputResources.rootInput,
+						output = solution.outputResources.rootOutput,
+						ext = path_getExtension(input.url);
+
+					var handler = solution.handlers.find(x => x.rewriter.accepts(input.type) || x.rewriter.accepts(ext))				
+					if (handler == null || handler.rewriter.rewriteRoot == null) {
+						//throw new Error(`RootRewriter is not found for a resource ${main.url} and type ${main.type}`);
+
+						return;
+					}
+								
+					return handler.rewriter.rewriteRoot(input, output);
+				})
 			}
 
 			function buildOutputItems () {
@@ -60,16 +78,16 @@ var Builder;
 
 				return handler.builder.createModule(outputItem, otherOutputItems);
 			}
-			function rewriteRoot () {
-				var main = solution.outputResources.root;
+			function buildRoot () {
+				var main = solution.outputResources.rootOutput;
 				var dependencies = solution.outputResources.getForPage(solution.opts.mainPage);
 				var ext = path_getExtension(main.url);
 				var handler = solution.handlers.find(x => x.builder.accepts(main.type) || x.builder.accepts(ext))				
-				if (handler == null || handler.builder.rewriteRoot == null) {
+				if (handler == null || handler.builder.buildRoot == null) {
 					throw new Error(`RootBuilder is not found for a resource ${main.url} and type ${main.type}`);
 				}
 							
-				return handler.builder.rewriteRoot(main, dependencies, solution);
+				return handler.builder.buildRoot(main, dependencies, solution);
 			}					
 		}
 	};

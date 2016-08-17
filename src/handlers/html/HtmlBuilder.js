@@ -16,7 +16,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 		];
 	}
 
-	rewriteRoot (resource, dependencies) {
+	buildRoot (resource, dependencies) {
 		var $ = this.createDocument(resource.content);
 
 

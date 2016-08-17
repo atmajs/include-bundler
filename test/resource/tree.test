@@ -20,13 +20,13 @@ UTest({
 		return Bundler.getResourceTree('main-amd.js').done(resource => {
 
 			var expect = {
-				url: 'main-amd.js',
+				url: '/main-amd.js',
 				resources: [{
-					url: 'foo-include.js',
+					url: '/foo-include.js',
 					resources: [{
-						url: 'folder/bar-commonjs.js',
+						url: '/folder/bar-commonjs.js',
 						resources: [{
-							url: 'qux.js',
+							url: '/qux.js',
 							resources: []
 						}]
 					}]
@@ -39,10 +39,10 @@ UTest({
 		return Bundler.getResources('main-amd.js').done(resources => {
 			var urls = resources.map(x => x.url);
 			deepEq_(urls, [
-				'qux.js',
-				'folder/bar-commonjs.js',
-				'foo-include.js',
-				'main-amd.js',
+				'/qux.js',
+				'/folder/bar-commonjs.js',
+				'/foo-include.js',
+				'/main-amd.js',
 			]);
 		})
 	}

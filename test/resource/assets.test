@@ -22,16 +22,16 @@ UTest({
 			var solution = bundler.solution;			
 			var urls = resources.map(x => x.url);
 
-			deepEq_(urls, [ "main.js", "styles/icons.less" ]);
+			deepEq_(urls, [ "/styles/icons.less", "/main.js"]);
 
-			var css = resources[1].content;
+			var css = resources[0].content;
 			has_(css, '"../assets/styles/foodir/gear.png"');
 			has_(css, '"/styles/foodir/user.png"', 'Absolute path by same bases is not rewritten');
 
 			var assets = solution.assetsManager.getAssets();
 			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 1, 'Only when asset with relative path in less should be copied')
-			eq_(arr[0].url, 'build/release/assets/styles/foodir/gear.png')
+			eq_(arr[0].url, '/build/release/assets/styles/foodir/gear.png')
 		});
 	},
 	'should get resource tree from files for different bases' () {
@@ -41,9 +41,9 @@ UTest({
 			var solution = bundler.solution;
 			var urls = resources.map(x => x.url);
 
-			deepEq_(urls, [ "main.js", "styles/icons.less" ]);
+			deepEq_(urls, [ "/styles/icons.less", "/main.js" ]);
 
-			var css = resources[1].content;
+			var css = resources[0].content;
 			has_(css, '"../assets/styles/foodir/gear.png"');
 			has_(css, '"../assets/styles/foodir/user.png"');
 
@@ -51,7 +51,7 @@ UTest({
 
 			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 2, 'Only when asset with relative path in less should be copied')
-			eq_(arr[0].url, 'build/release/assets/styles/foodir/gear.png')
+			eq_(arr[0].url, '/build/release/assets/styles/foodir/gear.png')
 		});
 	}
 });

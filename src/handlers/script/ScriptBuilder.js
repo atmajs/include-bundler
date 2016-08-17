@@ -25,12 +25,12 @@ ScriptHandler.Builder = class ScriptBuilder extends BaseBuilder {
 		outputItem.resource.content = out.join('\n');
 	}
 
-	rewriteRoot (resource, dependencies) {
+	buildRoot (resource, dependencies) {
 		var builder = this.builders.find(x => x.accepts(resource));
 		if (builder == null)
 			throw new Error('Builder is not found for ' + resource.url);
 
-		return builder.rewriteRoot(resource, dependencies);
+		return builder.buildRoot(resource, dependencies);
 	}
 
 	accepts (type) {

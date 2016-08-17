@@ -42,7 +42,7 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		return body + module;
 	}
 
-	rewriteRoot (root, dependencies) {
+	buildRoot (root, dependencies) {
 		dependencies.forEach(x => x.embed = true);
 
 

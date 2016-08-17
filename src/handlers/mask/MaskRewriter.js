@@ -50,6 +50,23 @@ MaskHandler.Rewriter = class MaskRewriter extends BaseRewriter {
 		}
 	}
 
+	rewriteRoot (resourceInput, resourceOutput) {
+		var ast = this.handler.parser._parse(resourceInput.content);
+		mask.TreeWalker.walk(ast, (node) => {
+			if (node.tagName !== 'import')
+				return;
+
+			if (path_isRelative(node.path) === false)
+				return;
+
+			var path = path_combine(path_getDir(resourceInput.url), node.path);
+			
+			node.path = path_toRelative(path, resourceOutput.url);
+		});
+
+		resourceOutput.content = mask.stringify(ast);
+	}
+
 	accepts (type) {
 		return type === 'mask';
 	}
