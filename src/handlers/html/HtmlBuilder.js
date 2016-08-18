@@ -19,6 +19,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 	buildRoot (resource, dependencies) {
 		var $ = this.createDocument(resource.content);
 
+		dependencies.forEach(x => x.url = x.toRelative(resource));
 
 		this.serializers.forEach(x => x.removeDependencies($));
 		this.serializers.forEach(x => x.rewrite($, resource));		

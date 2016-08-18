@@ -18,7 +18,7 @@ var __register, __require, require;
 	};
 
 	__register = function (path, factory) {
-		var filename = path_resolveUrl(path);			
+		var filename = path_resolveUrl(path);	
 		modules[filename] = new Module(filename, factory);			
 	};
 

@@ -58,26 +58,15 @@ var path_getDir,
 	};
 	path_resolveUrl = function(path, location) {
 		var url = path_normalize(path);
-		if (path_isRelative(url)) {
+		if (url[0] === '/') {
+			url = path_combine(path_resolveCurrent(), url);
+		} else if (rgx_PROTOCOL.test(url) === false) {
 			url = path_normalize(path_combine(location || path_resolveCurrent(), url));
 		}
 		if (rgx_PROTOCOL.test(url) === false) {
 			url = 'file://' + url;
 		}
 		return url;
-	};
-	path_isRelative = function(path) {
-		var c = path.charCodeAt(0);
-		switch (c) {
-			case 47:
-				// /
-				return false;
-			case 102:
-			case 104:
-				// f || h
-				return rgx_PROTOCOL.test(path) === false;
-		}
-		return true;
 	};
 	
 	path_combine = function() {

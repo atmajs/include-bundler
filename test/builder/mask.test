@@ -196,7 +196,7 @@ UTest({
 				})
 		});
 	},
-	'should test mask scripts' (done) {
+	'!should test mask scripts' (done) {
 		Bundler.build('scripts.mask').done(resources => {
 			
 			eq_(resources.length, 2);
@@ -206,10 +206,10 @@ UTest({
 				'/build/release/scripts.mask'
 			]);
 
+
 			
 			var main = resources[1];
 			has_(main.content, `import sync from 'main_index.js';`);
-
 
 			mask.cfg('getScript', assert.await(path => {
 				var resource = resources.find(x => path.indexOf(x.url) > -1);
@@ -220,8 +220,14 @@ UTest({
 				
 				return (new mask.class.Deferred()).resolve();
 			}));
+
+			io.File.write('test.mask', main.content);
+			logger.log(mask.stringify(mask.parse(main.content)).bold);
+			done();
+			return;
+
 			
-			var template = main.content;
+			var template = main.content;			
 			mask
 				.renderAsync(template, {}, { filename: main.url }, null, new mask.Compo())
 				.fail(console.error)

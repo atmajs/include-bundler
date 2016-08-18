@@ -14,7 +14,7 @@ class StyleSerializer extends BaseSerializer {
 	}
 	
 	serialize ($, resources) {
-		var arr = resources.filter(x => x.type === 'js');
+		var arr = resources.filter(x => x.type === 'css');
 		if (arr.length === 0)
 			return;
 

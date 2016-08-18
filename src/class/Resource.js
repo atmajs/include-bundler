@@ -76,8 +76,16 @@ var Resource = class_create({
 
 	},
 	toTarget (solution) {
-		var folder = solution.opts.getOutputFolder(this.type);
-		var url = path_combine(folder, this.url);
+		var url;
+		if (solution.isMainResource(this)) {
+			url = solution.opts.outputMain;
+		} else {
+			url = path_combine(
+				solution.opts.getOutputFolder(this.type), 
+				this.url
+			);
+		}
+
 		var filename = path_combine(solution.opts.outputBase, url);
 		var resource = new Resource({ type: this.type }, this, solution);
 

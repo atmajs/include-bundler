@@ -25,6 +25,10 @@ var Solution = null;
 			}
 			// @TODO support settings for a resource
 		}
+
+		isMainResource (resource) {
+			return this.outputResources.rootInput === resource;
+		}
 	};
 
 }());

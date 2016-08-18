@@ -11,7 +11,7 @@ var SolutionOpts;
 			mainBundle: '',
 
 			outputBase: '',
-			outputMain: '{filename}.{build}.{ext}',
+			outputMain: 'build/{build}/{filename}.{ext}',
 			outputSources: 'build/{build}',
 			outputAssets: 'build/{build}/assets',
 			package: {
@@ -127,7 +127,7 @@ var SolutionOpts;
 
 					var match = /([^/\\]+)\.\w+$/.exec(path);
 					if (match) {
-						return match[0];
+						return match[1];
 					}
 					throw new Error('Filename can`t be parsed from: ' + opts.paths.join(','));
 				case 'ext':
@@ -137,7 +137,7 @@ var SolutionOpts;
 
 					var match = /\.(\w+)$/.exec(path);
 					if (match) {
-						return match[0];
+						return match[1];
 					}
 					throw new Error('Extension can`t be parsed from: ' + opts.paths.join(','));
 				default:

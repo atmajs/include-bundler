@@ -21,11 +21,11 @@ var Files =  {
 	`
 };
 
-var Bundler;
+//var Bundler;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
-		Bundler = require('../../lib/bundler.js');
+		//Bundler = require('../../lib/bundler.js');
 	},
 	$teardown () {
 		Bundler.clearCache();
@@ -37,10 +37,11 @@ UTest({
 			eq_(resources.length, 1);
 			var main = resources[0];
 
-			eq_(main.url, 'build/release/main.js');
+			eq_(main.url, '/build/release/main.js');
 
-			var module = {};
-			eval(main.content);			
+			io.File.write('test.js', main.content)
+			var module = {};			
+			eval(main.content);
 			deepEq_(module.exports.letters, ['a', 'b']);
 		});
 	},
@@ -52,7 +53,11 @@ UTest({
 				eq_(arr.length, 4);
 
 				var paths = arr.map(x => x.url);
-				deepEq_(paths, ['data/icons.js', 'main.js', 'global.js', 'index.html']);
+				deepEq_(paths, [
+					'/data/icons.js', 
+					'/main.js', 
+					'/global.js', 
+					'/index.html']);
 
 				var asModules = arr.map(x => x.asModules);
 				deepEq_(asModules, [['commonjs'], ['commonjs'], ['global'], ['root']]);
@@ -73,10 +78,18 @@ UTest({
 				letters: ['a', 'b']
 			});
 
-
 			eq_(resources[1].type, 'load');
-			has_(resources[1].content, 'src="build/release/main_index.js"');
-			
+			eq_(resources[1].url, '/build/release/index.html');
+			has_(resources[1].content, 'src="main_index.js"');			
+		});
+	},
+	'should bundle scripts in html with overriden mainOutputPath' () {
+		return Bundler.build('index.html', {
+			module: 'commonjs',
+			outputMain: '{filename}.{build}.{ext}'
+		}).done(resources => {
+			eq_(resources[1].url, '/index.release.html');
+			has_(resources[1].content, 'src="build/release/main_index.js"');			
 		});
 	}
 })
