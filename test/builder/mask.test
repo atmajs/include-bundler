@@ -196,7 +196,7 @@ UTest({
 				})
 		});
 	},
-	'!should test mask scripts' (done) {
+	'should test mask scripts' (done) {
 		Bundler.build('scripts.mask').done(resources => {
 			
 			eq_(resources.length, 2);
@@ -220,12 +220,6 @@ UTest({
 				
 				return (new mask.class.Deferred()).resolve();
 			}));
-
-			io.File.write('test.mask', main.content);
-			logger.log(mask.stringify(mask.parse(main.content)).bold);
-			done();
-			return;
-
 			
 			var template = main.content;			
 			mask

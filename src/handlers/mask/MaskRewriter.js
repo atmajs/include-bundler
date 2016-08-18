@@ -64,7 +64,7 @@ MaskHandler.Rewriter = class MaskRewriter extends BaseRewriter {
 			node.path = path_toRelative(path, resourceOutput.url);
 		});
 
-		resourceOutput.content = mask.stringify(ast);
+		resourceOutput.content = mask.stringify(ast, { indent: 4 });
 	}
 
 	accepts (type) {
