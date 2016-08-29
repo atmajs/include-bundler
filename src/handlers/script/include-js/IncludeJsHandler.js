@@ -14,32 +14,7 @@ IncludeJsHandler = class IncludeJsHandler extends BaseHandler {
 		return module === 'includejs';
 	}
 
-	wrapModule (resource) {
-		var opts = this.solution.opts;
-		if (opts.includejs == null) {
-			opts.includejs = {
-				addHeading: true,
-				hasHeading: false
-			}
-		};
-
-		var body = '';
-
-		if (opts.includejs.hasHeading === false && opts.includejs.addHeading === true) {			
-			opts.includejs.hasHeading = true;			
-			body = Templates.Header;
-		}
-
-		var {url, content} = resource;
-
-		var module = Templates
-			.Module
-			.replace('%MODULE_PATH%', () => url)
-			.replace('%MODULE%', () => content);
-		
-
-		return body + module;
-	}
+	
 
 	rewriteRoot (root, dependencies) {
 		dependencies.forEach(x => x.embed = true);

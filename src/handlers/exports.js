@@ -9,8 +9,10 @@ var Handlers;
 	// import mask/
 	// import css/
 	// import html/
+	// import load/
 
 	Handlers = [
+		LoadHandler,
 		MaskHandler,
 		ScriptHandler,
 		CssHandler,

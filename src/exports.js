@@ -13,6 +13,7 @@
 
 	// import ./class/Resource.js
 	// import ./class/ResourceInfo.js
+	// import ./class/ResourceMapping.js
 	// import ./class/Include.js
 	// import ./class/Solution.js
 	// import ./class/Resource.js

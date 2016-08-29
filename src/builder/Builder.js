@@ -72,9 +72,13 @@ var Builder;
 					return;
 				}
 				var ext = path_getExtension(outputItem.resource.url);
-				var handler = solution.handlers.find(x => x.builder.accepts(outputItem.type) || x.builder.accepts(ext))
-				if (handler == null)
+				var handler = solution.handlers.find(x => x.builder.accepts(outputItem.type));
+				if (handler == null) {
+					handler = solution.handlers.find(x => x.builder.accepts(ext));
+				}
+				if (handler == null) {
 					throw Error(`Unknown builder for type ${outputItem.type}`)
+				}
 
 				return handler.builder.createModule(outputItem, otherOutputItems);
 			}

@@ -35,7 +35,7 @@ var SolutionOpts;
 				'scss': { type: 'css' },
 				'sass': { type: 'css' },
 
-				'html': { type: 'load' },
+				'html': { type: 'html' },
 				'json': { type: 'data' },
 
 				'jpg': { type: 'asset' },
@@ -46,8 +46,9 @@ var SolutionOpts;
 				'js': 'js',
 				'mask': 'mask',
 				'css': 'css',
-				'load': 'html'
-			}
+				'load': 'load'
+			},
+			mappings: []
 		},
 		resolvers: {
 			base (basePath) {
@@ -107,6 +108,13 @@ var SolutionOpts;
 				throw new Error('Extension is not configurated: ' + ext);
 
 			return match.type;
+		},
+		mapResource (resource_) {
+			var resource = resource_;
+			this.mappings.forEach(mapping => {
+				resource = mapping.map(resource);
+			});
+			return resource;
 		}
 	});
 

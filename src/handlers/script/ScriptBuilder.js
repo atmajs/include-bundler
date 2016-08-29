@@ -12,14 +12,14 @@ ScriptHandler.Builder = class ScriptBuilder extends BaseBuilder {
 		]
 	}
 
-	createModule (outputItem) {
+	createModule (outputItem, otherOutputItems) {
 		var out = outputItem.resources.map(res => {
 
 			var builder = this.builders.find(x => x.accepts(res));
 			if (builder == null)
 				throw new Error('Builder is not found for ' + res.url);
 
-			return builder.wrapModule(res);
+			return builder.wrapModule(res, outputItem, otherOutputItems);
 		});
 		
 		outputItem.resource.content = out.join('\n');

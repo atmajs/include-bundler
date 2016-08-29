@@ -2,6 +2,8 @@
 // import ./serializers/MaskSerializer.js
 // import ./serializers/StyleSerializer.js
 // import ./serializers/ScriptSerializer.js
+// import ./serializers/HtmlSerializer.js
+// import ./serializers/LoadSerializer.js
 
 
 HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
@@ -11,9 +13,20 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 
 		this.serializers = [
 			new MaskSerializer(solution, this),
+			new StyleSerializer(solution, this),
 			new ScriptSerializer(solution, this),
-			new StyleSerializer(solution, this)
+			new HtmlSerializer(solution, this),
+			new LoadSerializer(solution, this)
 		];
+	}
+
+	createModule (outputItem, otherOutputItems) {
+		var arr = outputItem.resources.map(resource => {
+			return `<script type='text/plain' name='bunder-item' data-bundler-path='${resource.url}'>			
+				<![CDATA[${resource.content}]]>
+			</script>`
+		});
+		outputItem.resource.content = arr.join('\n');
 	}
 
 	buildRoot (resource, dependencies) {
@@ -29,7 +42,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 	}
 
 	append ($, selector, html) {
-		var container = $.root().find(selector);
+		var container = $.root().find(selector).first();
 		if (container.length !== 0) {
 			container.append(html);
 		} else {
@@ -37,7 +50,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 		}
 	}
 	insertBefore ($, selector, html) {
-		var anchor = $.root().find(selector);
+		var anchor = $.root().find(selector).first();
 		if (anchor.length !== 0) {
 			anchor.before(html);
 		} else {

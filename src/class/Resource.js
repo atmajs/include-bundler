@@ -17,8 +17,13 @@ var Resource = class_create({
 	module: '',
 
 	embed: false,
+	asModules: null,
+	inPages: null,
 
 	constructor: function (includeData, parent, solution) {
+		if (arguments.length === 0)
+			return;
+
 		this.resources = [];
 
 		if (includeData == null) {
@@ -74,6 +79,30 @@ var Resource = class_create({
 		this.url = '/' + path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
 
+		var mapped = solution.opts.mapResource(this);
+		if (mapped) {			
+			return mapped;
+		}
+
+		return this;
+	},
+	clone () {
+		var res = new Resource();
+		res.resources = this.resource;
+		res.parent = this.parent;
+		res.filename = this.filename;
+		res.directory = this.directory;
+		res.content = this.content;
+		res.url = this.url;
+		res.location = this.location;
+		res.namespace = this.namespace;
+		res.type = this.type;
+		res.bundle = this.bundle;
+		res.module = this.module;
+		res.embed = this.embed;
+		res.asModules = this.asModules;
+		res.inPages = this.inPages;
+		return res;
 	},
 	toTarget (solution) {
 		var url;

@@ -25,7 +25,7 @@ var Include;
 					url: net.Uri.combine(this.base, route.path),
 					route: route,
 					namespace: namespace,
-					module: 'include'
+					module: 'includejs'
 				});
 			});
 
