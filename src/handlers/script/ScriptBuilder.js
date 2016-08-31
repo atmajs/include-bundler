@@ -9,7 +9,7 @@ ScriptHandler.Builder = class ScriptBuilder extends BaseBuilder {
 			new AmdJsHandler.Builder(this.solution, this.handler),
 			new IncludeJsHandler.Builder(this.solution, this.handler),
 			new MaskJsHandler.Builder(this.solution, this.handler)
-		]
+		];
 	}
 
 	createModule (outputItem, otherOutputItems) {

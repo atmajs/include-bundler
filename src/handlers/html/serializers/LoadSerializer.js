@@ -18,7 +18,7 @@ class LoadSerializer extends BaseSerializer {
 		var html = arr
 			.map(resource => {
 				return `<script type='text/plain' data-bundler-path='${resource.url}'>			
-					<![CDATA[${resource.content}]]>
+					${resource.content}
 				</script>`
 			})
 			.join('\n');

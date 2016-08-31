@@ -9,10 +9,12 @@ IncludeJsHandler.Rewriter = class IncludeJsRewriter extends BaseRewriter {
 	}
 
 	rewriteResource (resource) {
-
+		if (resource.getModule() === 'global' && resource && resource.meta && resource.meta.includejs && resource.meta.includejs.hasIncludes) {
+			resource.asModules = ['includejs'];
+		}
 	}
 
 	accepts (type) {
-		return type === 'mask';
+		return type === 'js';
 	}
 };

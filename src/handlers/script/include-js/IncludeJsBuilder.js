@@ -25,9 +25,9 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 		var {url, content} = resource;
 
 
-		body += `include.setCurrent({ url: '${url}' });`
+		body += `include.setCurrent({ url: '${url}' });\n`
 		body += content;
-		body += `include.getResourceById('${url}', 'js').readystatechanged(3);`
+		body += `\ninclude.getResourceById('${url}', 'js').readystatechanged(3);`
 
 		if (builderOpts.hasHeading && builderOpts.lastItem === resource) {
 			body += `\ninclude.resumeStack();`

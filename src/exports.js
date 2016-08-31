@@ -16,7 +16,6 @@
 	// import ./class/ResourceMapping.js
 	// import ./class/Include.js
 	// import ./class/Solution.js
-	// import ./class/Resource.js
 	// import ./class/Middlewares.js
 
 	// import ./assets/AssetsManager.js

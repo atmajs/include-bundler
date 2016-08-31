@@ -29,6 +29,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 			dependencies: [],
 			meta: {
 				includejs: {
+					hasIncludes: false,
 					hasExports: false,
 					hasResponseObject: false,
 					responseAccessors: null,
@@ -78,6 +79,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 				if (pckg.args.length > 0) {
 					arr.unshift(pckg);
 				}
+				info.meta.includejs.hasIncludes = true;
 
 				break
 			case 'done':
@@ -110,7 +112,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 			include[x.type].apply(include, x.args);
 		});
 
-		info.dependencies.push(...include.includes);
+		info.dependencies.push(...include.includes);		
 	}
 
 	_processIncludeCallback (info, CallbackNode) {

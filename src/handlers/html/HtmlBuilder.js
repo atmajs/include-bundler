@@ -23,7 +23,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 	createModule (outputItem, otherOutputItems) {
 		var arr = outputItem.resources.map(resource => {
 			return `<script type='text/plain' name='bunder-item' data-bundler-path='${resource.url}'>			
-				<![CDATA[${resource.content}]]>
+				${resource.content}
 			</script>`
 		});
 		outputItem.resource.content = arr.join('\n');
