@@ -65,8 +65,17 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 	createDocument (html) {
 		return require('cheerio').load(html);
 	}
+/*
+	removeDependencies ($) {
+		$('[data-bundler-if]')
+			.filter((i, x) => {
+				var condition = x.attribs['data-bundler-if'];
+				var result = this.solution.opts.varDefs.evaluate(condition);
+				return !!result;
+			})
+			.remove()
+			;
 
-	removeDependencies ($) {		
 		$('script[src]')
 			.filter(function(i, x){
 				return x.attribs['data-bundler'] !== 'ignore';
@@ -81,5 +90,6 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 			.remove()
 			;
 	}
+	*/
 };
 

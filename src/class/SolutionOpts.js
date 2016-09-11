@@ -11,6 +11,7 @@ var SolutionOpts;
 			mainBundle: '',
 
 			outputBase: '',
+			outputAppBase: '',
 			outputMain: 'build/{build}/{filename}.{ext}',
 			outputSources: 'build/{build}',
 			outputAssets: 'build/{build}/assets',
@@ -48,7 +49,8 @@ var SolutionOpts;
 				'css': 'css',
 				'load': 'load'
 			},
-			mappings: []
+			mappings: null,
+			varDefs: null,
 		},
 		resolvers: {
 			base (basePath) {
@@ -61,6 +63,11 @@ var SolutionOpts;
 					? path_toAbsolute(outputBase)
 					: opts.base;
 			},
+			outputAppBase (outputAppBase, opts) {
+				return outputAppBase
+					? path_toAbsolute(outputAppBase, null, this.outputBase)
+					: this.outputBase;
+			},
 			outputMain: prepairPath,
 			outputSources: prepairPath,
 			outputAssets: prepairPath,
@@ -70,9 +77,16 @@ var SolutionOpts;
 				}
 				var opts = Object.create(this.package);
 				return Object.assign(opts, packageOpts);
+			},
+			varDefs (varDefs) {
+				return new VarDefinitions(this.solution, varDefs);
+			},
+			mappings () {
+				return []
 			}
 		},
 		constructor: function(solution, opts_){
+			this.solution = solution;
 			this.paths = [ solution.path ];
 			var opts = opts_ || {};
 			for (var key in this.defaults) {

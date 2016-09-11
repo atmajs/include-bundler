@@ -32,6 +32,7 @@ var Files =  {
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
+		Bundler.clearCache();
 	},
 	'should get resource tree with different types' () {
 
@@ -73,12 +74,12 @@ UTest({
 		return Bundler.getResources('root.js').done(resources => {
 			var arr = resources.map(x => x.url);
 			var expect = [
-				'/scripts/helper.js',
-				'/styles/main.less',
-				'/styles/reset.less',
-				'/scripts/app.js',
 				'/styles/app.css',
+				'/scripts/helper.js',
+				'/scripts/app.js',
 				'/templates/root.mask',
+				'/styles/reset.less',
+				'/styles/main.less',
 				'/root.js'
 			];
 			deepEq_(arr, expect);

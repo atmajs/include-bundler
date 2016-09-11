@@ -34,13 +34,33 @@ UTest({
 				{type: 'js', url: 'Controller.x2', module: 'mask'},
 				{page: 'about', type: 'mask', url: './my.mask', module: 'mask'}
 			]);
+		},
+		'should include conditions' () {
+			var template = `
+				<script src='/debug.js' data-bundler-if='DEBUG'></script>
+			`;
+			return parse(template, [
+				{
+					type: 'js', 
+					url: '/debug.js', 
+					module: 'global'
+				}
+			], { varDefs: { DEBUG: true }})
+		},
+		'should exclude conditions' () {
+			var template = `
+				<script src='/debug.js' data-bundler-if='DEBUG'></script>
+			`;
+			return parse(template, [], { varDefs: { DEBUG: false }});
 		}
 	}
 });
 
-function parse (code, expect) {
+function parse (code, expect, opts) {
 	var dfr = new Class.Deferred();
-	Bundler.Parser.getDependencies(code, 'html').then(result => {
+	opts = opts || {};
+	opts.type = 'html';
+	Bundler.Parser.getDependencies(code, opts).then(result => {
 		var deps = result.dependencies;
 		eq_(deps.length, expect.length)
 

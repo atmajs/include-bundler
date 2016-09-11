@@ -85,9 +85,11 @@
 
 		static get Parser () {
 			return { 
-				getDependencies (content, type = 'js') {
-					var solution = new Solution('', { type: type });
-					var resource = new Resource({ type: type, content: content}, null, solution);
+				getDependencies (content, opts = { type : 'js'}) {
+					if (typeof opts === 'string') opts = { type: opts };
+
+					var solution = new Solution('', opts);
+					var resource = new Resource({ type: opts.type, content: content}, null, solution);
 					return Parser.getDependencies(resource, solution);
 				}
 			}

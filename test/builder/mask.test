@@ -67,14 +67,22 @@ var mask;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);
-
 		mask = require('maskjs');
-		
+
+		Bundler.clearCache();
+		mask.Module.clearCache();
+		mask.cfg('getFile');
+	},
+	$after () {
+		TestHelper.clearFiles(Files);
 	},
 	$teardown () {
 		Bundler.clearCache();
 		mask.Module.clearCache();
 		mask.cfg('getFile');
+	},
+	$config: {
+		breakOnError: true
 	},
 	'should bundle mask' () {
 		return Bundler.build('main.mask', {}).done(resources => {
@@ -110,7 +118,7 @@ UTest({
 		return Bundler.build('index.html').done(resources => {
 			
 			eq_(resources.length, 1);
-			eq_(resources[0].type, 'load');
+			eq_(resources[0].type, 'html');
 			var main = resources[0];
 			eq_(main.url, '/build/release/index.html');
 
@@ -168,8 +176,8 @@ UTest({
 			eq_(resources.length, 3);
 			var urls = resources.map(x => x.url);
 			deepEq_(urls, [
-				'/build/release/info_index.mask',
 				'/build/release/about_index.mask', 
+				'/build/release/info_index.mask',
 				'/build/release/pages.html'
 			]);
 
@@ -268,9 +276,9 @@ UTest({
 				.then(result => {
 					var urls = result.map(x => x.url);
 					deepEq_(urls, [
+						'/button.css',
 						'/compos/clickable.css',
 						'/compos/Clickable.mask',
-						'/button.css',
 						'/button.mask'
 					]);
 				});

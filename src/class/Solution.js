@@ -1,6 +1,8 @@
 var solution = null;
 var Solution = null;
 (function(){
+
+	// import ./VarDefinitions.js
 	// import ./SolutionOpts.js
 	// import ./OutputResources.js
 	// import ./Reporter.js

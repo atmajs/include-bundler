@@ -13,5 +13,13 @@ var TestHelper = {
 				read () { return Files[key] }
 			}));
 		});
+	},
+
+	clearFiles (Files) {
+		Object.keys(Files).forEach(key => {
+			var rgx = new RegExp(key, 'i');
+			var Factory = io.File.getFactory();
+			Factory.unregisterHandler(rgx);
+		});
 	}
 }

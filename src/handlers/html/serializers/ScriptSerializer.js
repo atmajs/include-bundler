@@ -26,6 +26,13 @@ class ScriptSerializer extends BaseSerializer {
 	}
 
 	rewrite ($, resource) {
-		return void 0;
+		$('script[data-bundler="ignore"]')
+			.each((i, x) => {
+				var path = x.attribs['src'];
+				var resource = new Resource({url: path}, null, this.solution);
+				var url = resource.toTarget(this.solution).url;
+
+				x.attribs['src'] = url;
+			})
 	}
 }

@@ -19,7 +19,7 @@ LoadHandler.Builder = class LoadBuilder extends BaseBuilder {
 		outputItem.resource.type = 'html';
 	}
 
-	buildRoot (resource, dependencies) {
+	buildRoot (resource, dependencies) {		
 		throw new Error('Right now only rewriter is supported')	
 	}
 

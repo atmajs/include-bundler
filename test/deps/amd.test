@@ -1,6 +1,6 @@
 UTest({
 	'should parse defines' : {
-		'!should parse single amd' () {
+		'should parse single amd' () {
 			return parse(`define(["foo"], function(){})`, [ 
 				{type: 'js', url: 'foo', module: 'amd'}
 			]);

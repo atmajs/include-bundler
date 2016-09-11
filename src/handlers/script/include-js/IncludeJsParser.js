@@ -2,25 +2,10 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 
 	constructor (solution) {
 		super(...arguments);
-		if (solution.opts.package.module === 'includejs') {
 
-
-			solution.opts.mappings.push(new ResourceMapping({
-				asModules: (arr) => arr.indexOf('mask') > -1
-			}, {
-				asModules: (arr) => {
-					var i = arr.indexOf('mask');
-					arr[i] = 'includejs';
-					return arr;
-				}
-			}));
-			solution.opts.mappings.push(new ResourceMapping({
-				type: 'mask'
-			}, {
-				type: 'load'
-			}));
+		if (this.solution.opts.package.module === 'includejs') {
+			this.solution.opts.mappings.push(...IncludeJsMappings);
 		}
-		
 	}
 	
 	getDependencies (ast, ownerResource) {
@@ -176,4 +161,23 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 		});
 		return result;
 	}
+
 };
+
+
+var IncludeJsMappings = [
+	new ResourceMapping({
+		asModules: (arr) => arr.indexOf('mask') > -1
+	}, {
+		asModules: (arr) => {
+			var i = arr.indexOf('mask');
+			arr[i] = 'includejs';
+			return arr;
+		}
+	}),
+	new ResourceMapping({
+		type: 'mask'
+	}, {
+		type: 'load'
+	})
+];

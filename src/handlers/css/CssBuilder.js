@@ -7,8 +7,7 @@ CssHandler.Builder = class CssRewriter extends BaseBuilder {
 	createModule (outputItem) {
 		var out = outputItem
 			.resources
-			.map(res => res.content)
-			.reverse();
+			.map(res => res.content);
 		
 		outputItem.resource.content = out.join('\n');
 	}

@@ -95,8 +95,8 @@ var res_groupByType,
 			return stack;
 		}
 		function toArray(resource, out) {
-			out['unshift'](resource);
 			resource.resources.forEach(x => toArray(x, out));
+			out['push'](resource);
 			return out;
 		}
 		function takeModuleDescriptions (resA, resB) {

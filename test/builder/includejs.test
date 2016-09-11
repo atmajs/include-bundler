@@ -27,8 +27,15 @@ var Files =  {
 
 
 UTest({
-	$teardown () {
+	$before () {
+		TestHelper.registerFiles(Files);		
 		Bundler.clearCache();
+	},
+	$after () {
+		TestHelper.clearFiles(Files);
+	},
+	$teardown () {
+		Bundler.clearCache();		
 	},
 	'should bundle simple script files': {
 		$before () {
@@ -117,11 +124,12 @@ UTest({
 
 					var paths = arr.map(x => x.url);
 					deepEq_(paths, [
-						'/foo.js', 
-						'/bar.css', 
 						'/foo.css', 
+						'/bar.css', 
+						'/foo.js', 
 						'/main.js', 
-						'/index.html']);
+						'/index.html'
+					]);
 
 					var asModules = arr.map(x => x.asModules);
 					deepEq_(asModules, [['includejs'], ['includejs'], ['includejs'], ['global'], ['root']]);
@@ -135,14 +143,21 @@ UTest({
 
 				eq_(resources.length, 3);
 
-				var js = resources[0].content.trim();
+				var urls = resources.map(x => x.url);
+				deepEq_(urls, [
+					'main_index.css',
+					'main_index.js',
+					'/build/release/index.html'
+				]);
+				
+				var js = resources[1].content.trim();
 				
 				'> register resource'
 				has_(js, '"url":"/foo.js"');
 				has_(js, '"url":"/bar.css"');
 				has_(js, '"url":"/foo.css"');
 
-				var css = resources[1].content.trim();				
+				var css = resources[0].content.trim();				
 				has_(css.replace(/\s/g, ''), 'html{}body{}');
 
 				var html = resources[2].content.trim();
@@ -185,16 +200,16 @@ UTest({
 
 					var paths = arr.map(x => x.url);
 					deepEq_(paths, [
-						'/foo.less', 
 						'/foo.js', 
+						'/foo.less', 
 						'/Foo.mask', 
 						'/index.html'
 					]);
 
 					var types = arr.map(x => x.type);
 					deepEq_(types, [
-						'css', 
 						'js', 
+						'css', 
 						'load', 
 						'html'
 					]);
@@ -213,12 +228,19 @@ UTest({
 
 				eq_(resources.length, 3);
 
+				var urls = resources.map(x => x.url);				
+				deepEq_(urls, [
+					'main_index.js',
+					'main_index.css',
+					'/build/release/index.html'
+				]);
+				
 
-				var css = resources[0].content.trim();
+				var css = resources[1].content.trim();
 				eq_(css, 'body.foo {}')
 				
 
-				var js = resources[1].content.trim();
+				var js = resources[0].content.trim();
 
 				'> register resource'
 				has_(js, '"url":"/foo.less"');

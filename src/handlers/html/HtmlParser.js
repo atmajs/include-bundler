@@ -27,6 +27,14 @@ HtmlHandler.Parser = class HtmlParser extends BaseParser {
 				return;
 			}
 
+			var condition = $el.attr('data-bundler-if');
+			if (condition) {
+				var result = this.solution.opts.varDefs.evaluate(condition)
+				if (!result) {
+					return;
+				}
+			}
+
 			var reader = this.readers.find(reader => reader.canHandle($el));
 			if (reader) {
 				queue.push({

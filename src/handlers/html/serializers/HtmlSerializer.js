@@ -5,7 +5,18 @@ class HtmlSerializer extends BaseSerializer {
 	}
 
 	removeDependencies ($) {
-		return void 0;
+		$('[data-bundler-if]')
+			.filter((i, x) => {
+				var condition = x.attribs['data-bundler-if'];
+				var result = !!this.solution.opts.varDefs.evaluate(condition);
+				if (result) {
+					this.solution.reporter.info('Removing resource from HTML with condition ' + condition);
+				}
+				return result;
+			})
+			.remove()
+			;
+
 	}
 
 	serialize ($, resources) {

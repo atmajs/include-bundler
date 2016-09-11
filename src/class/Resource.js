@@ -104,22 +104,31 @@ var Resource = class_create({
 		res.inPages = this.inPages;
 		return res;
 	},
-	toTarget (solution) {
+	toTarget (solution, settings) {
+		var opts = solution.opts;
 		var url;
 		if (solution.isMainResource(this)) {
-			url = solution.opts.outputMain;
+			url = opts.outputMain;
 		} else {
 			url = path_combine(
-				solution.opts.getOutputFolder(this.type), 
+				opts.getOutputFolder(this.type), 
 				this.url
-			);
+			);			
 		}
 
-		var filename = path_combine(solution.opts.outputBase, url);
+		var filename = path_combine(opts.outputBase, url);
 		var resource = new Resource({ type: this.type }, this, solution);
 
-		resource.type = this.type;
-		resource.url = '/' + url;
+		
+		var baseDiffers = opts.outputBase !== opts.outputAppBase;
+		if (baseDiffers) {
+			url =  path_toRelative(filename, solution.opts.outputAppBase);
+		} else if (settings == null || settings.relative !== true) {
+			url = '/' + url;			
+		}
+		
+
+		resource.url = url;
 		resource.location = path_getDir(url);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);

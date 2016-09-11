@@ -1,6 +1,10 @@
 IncludeJsHandler = class IncludeJsHandler extends BaseHandler {
 	constructor () {
 		super(...arguments);
+
+		if (this.solution.opts.package.module === 'includejs') {
+			this.registerMappings_();
+		}
 	}
 
 	accepts (resource) {
@@ -29,4 +33,6 @@ IncludeJsHandler = class IncludeJsHandler extends BaseHandler {
 
 		root.content = body;
 	}
+
+	
 };

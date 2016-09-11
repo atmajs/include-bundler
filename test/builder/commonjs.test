@@ -24,11 +24,17 @@ var Files =  {
 //var Bundler;
 UTest({
 	$before () {
-		TestHelper.registerFiles(Files);
-		//Bundler = require('../../lib/bundler.js');
+		TestHelper.registerFiles(Files);		
+		Bundler.clearCache();
+	},
+	$after () {
+		TestHelper.clearFiles(Files);
 	},
 	$teardown () {
-		Bundler.clearCache();
+		Bundler.clearCache();		
+	},
+	$config: {
+		breakOnError: true
 	},
 	'should bundle commonjs scripts' () {
 		return Bundler.build('main.js', { 
@@ -39,7 +45,6 @@ UTest({
 
 			eq_(main.url, '/build/release/main.js');
 
-			io.File.write('test.js', main.content)
 			var module = {};			
 			eval(main.content);
 			deepEq_(module.exports.letters, ['a', 'b']);
@@ -78,7 +83,7 @@ UTest({
 				letters: ['a', 'b']
 			});
 
-			eq_(resources[1].type, 'load');
+			eq_(resources[1].type, 'html');
 			eq_(resources[1].url, '/build/release/index.html');
 			has_(resources[1].content, 'src="main_index.js"');			
 		});

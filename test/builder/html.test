@@ -1,0 +1,99 @@
+
+UTest({
+	$before () {
+		Bundler.clearCache();
+	},	
+	$teardown () {
+		Bundler.clearCache();		
+	},
+	$config: {
+		breakOnError: true
+	},
+	'should just rewrite path with changed base': {
+		$before () {
+			TestHelper.registerFiles({
+				'index.html': `
+					<!doctype html>					
+					<script src='/node_modules/foo.js' data-bundler='ignore'></script>					
+				`
+			});
+		},		
+		'should rewrite path to load file from local app base path' () {
+			return Bundler
+				.build('index.html', {
+					outputMain: 'bar-folder/index.html',
+					outputSources: 'bar-folder',
+					outputAppBase: 'bar-folder'
+				})
+				.done(arr => {			
+					eq_(arr.length, 1);
+					has_(arr[0].content, 'src="node_modules/foo.js"');
+				});
+		},
+		'should rewrite path to load file from global path relative to index' () {
+			return Bundler
+				.build('index.html', {
+					outputMain: 'bar-folder/index.html',
+					outputSources: 'bar-folder'
+				})
+				.done(arr => {			
+					eq_(arr.length, 1);
+					has_(arr[0].content, 'src="/bar-folder/node_modules/foo.js"');
+				});
+		},
+	},
+	'should build bundles': {
+		$before () {
+			TestHelper.registerFiles({
+				'foo1.js': `var foo = { foo1: true }`,
+				'foo2.js': `foo.foo2 = true`,
+				'bar1.js': `var bar = { bar1: true }`,
+				'bar2.js': `bar.bar2 = true`,
+				'index.html': `
+					<!doctype html>					
+					<script src='/foo1.js' data-bundler-bundle='foo'></script>
+					<script src='/foo2.js' data-bundler-bundle='foo'></script>
+					<script src='/bar1.js' data-bundler-bundle='bar'></script>
+					<script src='/bar2.js' data-bundler-bundle='bar'></script>
+				`
+			});
+		},
+		'should get resource' () {
+			Bundler
+				.getResources('index.html', { type: 'html'})
+				.done(arr => {
+					deepEq_(arr.map(x => x.url), [
+						'/foo1.js',
+						'/foo2.js',
+						'/bar1.js',
+						'/bar2.js',
+						'/index.html'
+					]);
+				})
+		},
+		'should rewrite path to load file from local app base path' () {
+			return Bundler
+				.build('index.html', {
+					outputMain: 'bar-folder/index.html',
+					outputSources: 'bar-folder',
+					outputAppBase: 'bar-folder'
+				})
+				.done(arr => {			
+					eq_(arr.length, 3);
+
+					eq_(arr[0].url, 'main_foo.js');
+					has_(arr[0].filename, '/bar-folder/main_foo.js');
+
+					eq_(arr[1].url, 'main_bar.js');
+					has_(arr[1].filename, '/bar-folder/main_bar.js');
+
+					var iFoo = arr[2].content.indexOf('"main_foo.js"');
+					var iBar = arr[2].content.indexOf('"main_bar.js"');
+
+					assert.lt_(iFoo, iBar);
+				});
+		}
+	},
+	
+	
+})
