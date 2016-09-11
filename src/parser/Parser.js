@@ -3,10 +3,7 @@ var Parser;
 	
 	var assert = require('assert');
 
-	// import ./ScriptParser.js
-	// import ./MaskParser.js
-	// import ./HtmlParser.js
-
+	
 	Parser = {
 		getDependencies (resource, solution) {
 			assert(resource != null, 'Resource is empty');

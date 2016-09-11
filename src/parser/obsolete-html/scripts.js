@@ -17,7 +17,10 @@ class ScriptReader {
 		var resource = {
 			type: 'js',
 			url: this.getSource(el),
-			module: 'global'
+			module: 'global',
+			meta: {
+				skipDependencies: el.attr('data-bundler-dependencies') === 'ignore'
+			}
 		};		
 		arr.push(resource);
 	}

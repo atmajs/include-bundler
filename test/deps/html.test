@@ -52,6 +52,48 @@ UTest({
 				<script src='/debug.js' data-bundler-if='DEBUG'></script>
 			`;
 			return parse(template, [], { varDefs: { DEBUG: false }});
+		},
+
+		'should check deeper dependencies': {
+			$before () {
+				TestHelper.registerFiles({
+					'index-deep.html': `
+						<script src='/foo.js'></script>
+					`,
+					'index-single.html': `
+						<script src='/foo.js' data-bundler-dependencies='ignore'></script>
+					`,
+					'foo.js': `
+						require('bar.js');
+					`,
+					'bar.js': `
+						module.exports = 'Bar';
+					`
+				});
+			},
+			$teardown () {
+				Bundler.clearCache();
+			},
+			'should get nested scripts' () {
+				
+				return Bundler.getResources('index-deep.html').done(resources => {
+
+					eq_(resources.length, 3);
+					has_(resources[0].toJSON(), {type: 'js', url: '/bar.js', asModules: ['commonjs']});
+					has_(resources[1].toJSON(), {type: 'js', url: '/foo.js', asModules: ['global']});
+					has_(resources[2].toJSON(), {type: 'html'});
+				});
+			},
+			'should ignore nested scripts' () {
+				
+				return Bundler.getResources('index-single.html').done(resources => {
+
+					eq_(resources.length, 2);
+					return;
+					has_(resources[0].toJSON(), {type: 'js', url: '/foo.js', asModules: ['global']});
+					has_(resources[1].toJSON(), {type: 'html'});
+				});
+			}
 		}
 	}
 });

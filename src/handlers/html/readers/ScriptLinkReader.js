@@ -19,7 +19,10 @@ class ScriptLinkReader {
 			type: 'js',
 			url: this.getSource(el),
 			module: 'global',
-			bundle: el.attr('data-bundler-bundle')
+			bundle: el.attr('data-bundler-bundle'),
+			meta: {
+				skipDependencies: el.attr('data-bundler-dependencies') === 'ignore'
+			}
 		};		
 		return [ resource ];
 	}

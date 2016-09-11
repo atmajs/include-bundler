@@ -51,6 +51,9 @@ var Resource = class_create({
 		if (includeData.module) {
 			this.asModules = [ includeData.module ];
 		}
+		if (includeData.meta) {
+			this.meta = includeData.meta;
+		}
 		if (includeData.page) {
 			this.inPages = [ includeData.page ];	
 		} else {

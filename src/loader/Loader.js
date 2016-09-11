@@ -62,6 +62,10 @@ var Loader;
 				}).fail(error => this.reject(error));
 			},
 			processChildren () {
+				if (this.shouldSkipChildren()) {
+					this.resolve(this);
+					return;
+				}
 				Parser
 					.getDependencies(this.resource, this.solution)
 					.then(result => this.loadChildren(result), error => this.reject(error));
@@ -69,7 +73,7 @@ var Loader;
 			loadChildren: function (result) {
 				assert(Array.isArray(result.dependencies), `Expects array of dependencies for ${this.resource.url}`);
 				
-				this.resource.meta = result.meta;
+				this.resource.meta = obj_extend(this.resource.meta, result.meta);
 
 				var deps = result.dependencies;
 				async_map(deps, dep => {
@@ -82,6 +86,16 @@ var Loader;
 					this.resource.resources = resources;
 					this.resolve(this);
 				});
+			},
+			shouldSkipChildren () {
+				if (/\.min\./.test(this.resource.filename)) {
+					return true;
+				}
+				var meta = this.resource.meta;
+				if (meta && meta.skipDependencies) {
+					return true;
+				}
+				return false;
 			}
 		});
 
