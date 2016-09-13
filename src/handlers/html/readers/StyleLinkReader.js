@@ -19,7 +19,8 @@ class StyleLinkReader {
 		var resource = {
 			type: 'css',
 			url: el.attr('href'),
-			module: 'global'
+			module: 'global',
+			bundle: el.attr('data-bundler-bundle')
 		};
 		return [resource];
 	}

@@ -8,7 +8,8 @@ var path_getDir,
 	path_isRelative,
 	path_toRelative,
 	path_appendQuery,
-	path_toAbsolute
+	path_toAbsolute,
+	path_withProtocol
 	;
 (function(){
 	var isWeb = true;
@@ -40,6 +41,10 @@ var path_getDir,
 	path_appendQuery = function(path, key, val){
 		var conjunctor = path.indexOf('?') === -1 ? '?' : '&';
 		return path + conjunctor + key + '=' + val;
+	};
+
+	path_withProtocol = function (path) {
+		return /^\/\/|^file:|^https?:|^ftps?:/i.test(path);
 	};
 
 	(function(){

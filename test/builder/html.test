@@ -23,11 +23,11 @@ UTest({
 				.build('index.html', {
 					outputMain: 'bar-folder/index.html',
 					outputSources: 'bar-folder',
-					outputAppBase: 'bar-folder'
+					outputAppBase: '/bar-folder'
 				})
 				.done(arr => {			
 					eq_(arr.length, 1);
-					has_(arr[0].content, 'src="node_modules/foo.js"');
+					has_(arr[0].content, 'src="/bar-folder/node_modules/foo.js"');
 				});
 		},
 		'should rewrite path to load file from global path relative to index' () {
@@ -38,7 +38,7 @@ UTest({
 				})
 				.done(arr => {			
 					eq_(arr.length, 1);
-					has_(arr[0].content, 'src="/bar-folder/node_modules/foo.js"');
+					has_(arr[0].content, 'src="/node_modules/foo.js"');
 				});
 		},
 	},
@@ -76,7 +76,7 @@ UTest({
 				.build('index.html', {
 					outputMain: 'bar-folder/index.html',
 					outputSources: 'bar-folder',
-					outputAppBase: 'bar-folder'
+					outputAppBase: '/bar-folder'
 				})
 				.done(arr => {			
 					eq_(arr.length, 3);

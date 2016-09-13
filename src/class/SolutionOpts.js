@@ -11,7 +11,7 @@ var SolutionOpts;
 			mainBundle: '',
 
 			outputBase: '',
-			outputAppBase: '',
+			outputAppBase: '/',
 			outputMain: 'build/{build}/{filename}.{ext}',
 			outputSources: 'build/{build}',
 			outputAssets: 'build/{build}/assets',
@@ -62,11 +62,6 @@ var SolutionOpts;
 				return outputBase
 					? path_toAbsolute(outputBase)
 					: opts.base;
-			},
-			outputAppBase (outputAppBase, opts) {
-				return outputAppBase
-					? path_toAbsolute(outputAppBase, null, this.outputBase)
-					: this.outputBase;
 			},
 			outputMain: prepairPath,
 			outputSources: prepairPath,

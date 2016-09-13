@@ -108,6 +108,41 @@ var Resource = class_create({
 		return res;
 	},
 	toTarget (solution, settings) {
+
+		var resource = settings && settings.targetType === 'static'
+			? this._toStaticTarget(solution, settings)
+			: this._toOutputTarget(solution, settings);
+		
+
+		resource.content = this.content;
+		resource.asModules = this.asModules;
+		resource.inPages = this.inPages;
+
+		if (solution.opts.version) {
+			resource.url += '?v=' + solution.opts.version;
+		}
+
+		return resource;
+	},
+	_toStaticTarget (solution, settings) {
+		var opts = solution.opts;
+		var url = this.url;
+
+		var filename = url;
+		var resource = new Resource({ type: this.type }, this, solution);
+		
+		if (settings == null || settings.relative !== true) {
+			url = path_combine(solution.opts.outputAppBase, url);
+		}
+		
+
+		resource.url = url;
+		resource.location = path_getDir(url);
+		resource.filename = filename;
+		resource.directory = path_getDir(filename);
+		return resource;
+	},
+	_toOutputTarget (solution, settings) {
 		var opts = solution.opts;
 		var url;
 		if (solution.isMainResource(this)) {
@@ -122,28 +157,14 @@ var Resource = class_create({
 		var filename = path_combine(opts.outputBase, url);
 		var resource = new Resource({ type: this.type }, this, solution);
 
-		
-		var baseDiffers = opts.outputBase !== opts.outputAppBase;
-		if (baseDiffers) {
-			url =  path_toRelative(filename, solution.opts.outputAppBase);
-		} else if (settings == null || settings.relative !== true) {
-			url = '/' + url;			
+		if (settings == null || settings.relative !== true) {
+			url = path_combine(solution.opts.outputAppBase, url);
 		}
-		
 
 		resource.url = url;
 		resource.location = path_getDir(url);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);
-
-		resource.content = this.content;
-		resource.asModules = this.asModules;
-		resource.inPages = this.inPages;
-
-		if (solution.opts.version) {
-			resource.url += '?v=' + solution.opts.version;
-		}
-
 		return resource;
 	},
 	toRelative (resource) {
