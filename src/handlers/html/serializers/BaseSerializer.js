@@ -52,4 +52,43 @@ class BaseSerializer {
 
 		return false;
 	}
+
+	_rewriteStaticUrls (ownerResource, $, selector, pathAttrName) {
+		$(selector)
+			.each((i, el) => {
+				var path = $(el).attr(pathAttrName);
+				if (!path || path_withProtocol(path))
+					return;
+
+				var resource = new Resource({url: path}, ownerResource, this.solution);
+				var url = resource.toTarget(this.solution, { targetType: 'static' }).url;
+
+
+				$(el).attr(pathAttrName, url);
+			});
+	}
+
+	_inlineResources ($, selector, pathAttrName, createHtmlFn) {
+		var reporter = this.solution.reporter;
+		$(selector)
+			.each((i, el) => {
+				var path = $(el).attr(pathAttrName);
+				if (/^https?:/.test(path)) {
+					reporter.error('Only local resources can be inlined. Current: ' + path);
+					return;
+				}
+
+				var resource = new Resource({url: path}, resource, this.solution);
+				if (io.File.exists(resource.filename) === false) {
+					reporter.error('File not found: ' + resource.filename);
+					return;
+				}
+
+				var content = io.File.read(resource.filename);
+				var html = createHtmlFn(content);
+				$(el).replaceWith(html);
+
+				reporter.info('Inlined resource from ' + resource.url);
+			});
+	}
 }

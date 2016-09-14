@@ -207,5 +207,38 @@ UTest({
 				});
 		}
 	},
+
+	'!should inline content': {
+		$before () {
+			TestHelper.registerFiles({
+				'foo.css': ` h2 {}`,
+				'bar.js': `var bar`,
+				'index.html': `
+					<!doctype html>
+					<body>
+						<script src='/bar.js' data-bundler='ignore' data-bundler-content='inline'></script>
+						<link href='foo.css' rel='sTylesheet' data-bundler='ignore' data-bundler-content='inline' />
+					</body>
+				`
+			});
+		},
+		
+		'should test inline' () {
+			return Bundler
+				.build('index.html')
+				.then(arr => {			
+					eq_(arr.length, 1);
+
+					var html = arr[0].content;
+					return UTest
+						.domtest
+						.use('cheerio')
+						.process(html, `
+							find ('script') > has text ('var bar');
+							find ('style') > has text ('h2 {}');
+						`);
+				});
+		}
+	}
 	
 })

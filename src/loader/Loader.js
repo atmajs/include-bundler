@@ -56,7 +56,8 @@ var Loader;
 				this.opts = opts;
 			},
 			process () {
-				io.File.readAsync(this.resource.filename, this.opts).done(content => {					
+				var reader = _config.get('readFile');
+				reader(this.resource.filename, this.opts).done(content => {					
 					this.resource.content = content;
 					this.processChildren();
 				}).fail(error => this.reject(error));

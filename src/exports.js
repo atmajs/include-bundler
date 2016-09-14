@@ -10,6 +10,7 @@
 	// import ./utils/arr.js
 	// import ./utils/path.js
 	// import ./utils/async.js
+	// import ./utils/file.js
 
 	// import ./class/Resource.js
 	// import ./class/ResourceInfo.js
@@ -17,6 +18,8 @@
 	// import ./class/Include.js
 	// import ./class/Solution.js
 	// import ./class/Middlewares.js
+
+	// import ./config/
 
 	// import ./assets/AssetsManager.js
 
@@ -30,6 +33,9 @@
 		static clearCache() {
 			Loader.clearCache();
 			return Bundler;
+		}
+		static get Config () {
+			return _config;
 		}
 
 		constructor (path, opts) {
