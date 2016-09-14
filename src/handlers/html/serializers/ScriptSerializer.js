@@ -46,6 +46,6 @@ class ScriptSerializer extends BaseSerializer {
 	}
 
 	clean ($) {
-		$('placeholder#bundlers-placeholder').remove();
+		
 	}
 }

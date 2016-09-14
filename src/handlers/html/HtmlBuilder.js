@@ -39,6 +39,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 		this.serializers.forEach(x => x.serialize($, dependencies));
 		this.serializers.forEach(x => x.clean($));
 
+		this.clean($);
 		resource.content = $.html();
 	}
 
@@ -66,8 +67,8 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 	createDocument (html) {
 		return require('cheerio').load(html);
 	}
-/*
-	removeDependencies ($) {
+
+	clean ($) {
 		$('[data-bundler-if]')
 			.filter((i, x) => {
 				var condition = x.attribs['data-bundler-if'];
@@ -77,20 +78,10 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 			.remove()
 			;
 
-		$('script[src]')
-			.filter(function(i, x){
-				return x.attribs['data-bundler'] !== 'ignore';
-			})
-			.remove()
-			;
-			
-		$('link[href]')
-			.filter(function(i, x){
-				return x.attribs['data-bundler'] !== 'ignore';
-			})
+		$('placeholder#bundlers-placeholder')
 			.remove()
 			;
 	}
-	*/
+	
 };
 
