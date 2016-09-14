@@ -117,6 +117,7 @@ var Resource = class_create({
 		resource.content = this.content;
 		resource.asModules = this.asModules;
 		resource.inPages = this.inPages;
+		resource.bundle = this.bundle;
 
 		if (solution.opts.version) {
 			resource.url += '?v=' + solution.opts.version;

@@ -9,7 +9,9 @@ class ScriptSerializer extends BaseSerializer {
 			.filter(function(i, x){
 				return x.attribs['data-bundler'] !== 'ignore';
 			})
-			.remove()
+			.each((i, el) => {
+				this._replaceWithPlaceholder($(el), 'js');
+			})
 			;
 	}
 
@@ -18,11 +20,15 @@ class ScriptSerializer extends BaseSerializer {
 		if (arr.length === 0)
 			return;
 
-		var html = arr
-			.map(x => `<script src='${x.url}' type='text/javascript'></script>`)
-			.join('\n');
+		arr.forEach(resource => {
+			var html = `<script src='${resource.url}' type='text/javascript'></script>`; 
 
-		this.builder.append($, 'body', html);
+			var inserted = this._insertDependency($, resource, html);
+			if (inserted === false) {
+				this.builder.append($, 'body', html);
+				return;
+			}
+		});
 	}
 
 	rewrite ($, resource) {
@@ -37,5 +43,9 @@ class ScriptSerializer extends BaseSerializer {
 
 				x.attribs['src'] = url;
 			})
+	}
+
+	clean ($) {
+		$('placeholder#bundlers-placeholder').remove();
 	}
 }

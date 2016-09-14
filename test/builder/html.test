@@ -50,7 +50,7 @@ UTest({
 				'bar1.js': `var bar = { bar1: true }`,
 				'bar2.js': `bar.bar2 = true`,
 				'index.html': `
-					<!doctype html>					
+					<!doctype html>
 					<script src='/foo1.js' data-bundler-bundle='foo'></script>
 					<script src='/foo2.js' data-bundler-bundle='foo'></script>
 					<script src='/bar1.js' data-bundler-bundle='bar'></script>
@@ -95,5 +95,117 @@ UTest({
 		}
 	},
 	
+	'should insert bundles in proper places': {
+		$before () {
+			TestHelper.registerFiles({
+				'foo1.js': `var foo1;`,
+				'foo2.js': `var foo2;`,
+				'bar1.js': `var bar1;`,
+				'bar2.js': `var bar2;`,
+				'foo1.css': ` foo1 {} `,
+				'foo2.css': ` foo2 {}`,
+				'bar1.css': ` bar1 {} `,
+				'bar2.css': ` bar2 {}`,
+				
+				'index.html': `
+					<!doctype html>
+					<head>
+						<link rel='stylesheet' href='csstest1' data-bundler='ignore' />
+						<link rel='stylesheet' href='foo1.css' data-bundler-bundle='foo' />
+						
+						<link rel='stylesheet' href='csstest2' data-bundler='ignore' />
+						<link rel='stylesheet' href='foo2.css' data-bundler-bundle='foo' />
+					</head>
+					<body>
+						<link rel='stylesheet' href='bar1.css' data-bundler-bundle='bar' />
+
+						<script src='some-global-main' data-bundler='ignore'></script>
+
+						<script src='/foo1.js' data-bundler-bundle='foo'></script>
+						<script src='/foo2.js' data-bundler-bundle='foo'></script>
+						
+						<script src='some-helpers' data-bundler='ignore'></script>
+
+						<script src='/bar1.js' data-bundler-bundle='bar'></script>
+						<script src='/bar2.js' data-bundler-bundle='bar'></script>
+
+						<script src='some-further-helpers' data-bundler='ignore'></script>
+
+
+						<link rel='stylesheet' href='bar2.css' data-bundler-bundle='bar' />
+					</body>
+				`
+			});
+		},
+		'should get resource' () {
+			Bundler
+				.getResources('index.html', { type: 'html'})
+				.done(arr => {
+					deepEq_(arr.map(x => x.url), [
+						'/foo1.css',
+						'/foo2.css',
+						'/bar1.css',
+						'/foo1.js',
+						'/foo2.js',
+						'/bar1.js',
+						'/bar2.js',
+						'/bar2.css',
+						'/index.html'
+					]);
+				})
+		},
+		'should build html' () {
+			return Bundler
+				.build('index.html', {
+					outputMain: 'release.html',
+					outputSources: '/'
+				})
+				.then(arr => {			
+					eq_(arr.length, 5);
+
+					var html = arr[4].content;
+
+					return UTest
+						.domtest
+						.use('cheerio')
+						.process(html, `
+							find('link') > length 4;
+							find('script') > length 5;
+
+							find('link, script') {
+								length 9;
+
+								eq(0) {
+									has attr href csstest1;
+								}
+								eq(1) {
+									has attr href foo;
+								}
+								eq(2) {
+									has attr href csstest2;
+								}
+								eq(3) {
+									has attr href bar;
+								}
+								eq(4) {
+									has attr src some-global-main;
+								}
+								eq(5) {
+									has attr src foo;
+								}
+								eq(6) {
+									has attr src some-helpers;
+								}
+								eq(7) {
+									has attr src bar;
+								}
+								eq(8) {
+									has attr src some-further-helpers;
+								}
+							}
+						`)
+				});
+		}
+	},
 	
 })

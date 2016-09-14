@@ -37,6 +37,7 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 		this.serializers.forEach(x => x.removeDependencies($));
 		this.serializers.forEach(x => x.rewrite($, resource));		
 		this.serializers.forEach(x => x.serialize($, dependencies));
+		this.serializers.forEach(x => x.clean($));
 
 		resource.content = $.html();
 	}

@@ -64,7 +64,11 @@ class OutputItem {
 		this.type = type;
 		var ext = solution.opts.getExtForType(type);
 		var filename = `${page}_${bundle}.${ext}`;
-		var resource = new Resource({type: type, url: filename}, null, solution);
+		var resource = new Resource({
+			type: type, 
+			url: filename,
+			bundle: bundle
+		}, null, solution);
 
 		this.resource = resource.toTarget(solution);
 		this.resources = resources || [];

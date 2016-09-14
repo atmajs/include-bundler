@@ -9,7 +9,9 @@ class StyleSerializer extends BaseSerializer {
 			.filter(function(i, x){
 				return x.attribs['data-bundler'] !== 'ignore';
 			})
-			.remove()
+			.each((i, el) => {
+				this._replaceWithPlaceholder($(el), 'css');
+			})
 			;
 	}
 	
@@ -18,11 +20,16 @@ class StyleSerializer extends BaseSerializer {
 		if (arr.length === 0)
 			return;
 
-		var html = arr
-			.map(x => `<link href='${x.url}' rel='stylesheet' />`)
-			.join('\n');
 
-		this.builder.append($, 'head', html);
+		arr.forEach(resource => {
+			var html = `<link href='${resource.url}' rel='stylesheet' />`; 
+
+			var inserted = this._insertDependency($, resource, html);
+			if (inserted === false) {
+				this.builder.append($, 'head', html);
+				return;
+			}
+		});		
 	}
 
 	rewrite ($, resource) {
