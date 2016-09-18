@@ -31,13 +31,6 @@ function loadConfig () {
 
 function process (config) {
 
-	/** 
-	 * Load atma env and its plugins. 
-	 * TODO: remove atma dependency and extract io middlewares to standalone plugins
-	 */
-
-	require('atma');
-
 	var Bundler = require('./lib/bundler');
 	var path = config.file,
 		opts = config;
