@@ -1,8 +1,11 @@
 {
   "name": "app-bundler",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "lib/bundler.js",
+  "bin": {
+    "app-bundler": "bin/bundler.js"
+  },
   "scripts": {
     "test": "atma test"
   },
@@ -26,11 +29,14 @@
   },
   "homepage": "https://github.com/atmajs/app-bundler",
   "dependencies": {
+    "appcfg": "^0.2.42",
     "atma-io": "^0.2.16",
     "cheerio": "^0.20.0",
     "includejs": "^0.10.28",
     "maskjs": "^0.56.3",
-    "uglify-js": "^2.6.2"
+    "uglify-js": "^2.6.2",
+    "atma-utils": "^0.1.6",
+    "atma": "latest"
   },
   "atma": {
     "plugins": [
@@ -51,9 +57,5 @@
         "output": "lib/bundler.js"
       }
     }
-  },
-  "devDependencies": {
-    "atma-utils": "^0.1.6",
-    "atma": "latest"
   }
 }

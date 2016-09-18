@@ -1,4 +1,4 @@
-_config.defineMaby({
+_config.defineMany({
 	readFile: function (path, opts) {
 		return io.File.readAsync(path, opts)
 	},

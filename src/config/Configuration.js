@@ -8,6 +8,9 @@ class Configuration {
 			default: defaultVal,
 			value: defaultVal
 		};
+		if (key === 'middlewares') {
+			io.File.registerExtensions(defaultVal);
+		}
 	}
 
 	defineMany (options) {
