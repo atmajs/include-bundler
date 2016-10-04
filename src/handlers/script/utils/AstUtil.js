@@ -82,13 +82,15 @@ var AstUtil;
 			case 'Number':
 				return node.value;
 			case 'Array':
-				return ruqq.arr.map(Array.prototype.slice.call(node.elements), function(x) {
+				return Array.from(node.elements).map(function(x) {
 					return evaluateNode(x, scope);
 				});
 			case 'Object':
-				return ruqq.arr.aggr(node.properties, {}, function(x, aggr) {
+				var aggr = {};
+				Array.from(node.properties).forEach(function(x) {
 					aggr[x.key] = evaluateNode(x.value, scope);
 				});
+				return aggr;
 			case 'Binary':
 				var left = evaluateNode(node.left, scope),
 					right = evaluateNode(node.right, scope);
@@ -133,7 +135,7 @@ var AstUtil;
 
 
 
-			args = ruqq.arr.map(args, function(x) {
+			args = Array.from(args).map(function(x) {
 				return evaluateNode(x, scope);
 			});
 

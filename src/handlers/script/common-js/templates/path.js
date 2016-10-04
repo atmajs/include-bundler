@@ -57,6 +57,9 @@ var path_getDir,
 		return path_;
 	};
 	path_resolveUrl = function(path, location) {
+		if (/\\.\\w+$/.test(path) === false) {
+			path += '.js';
+		}
 		var url = path_normalize(path);
 		if (url[0] === '/') {
 			url = path_combine(path_resolveCurrent(), url);

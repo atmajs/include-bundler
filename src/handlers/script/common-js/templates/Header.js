@@ -22,7 +22,7 @@ var __register, __require, require;
 		modules[filename] = new Module(filename, factory);			
 	};
 
-	__require =__originalRequire.bind({ location: path_resolveCurrent() });
+	__require =__originalRequire.bind({ location: path_getDir(path_resolveUrl('%ROOT_DIR%')) });
 
 	var modules = {};
 	var Module = function(filename, factory){	

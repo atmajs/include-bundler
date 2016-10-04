@@ -22,7 +22,7 @@ var Include;
 			Routes.each(type, pckg, (namespace, route) => {
 				this.includes.push({
 					type: type,
-					url: net.Uri.combine(this.base, route.path),
+					url: class_Uri.combine(this.base, route.path),
 					route: route,
 					namespace: namespace,
 					module: 'includejs'

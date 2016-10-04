@@ -27,8 +27,13 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		var body = '';
 
 		if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
-			opts.commonjs.hasHeading = true;			
-			body = Templates.Header;
+			opts.commonjs.hasHeading = true;	
+
+			var mainUrl = this.solution.outputResources.rootInput.url;
+
+			body = Templates
+				.Header
+				.replace('%ROOT_DIR%', () => mainUrl);
 		}
 
 		var {url, content} = resource;
@@ -51,7 +56,23 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 			.concat([ root.content ])
 			.join('\n');
 
-		body = Templates.RootModule.replace('%BUNDLE%', () => body);
+
+		body = Templates
+			.RootModule
+			.replace('%BUNDLE%', () => body);
+
+		var packageOpts = this.solution.opts.package;
+		if (packageOpts.moduleWrapper === 'umd') {
+			var name = packageOpts.moduleName;
+			if (!name) {
+				throw Error('`moduleName` option is not set. Should be used for UMD wrapper');
+			}
+			body = Templates
+				.UMD
+				.replace('%MODULE%', () => body)
+				.replace('%NAME%', () => name)
+				;
+		}
 
 		root.content = body;
 	}
@@ -66,5 +87,8 @@ var Templates = {
 `,
 	RootModule: `
 // import ./templates/RootModule.js
+`,
+	UMD: `
+// import ./templates/UMD.js
 `,
 };

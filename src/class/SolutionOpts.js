@@ -20,7 +20,11 @@ var SolutionOpts;
 				modules: ['commonjs', 'includejs', 'global'],
 
 				type: 'module',
-				types: [ 'module', 'bundle']
+				types: [ 'module', 'bundle'],
+
+				moduleWrapper: '',
+				moduleWrappers: ['umd'],
+				moduleName: '',
 			},
 			extensions: {
 				'': { type: 'js'},

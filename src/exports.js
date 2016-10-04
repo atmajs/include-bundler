@@ -85,6 +85,17 @@
 			return new Bundler(path, opts).build(opts);
 		}
 
+		static process (path, opts) {
+			return Bundler
+				.build(path, opts)
+				.then(resources => {
+					resources.forEach(res => {
+						io.File.write(res.filename, res.content);
+					});
+					return resources;
+				})
+		}
+
 		defineMiddleware (name, fn) {
 			_middlewares.define(name, fn);
 		}
