@@ -31,11 +31,12 @@
   "dependencies": {
     "appcfg": "^0.2.42",
     "atma-io": "^0.2.16",
+    "atma-logger": "^1.0.2",
+    "atma-utils": "^0.1.6",
     "cheerio": "^0.20.0",
     "includejs": "^0.10.28",
     "maskjs": ">0.0.0",
-    "uglify-js": "^2.6.2",
-    "atma-utils": "^0.1.6"
+    "uglify-js": "^2.6.2"
   },
   "atma": {
     "plugins": [

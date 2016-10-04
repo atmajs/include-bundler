@@ -2,6 +2,7 @@
 
 	var mask = require('maskjs');
 	var assert = require('assert');
+	var logger = require('atma-logger');
 			
 
 	// import ../node_modules/atma-utils/lib/utils.embed.js
