@@ -17,7 +17,8 @@ class LoadSerializer extends BaseSerializer {
 		arr.forEach(x => x.embed = true);
 		var html = arr
 			.map(resource => {
-				return `<script type='text/plain' data-bundler-path='${resource.url}'>			
+				var url = resource.toTargetUrl(this.solution);
+				return `<script type='text/plain' data-bundler-path='${url}'>			
 					${resource.content}
 				</script>`
 			})

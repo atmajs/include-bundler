@@ -87,6 +87,8 @@ var Resource = class_create({
 			return mapped;
 		}
 
+		this.solution = solution;
+
 		return this;
 	},
 	clone () {
@@ -158,7 +160,7 @@ var Resource = class_create({
 		var filename = path_combine(opts.outputBase, url);
 		var resource = new Resource({ type: this.type }, this, solution);
 
-		if (settings == null || settings.relative !== true) {
+		if (settings == null || settings.relative !== true && url.indexOf(solution.opts.outputAppBase) === -1) {
 			url = path_combine(solution.opts.outputAppBase, url);
 		}
 
@@ -170,6 +172,13 @@ var Resource = class_create({
 	},
 	toRelative (resource) {
 		var url = path_toRelative(this.filename, resource.filename);
+		return url;
+	},
+	toTargetUrl (solution) {
+		var url = this.url;
+		if (url.indexOf(solution.opts.outputAppBase) === -1)
+			url = path_combine(solution.opts.outputAppBase, url);
+
 		return url;
 	},
 	toJSON (deep) {

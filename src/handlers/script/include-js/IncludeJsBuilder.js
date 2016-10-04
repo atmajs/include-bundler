@@ -22,7 +22,8 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 			body = this._createHeading(builderOpts, resource, outputItem, otherOutputItems);
 		}
 
-		var {url, content} = resource;
+		var content = resource.content,
+			url = resource.toTargetUrl(this.solution);
 
 
 		body += `include.setCurrent({ url: '${url}' });\n`
@@ -80,7 +81,12 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 	_serializeRegister (resources, type) {
 		var paths = resources
 			.filter(x => x.type === type)
-			.map(x => ({ type: type, url: x.url }));
+			.map(x => {
+				return { 
+					type: type, 
+					url: x.toTargetUrl(this.solution) 
+				};
+			});
 
 		if (paths.length === 0) {
 			return '';

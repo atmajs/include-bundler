@@ -95,7 +95,9 @@ var res_groupByType,
 			return stack;
 		}
 		function toArray(resource, out) {
-			resource.resources.forEach(x => toArray(x, out));
+			if (resource.resources) {
+				resource.resources.forEach(x => toArray(x, out));
+			}
 			out['push'](resource);
 			return out;
 		}

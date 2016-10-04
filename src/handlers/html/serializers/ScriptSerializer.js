@@ -32,18 +32,18 @@ class ScriptSerializer extends BaseSerializer {
 	}
 
 	rewrite ($, resource) {
+		this._inlineResources(
+			$,
+			'script[src][data-bundler-content="inline"]',
+			'src',
+			content => `<script type='text/javascript'>${content}</script>`	
+		);
 		this._rewriteStaticUrls(
 			resource,
 			$,
 			'script[data-bundler="ignore"]',
 			'src'
 		);
-		this._inlineResources(
-			$,
-			'script[src][data-bundler-content="inline"]',
-			'src',
-			content => `<script type='text/javascript'>${content}</script>`	
-		);		
 	}
 
 	clean ($) {

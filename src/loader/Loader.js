@@ -56,6 +56,11 @@ var Loader;
 				this.opts = opts;
 			},
 			process () {
+				this
+					.solution
+					.reporter
+					.info('Load: ' + this.resource.url);
+					
 				var reader = _config.get('readFile');
 				reader(this.resource.filename, this.opts).done(content => {					
 					this.resource.content = content;
@@ -92,6 +97,13 @@ var Loader;
 				if (/\.min\./.test(this.resource.filename)) {
 					return true;
 				}
+				if (/\/bower_components\//.test(this.resource.filename)) {
+					return true;
+				}
+				if (/\/node_modules\//.test(this.resource.filename)) {
+					return true;
+				}
+
 				var meta = this.resource.meta;
 				if (meta && meta.skipDependencies) {
 					return true;

@@ -22,7 +22,8 @@ HtmlHandler.Builder = class HtmlBuilder extends BaseBuilder {
 
 	createModule (outputItem, otherOutputItems) {
 		var arr = outputItem.resources.map(resource => {
-			return `<script type='text/plain' name='bunder-item' data-bundler-path='${resource.url}'>			
+			var url = resource.toTargetUrl(this.solution);
+			return `<script type='text/plain' name='bunder-item' data-bundler-path='${url}'>
 				${resource.content}
 			</script>`
 		});

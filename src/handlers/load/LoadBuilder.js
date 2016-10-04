@@ -9,7 +9,8 @@ LoadHandler.Builder = class LoadBuilder extends BaseBuilder {
 		var html = outputItem
 			.resources
 			.map(resource => {
-				return `<script type='text/plain' data-bundler-path='${resource.url}'>			
+				var url = resource.toTargetUrl(this.solution);
+				return `<script type='text/plain' data-bundler-path='${url}'>			
 					${resource.content}
 				</script>`
 			})

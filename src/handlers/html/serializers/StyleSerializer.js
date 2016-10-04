@@ -33,17 +33,17 @@ class StyleSerializer extends BaseSerializer {
 	}
 
 	rewrite ($, resource) {
-		this._rewriteStaticUrls(
-			resource,
-			$,
-			'link[rel="stylesheet"][data-bundler="ignore"]',
-			'href'
-		);
 		this._inlineResources(
 			$,
 			'link[href][data-bundler-content="inline"]',
 			'href',
 			content => `<style>${content}</style>`
+		);
+		this._rewriteStaticUrls(
+			resource,
+			$,
+			'link[rel="stylesheet"][data-bundler="ignore"]',
+			'href'
 		);
 	}
 }
