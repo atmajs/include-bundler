@@ -7,4 +7,6 @@ var CommonJsHandler;
 	// import ./CommonJsRewriter.js
 	// import ./CommonJsBuilder.js
 
+	// import ./CommonJsBuilderSimplified.js
+
 }());

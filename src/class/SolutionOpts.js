@@ -22,8 +22,8 @@ var SolutionOpts;
 				type: 'module',
 				types: [ 'module', 'bundle'],
 
-				moduleWrapper: '',
-				moduleWrappers: ['umd'],
+				moduleWrapper: 'iif',
+				moduleWrappers: ['umd', 'iif'],
 				moduleName: '',
 			},
 			extensions: {
@@ -74,7 +74,7 @@ var SolutionOpts;
 				if (packageOpts == null) {
 					return this.package;
 				}
-				var opts = Object.create(this.package);
+				var opts = Object.create(this.defaults.package);
 				return Object.assign(opts, packageOpts);
 			},
 			varDefs (varDefs) {

@@ -2,6 +2,12 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 
 	constructor () {
 		super(...arguments);
+
+		var opts = this.solution.opts.package.commonjs;
+		if (opts && opts.output === 'simplified') {
+			this.wrapModule = CommonJsBuilderSimplified.wrapModule;
+			this.getRootContent = CommonJsBuilderSimplified.getRootContent;
+		}
 	}
 
 	accepts (resource) {
@@ -50,37 +56,58 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 	buildRoot (root, dependencies) {
 		dependencies.forEach(x => x.embed = true);
 
-
+		var content = this.getRootContent(root);
 		var body = dependencies
 			.map(x => x.content)
-			.concat([ root.content ])
+			.concat([ content ])
 			.join('\n');
 
 
-		body = Templates
-			.RootModule
-			.replace('%BUNDLE%', () => body);
-
-		var packageOpts = this.solution.opts.package;
-		if (packageOpts.moduleWrapper === 'umd') {
-			var name = packageOpts.moduleName;
-			if (!name) {
-				throw Error('`moduleName` option is not set. Should be used for UMD wrapper');
-			}
-			body = Templates
-				.UMD
-				.replace('%MODULE%', () => body)
-				.replace('%NAME%', () => name)
-				;
-		}
+		var wrapper = this.solution.opts.package.moduleWrapper;
+		switch (wrapper) {
+			case 'iif':
+				body = this.wrapWithIIF(body);
+				break;
+			case 'umd':
+				body = this.wrapWithUMD(body);
+				break;
+			default:
+				throw new Error('Uknown module wrapper: ' + wrapper);
+		}		
 
 		root.content = body;
+	}
+
+	getRootContent (root) {
+		return  root.content;
+	}
+
+	wrapWithIIF (body) {
+		return Templates
+			.RootModule
+			.replace('%BUNDLE%', () => body);
+	}
+	
+	wrapWithUMD (body) {
+		var opts = this.solution.opts.package;
+		var name = opts.moduleName;
+		if (!name) {
+			throw Error('`moduleName` option is not set. Should be used for UMD wrapper');
+		}
+		return Templates
+			.UMD
+			.replace('%MODULE%', () => body)
+			.replace('%NAME%', () => name)
+			;
 	}
 };
 
 var Templates = {
 	Module: `
 // import ./templates/Module.js
+`,
+	ModuleSimplified: `
+// import ./templates/ModuleSimplified.js
 `,
 	Header: `
 // import ./templates/Header.js
