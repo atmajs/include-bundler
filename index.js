@@ -9,7 +9,8 @@ function loadConfig () {
 		return require('appcfg')
 			.fetch(sources)
 			.fail(error => {
-				throw new Error('<app:configuration>', error);
+				console.error('Configuration error', error.message);
+				process.exit(1);
 			})
 			.then(x => x.toJSON());	
 	}
@@ -31,6 +32,8 @@ function loadConfig () {
 
 function process (config) {
 
+	validate(config);
+
 	var Bundler = require('./lib/bundler');
 	var path = config.file,
 		opts = config;
@@ -50,9 +53,18 @@ function process (config) {
 	function run () {
 		Bundler
 			.process(path, opts)
-			.fail(console.error)
+			.fail(error => {
+				console.error('Failed: ', error);
+				process.exit(1);
+			})
 			.done(x => console.log('Ready'));	
 	}
 
 	
+}
+
+function validate (config) {
+	if (!config.file) {
+		throw new Error('`file` property should contain path to the main entry point of the app');
+	}
 }
