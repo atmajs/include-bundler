@@ -176,6 +176,15 @@ var IncludeJsMappings = [
 		}
 	}),
 	new ResourceMapping({
+		asModules: (arr) => arr.indexOf('amd') > -1
+	}, {
+		asModules: (arr) => {
+			var i = arr.indexOf('amd');
+			arr[i] = 'includejs';
+			return arr;
+		}
+	}),
+	new ResourceMapping({
 		type: 'mask'
 	}, {
 		type: 'load'

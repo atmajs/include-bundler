@@ -40,6 +40,7 @@ AmdJsHandler.Parser = class AmdJsParser extends BaseParser {
 			include[type].apply(include, groups[type]);
 		}
 		include.includes.forEach(x => x.module = 'amd');
+		include.includes = include.includes.filter(x => x.url !== 'exports');
 		return include.includes;
 	}
 

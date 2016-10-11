@@ -30,16 +30,14 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 
 	_forEachImports (ast, cb) {
 		mask.TreeWalker.walk(ast,  node => {
-			if (node.tagName !== 'imports') {
-				return;
+			if (node.tagName === 'imports') {				
+				var imports = Array
+					.from(node.nodes)
+					.filter(x => x.tagName === 'import')
+					.map(x => this._getDependencyFromNode(x));
+
+				cb(imports);
 			}
-
-			var imports = Array
-				.from(node.nodes)
-				.filter(x => x.tagName === 'import')
-				.map(x => this._getDependencyFromNode(x));
-
-			cb(imports);
 		});
 	}
 
