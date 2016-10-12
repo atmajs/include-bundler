@@ -3,17 +3,17 @@ var Loader;
 
 	Loader = {
 		load (type, path, opts, solution) {
-			var includeData = { type: type, url: path, module: 'root' };
-			var start = performance.now();
+			var includeData = { type: type, url: path, module: 'root', page: solution.opts.mainPage };
+			var start = Date.now();
 			return ResourceLoader
 				.load(includeData, null, opts, solution)
 				.then(loader => {
-					var end = performance.now();
+					var end = Date.now();
 					var seconds = ((end - start) / 1000).toFixed(2);
 					var treeInfo = res_getTreeInfo(loader.resource);
 					var reporter = solution.reporter;
 					reporter
-						.info(`Loaded ${treeInfo.count} files in ${seconds} sec.`);
+						.info(`Loaded bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color);
 					reporter
 						.info(treeInfo.treeString);
 					return loader.resource;
@@ -48,16 +48,32 @@ var Loader;
 			load (includeData, parent, opts, solution) {				
 				var resource = new Resource(includeData, parent, solution);
 				var loader = __loaders[resource.filename];
-				if (loader) {
-					return loader;
+				if (loader == null) {
+					loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
+					loader.process();
 				}
-				loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
-				loader.process();
+				if (includeData.page) {
+					loader.done(() => {
+						this.definePageForAll(includeData.page, loader.resource);
+					});
+				}
+				
 				return loader;
 			},
 			clearCache () {
 				__loaders = {};
 				return ResourceLoader;
+			},
+			definePageForAll (name, resource) {				
+				res_walk(resource, res => {
+					if (res.page) return false;
+
+					var arr = res.inPages;
+					if (arr.indexOf(name) !== -1)
+						return;
+
+					res.inPages.push(name);
+				});
 			}
 		};
 		var TreeLoader = class_create(class_Dfr, {

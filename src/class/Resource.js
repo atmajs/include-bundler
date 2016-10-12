@@ -41,6 +41,7 @@ var Resource = class_create({
 		this.type = includeData.type;
 		this.content = includeData.content;
 		this.namespace = includeData.namespace;
+		this.page = includeData.page;
 		this.asModules = [];
 		this.inPages = [];
 
