@@ -58,7 +58,7 @@ var Resource = class_create({
 			this.inPages = [ includeData.page ];	
 		} else {
 			var owner = parent;
-			while(owner != null && owner.inPages.length !== 0) {
+			while(owner != null && owner.inPages.length === 0) {
 				owner = owner.parent;
 			}
 			if (owner != null) {
