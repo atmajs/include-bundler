@@ -6,15 +6,20 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 
 	wrapModule (resource, outputItem, otherOutputItems) {
 		var opts = this.solution.opts;
+		var page = res_getPage(resource, opts);
+		
 		if (opts.includejs == null) {
-			opts.includejs = {
+			opts.includejs = {};							
+		}
+		if (opts.includejs[page] == null) {
+			opts.includejs[page] = {
 				addHeading: true,
 				hasHeading: false,
 				lastItem: null
-			}
-		};
+			};
+		}
 
-		var builderOpts = opts.includejs;
+		var builderOpts = opts.includejs[page];
 		var body = '';
 
 		if (builderOpts.hasHeading === false && builderOpts.addHeading === true) {			

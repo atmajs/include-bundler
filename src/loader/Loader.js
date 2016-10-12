@@ -4,9 +4,20 @@ var Loader;
 	Loader = {
 		load (type, path, opts, solution) {
 			var includeData = { type: type, url: path, module: 'root' };
+			var start = performance.now();
 			return ResourceLoader
 				.load(includeData, null, opts, solution)
-				.then(loader => loader.resource);
+				.then(loader => {
+					var end = performance.now();
+					var seconds = ((end - start) / 1000).toFixed(2);
+					var treeInfo = res_getTreeInfo(loader.resource);
+					var reporter = solution.reporter;
+					reporter
+						.info(`Loaded ${treeInfo.count} files in ${seconds} sec.`);
+					reporter
+						.info(treeInfo.treeString);
+					return loader.resource;
+				});
 		},
 		clearCache () {
 			ResourceLoader.clearCache();

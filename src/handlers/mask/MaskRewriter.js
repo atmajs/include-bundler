@@ -24,6 +24,15 @@ MaskHandler.Rewriter = class MaskRewriter extends BaseRewriter {
 				.solution
 				.outputResources
 				.getForPage(page)
+				.sort((a, b) => {
+					if (a.type === b.type) {
+						return 0;
+					}
+					if (a.type === 'js') {
+						return 1;
+					}
+					return 0;
+				})
 				.map(x => `import sync from '${x.url}';`)
 				.join('');
 
