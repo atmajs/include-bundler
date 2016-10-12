@@ -1,9 +1,20 @@
-# Web Application Bundler
+# JavaScript Application Bundler
 
-_Work in pogress_
+> Supports: `CommonJS`, [`MaskJS`](https://github.com/atmajs/maskjs), [`IncludeJS`](https://github.com/atmajs/includejs), `AMD`
 
-> Support: `CommonJS`, [`MaskJS`](https://github.com/atmajs/maskjs), [`IncludeJS`](https://github.com/atmajs/includejs), `AMD`
+#### Why not ✨✨✨✨?
 
+With this module we try to follow these ideas:
+
+1. **No dependency**. The dev process and your app is not depended on bundler. So you would need to run this only for deployments. 
+
+2. **No configuration _(or few lines in packages.json)_**. You don't have hundred lines of configuration. 
+
+3. **Single responsibility**. We combine your modules in one or multple `JS`, `CSS` and `html` bundles.
+
+4. **Decoupled pre- and post-processing**. Bundler loads your files with [`atma-io`](https://github.com/atmajs/atma-io), which supports middlewares for file reads and writes. For example, this bundler handles only plain javascript modules, but you can choose any middleware to load files, for instance TypeScript files, which will be compiled on the fly. Same is also for css and templates.
+
+----
 
 # `1` CommonJS
 
