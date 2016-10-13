@@ -86,10 +86,22 @@ var Loader;
 				this
 					.solution
 					.reporter
-					.info('Load: ' + this.resource.url);
-					
+					.print('Load ' + toMessage(this.resource.url));
+
+				function toMessage(path) {
+					var parts = path.replace(/^\/+/, '').split('/');
+					var name = parts.pop();
+					parts = parts.map(x => `bold<${x}>`.color);
+					name = `green<${name}>`.color;
+					parts.push(name);
+					return parts.join('/');
+				}
+				
+				var start = Date.now();	
 				var reader = _config.get('readFile');
-				reader(this.resource.filename, this.opts).done(content => {					
+				reader(this.resource.filename, this.opts).done(content => {			
+					var end = Date.now();
+					this.solution.reporter.print(` cyan<${end - start}> ms \n`.color);
 					this.resource.content = content;
 					this.processChildren();
 				}).fail(error => this.reject(error));
@@ -109,7 +121,7 @@ var Loader;
 				this.resource.meta = obj_extend(this.resource.meta, result.meta);
 
 				var deps = result.dependencies;
-				async_map(deps, dep => {
+				async_waterfall(deps, dep => {
 					return ResourceLoader
 						.load(dep, this.resource, this.opts, this.solution)
 						.then(loader => loader.resource);

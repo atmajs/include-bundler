@@ -127,14 +127,16 @@ var res_groupByType,
 
 	(function(){
 		res_getTreeInfo = function (resource) {
-			var arr = flattern(resource).map(x => {
-				return `${x.url} ${x.inPages.join(',')}`.color;
-			}).sort();
+			var arr = flattern(resource);
 
+			var paths = arr.map(x => {
+				var pages = x.inPages.map(page => `bg_white<black<${page}>>`.color).join(' ');
+				return `${x.url} ${pages}`;
+			}).sort();
 
 			return {
 				count: arr.length,
-				treeString: arr.join('\n')
+				treeString: formatTree(paths)
 			};
 		};
 
@@ -159,6 +161,146 @@ var res_groupByType,
 			out['push'](resource);
 			return out;
 		}
+
+		function formatTree(paths){
+			var tree = tree_fromPaths(paths);
+
+			tree = tree_collapse(tree);
+
+			var str = '';
+			formatArr(tree, 0);
+			return str;
+
+			function formatArr(items, indent) {
+				
+				items.forEach((item, index) => {
+					str += getIndent(indent, index === items.length - 1);
+					str += `yellow<${item.id}>`.color; 
+					str += '\n';
+
+					formatArr(item.items, indent + 1);
+				});
+			}
+
+			function getIndent(indent, isLastEntry) {
+				
+				var i = -1;
+				var str = '';
+				while(++i < indent) {
+					var leading = i === indent - 1 && isLastEntry ? '└' : '|';
+					var seperator = i === indent - 1 ? '───' : '   ';
+					str += leading + seperator;
+				}	
+				return str;
+			}
+		}
+		function tree_collapse(arr) {
+			arr.forEach(item => {
+				if (item.items.length === 1) {
+					item.id += '/' + item.items[0].id;
+					item.items = item.items[0].items;
+				}
+				tree_collapse(item.items);
+			})
+			return arr;
+		}
+		function tree_fromPaths(model) {
+            var index = -1,
+                index_ = index,
+                i = 0,
+                imax = model.length;
+            for (; i < imax - 1; i++){
+                
+                index_ = str_lastSameIndex(model[i], model[++i]);
+                if (index === -1 || index > index_) {
+                    index = index_;
+                }
+            }
+            
+            if (imax === 1) 
+                model[0] = model[0].substring(model[0].lastIndexOf('/') + 1);
+            
+            
+            if (index > 0) {
+                index_ = model[0].lastIndexOf('/');
+                if (index_ < index) {
+                    index = index_
+                }
+                
+                for (i = 0; i< imax; i++) {
+                    model[i] = model[i].substring(index);
+                    
+                    if (model[i][0] === '/') 
+                        model[i] = model[i].substring(1);
+                    
+                }
+            }
+            
+            var tree = [],
+                parts;
+            
+            for (var i = 0, imax = model.length; i < imax; i++){
+                
+                tree_ensurePath(tree, model[i].split('/'));
+            }
+            
+            return tree;
+        }
+        function tree_getItem(items, id) {
+            for (var i = 0, x, imax = items.length; i < imax; i++){
+                x = items[i];
+                
+                if (x.id === id) 
+                    return x;
+            }
+            return null;
+        }
+        
+        function tree_ensurePath(rootItems, parts) {
+            var items = rootItems,
+                item_,
+                item;
+            for (var i = 0, imax = parts.length; i < imax; i++){
+                item_ = tree_getItem(items, parts[i]);
+                
+                if (item_ == null) {
+                    item_ = {
+                        id: parts[i],
+                        items: []
+                    };
+                    items.push(item_);
+                }
+                
+                items = item_.items;
+            }
+            return items;
+        }
+        function str_lastSameIndex(str, compare) {
+            var i = 0,
+                imax = str.length < compare.length
+                ? str.length
+                : compare.length
+                ;
+            
+            for (; i< imax; i++) {
+                if (str.charCodeAt(i) !== compare.charCodeAt(i)) {
+                    break;
+                }
+            }
+            
+            return i;
+        }
+        
+        function path_combine(_1, _2) {
+            if (_1[_1.length - 1] === '/') 
+                _1 = _1.substring(0, _1.length - 1);
+            
+            if (_2[0] !== '/') 
+                _2 = '/' + _2;
+                
+            return _1 + _2;
+        }
+               
 	}());
 
 	res_walk = function (res, fn) {

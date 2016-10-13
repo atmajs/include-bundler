@@ -17,4 +17,7 @@ class ConsoleReporter {
 	info (...args) {
 		console.info(...args);
 	}
+	print (...args) {
+		process.stdout.write(...args);
+	}
 }

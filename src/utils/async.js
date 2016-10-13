@@ -2,7 +2,8 @@ var async_map,
 	async_whenAll,
 	async_resolve,
 	async_reject,
-	async_await;
+	async_await,
+	async_waterfall;
 (function(){
 	async_map = function(arr, mapper) {
 		var out = new Array(arr.length);
@@ -35,6 +36,43 @@ var async_map,
 			if (--wait === 0) {
 				dfr.resolve(out);
 			}
+		}
+		return dfr;
+	};
+
+	async_waterfall = function(arr, mapper) {
+		var out = new Array(arr.length);
+		var dfr = new class_Dfr;
+		var i = -1;
+
+		next();
+				
+		function next () {
+			if (++i >= arr.length) {
+				dfr.resolve(out);
+				return;
+			}
+			var x = arr[i];
+			if (x == null) {
+				set(null, i);
+				next();
+				return;
+			}
+			var mix = mapper(x);
+			if (mix == null || mix.then == null) {
+				set(mix, i);
+				next();
+				return;
+			}
+			mix.then(x => {
+				set(x, i);
+				next();
+			}, error => {
+				dfr.reject(error);
+			});
+		}
+		function set(value, i) {
+			out[i] = value;			
 		}
 		return dfr;
 	};

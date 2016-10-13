@@ -22,8 +22,15 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 		mask.off('warn');
 
 		var reporter = this.solution.reporter;
-		mask.on('error', error => reporter.error(resource && resource.url, error));
-		mask.on('warn', warning => reporter.warn(resource && resource.url, warning));
+		mask.on('error', error => reporter.error(toMessage(error)));
+		mask.on('warn', warning => reporter.warn(toMessage(warning)));
+
+		function toWarnMessage (warning) {
+			var msg = '';
+			if (resource) msg += `yellow<${resource.url}>\n`.color;
+			msg += warning.message;
+			return msg;
+		}
 
 		return mask.parse(content);
 	}
