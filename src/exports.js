@@ -3,6 +3,7 @@
 	var mask = require('maskjs');
 	var assert = require('assert');
 	var logger = require('atma-logger');
+	var io = require('atma-io');
 			
 
 	// import ../node_modules/atma-utils/lib/utils.embed.js
@@ -111,6 +112,10 @@
 					return Parser.getDependencies(resource, solution);
 				}
 			}
+		}
+
+		static get io () {
+			return io;
 		}
 
 		static get AssetsManager () { return AssetsManager }

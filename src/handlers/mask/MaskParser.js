@@ -2,6 +2,8 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 
 	constructor () {
 		super(...arguments);
+
+		mask.Module.cfg('base', '');
 	}
 	
 	getDependencies (content, ownerResource) {
@@ -46,12 +48,16 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 
 				cb(imports);
 			}
+			if (node.tagName === 'import:cfg') {
+				var arr = mask.Utils.Expression.evalStatements(node.expression);
+				mask.Module.cfg.apply(mask.Module, arr);
+			}
 		});
 	}
 
 	_getDependenciesFromNode (node) {
 		var page = this._getPageForNode(node),
-			path = mask.Module.resolvePath(node), 
+			path = mask.Module.resolvePath(node, null, null, null, false),
 			type = mask.Module.getType(new mask.Module.Endpoint(path, node.contentType));
 
 		return [ this._createDependency(path, type, page) ];

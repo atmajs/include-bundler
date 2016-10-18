@@ -15,7 +15,7 @@ UTest({
 	$teardown () {
 		Bundler.clearCache();
 	},
-	'should get resource tree from files for same bases' () {
+	'!should get resource tree from files for same bases' () {
 		var bundler = new Bundler('main.js');
 
 		return bundler.getResources().done((resources) => {
