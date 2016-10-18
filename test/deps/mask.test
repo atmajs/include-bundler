@@ -12,6 +12,12 @@ UTest({
 			return parse(`View name='about' { import from './my'; }`, [ 
 				{page: 'about', type: 'mask', url: './my.mask', module: 'mask'}
 			]);
+		},
+		'should parse namespace' () {
+			return parse(`import Foo from Services.Foos; import Button from controls is mask`, [ 
+				{type: 'js', url: '/Services/Foos/Foo.js', module: 'mask'},
+				{type: 'mask', url: '/controls/Button.mask', module: 'mask'}
+			]);
 		}
 	}
 });

@@ -9,7 +9,7 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 		var arr = [];
 		this._forEachImports(ast, imports => {
 			arr.push(...imports);
-		});
+		});		
 		return async_resolve({ dependencies: arr });
 	}
 
@@ -25,7 +25,7 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 		mask.on('error', error => reporter.error(toMessage(error)));
 		mask.on('warn', warning => reporter.warn(toMessage(warning)));
 
-		function toWarnMessage (warning) {
+		function toMessage (warning) {
 			var msg = '';
 			if (resource) msg += `yellow<${resource.url}>\n`.color;
 			msg += warning.message;
@@ -41,29 +41,37 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 				var imports = Array
 					.from(node.nodes)
 					.filter(x => x.tagName === 'import')
-					.map(x => this._getDependencyFromNode(x));
+					.map(x => this._getDependenciesFromNode(x))
+					.reduce((aggr, x) => aggr.concat(...x), []);
 
 				cb(imports);
 			}
 		});
 	}
 
-	_getDependencyFromNode (node) {
-		var path = node.path;
-		if (path_getExtension(path) === '') {
-			path += '.mask';
-		}
+	_getDependenciesFromNode (node) {
+		var page = this._getPageForNode(node),
+			path = mask.Module.resolvePath(node), 
+			type = mask.Module.getType(new mask.Module.Endpoint(path, node.contentType));
 
-		var type = mask.Module.getType(new mask.Module.Endpoint(node.path, node.contentType))
-		var page = this._getPageForNode(node);
-		var dependency = {
+		return [ this._createDependency(path, type, page) ];
+	}
+
+	_cfg_getExtensionForType (type) {
+		return mask.Module.cfg('ext')[type];
+	}
+
+	_cfg_getBaseForNs (type) {
+		return mask.Module.cfg('nsBase') || '';
+	}
+
+	_createDependency (path, type, page) {
+		return {
 			url: path,
 			type: MAPPING[type],
 			module: 'mask',
 			page: page
-		};
-
-		return dependency;
+		};		
 	}
 
 	_getPageForNode (node) {

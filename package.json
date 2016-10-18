@@ -35,7 +35,7 @@
     "atma-utils": "^0.1.6",
     "cheerio": "^0.20.0",
     "includejs": "^0.10.28",
-    "maskjs": ">0.0.0",
+    "maskjs": "^0.57.7",
     "uglify-js": "^2.6.2"
   },
   "atma": {
@@ -59,6 +59,7 @@
     }
   },
   "devDependencies": {
-    "atma": "latest"
+    "atma": "latest",
+    "maskjs": "^0.57.4"
   }
 }
