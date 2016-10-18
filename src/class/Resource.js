@@ -1,4 +1,3 @@
-
 var Resource = class_create({
 
 	resources: null,
@@ -71,9 +70,17 @@ var Resource = class_create({
 			return;
 		}
 
-		var url = Include
-			.PathResolver
-			.resolveBasic(includeData.url, includeData.type, parent);
+		var url;
+		
+		var handler = solution.handlers.find(x => x.accepts && x.accepts(includeData.module));
+		if (handler && handler.resolvePath) {
+			url = handler.resolvePath(includeData, parent);
+		}
+		if (url == null) {
+			url = Include
+				.PathResolver
+				.resolveBasic(includeData.url, includeData.type, parent);
+		}
 
 		// System paths
 		this.filename = path_toAbsolute(url, null, solution.opts.base);

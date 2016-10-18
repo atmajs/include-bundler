@@ -56,6 +56,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 			case 'mask':
 			case 'routes':
 			case 'setBase':
+			case 'cfg':
 				var pckg = {
 					type: node.expression.property,
 					args: AstUtil.getArguments(node.args, scope),
@@ -70,8 +71,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 			case 'done':
 			case 'ready':
 				this._processIncludeCallback(info, node.args && node.args[0]);
-				break;
-			case 'cfg':
+				break;			
 			case 'instance':
 			case 'embed':
 			case 'plugin':

@@ -32,6 +32,7 @@ var Include;
 			return this;
 		},
 		cfg: function() {
+			lib.include.cfg.apply(lib.include, arguments);
 			return this;
 		},
 		setBase: function(path){

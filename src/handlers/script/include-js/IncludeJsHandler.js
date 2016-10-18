@@ -34,5 +34,9 @@ IncludeJsHandler = class IncludeJsHandler extends BaseHandler {
 		root.content = body;
 	}
 
-	
+	resolvePath (includeData, parent) {
+		return Include
+			.PathResolver
+			.resolveBasic(includeData.url, includeData.type, parent);
+	}
 };
