@@ -21,7 +21,11 @@ class ScriptSerializer extends BaseSerializer {
 			return;
 
 		arr.forEach(resource => {
-			var html = `<script src='${resource.url}' type='text/javascript'></script>`; 
+			var url = resource.url;
+			if (this.solution.opts.version) {
+				url += '?v=' + this.solution.opts.version;
+			}
+			var html = `<script src='${url}' type='text/javascript'></script>`; 
 
 			var inserted = this._insertDependency($, resource, html);
 			if (inserted === false) {

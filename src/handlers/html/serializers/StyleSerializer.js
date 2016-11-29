@@ -22,7 +22,11 @@ class StyleSerializer extends BaseSerializer {
 
 
 		arr.forEach(resource => {
-			var html = `<link href='${resource.url}' rel='stylesheet' />`; 
+			var url = resource.url;
+			if (this.solution.opts.version) {
+				url += '?v=' + this.solution.opts.version;
+			}
+			var html = `<link href='${url}' rel='stylesheet' />`; 
 
 			var inserted = this._insertDependency($, resource, html);
 			if (inserted === false) {
