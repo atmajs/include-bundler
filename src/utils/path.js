@@ -9,7 +9,10 @@ var path_getDir,
 	path_toRelative,
 	path_appendQuery,
 	path_toAbsolute,
-	path_withProtocol
+	path_withProtocol,
+	path_sliceHash,
+	path_sliceQuery,
+	path_removeQuery
 	;
 (function(){
 	var isWeb = true;
@@ -134,6 +137,30 @@ var path_getDir,
 		}
 		return path_collapse(out);
 	};
+
+	path_sliceHash = function (url) {
+		if (url == null) return null;
+		var i = url.indexOf('#');
+		if (i === -1) return null;
+		return url.substring(i);
+	};
+	path_sliceQuery = function (url) {
+		if (url == null) return null;
+		var i = url.indexOf('?');
+		if (i === -1) return null;
+		return url.substring(i);
+	};
+	path_removeQuery = function (url) {
+		if (url == null) return null;
+		var i = url.indexOf('#');
+		if (i !== -1) url = url.substring(0, i);
+
+		var i = url.indexOf('?');
+		if (i !== -1) url = url.substring(0, i);
+
+		return url;
+	};
+
 
 	(function(){
 		path_toAbsolute = function(path, parentLocation, rootLocation){

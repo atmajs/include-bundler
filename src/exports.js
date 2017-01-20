@@ -12,7 +12,6 @@
 	// import ./utils/arr.js
 	// import ./utils/path.js
 	// import ./utils/async.js
-	// import ./utils/file.js
 
 	// import ./class/Resource.js
 	// import ./class/ResourceInfo.js
@@ -88,14 +87,21 @@
 		}
 
 		static process (path, opts) {
-			return Bundler
-				.build(path, opts)
+			var bundler = new Bundler(path, opts);
+			var solution = bundler.solution;
+			return bundler
+				.build(opts)
 				.then(resources => {
 					resources.forEach(res => {
 						io.File.write(res.filename, res.content);
 					});
-					return resources;
-				})
+					return solution
+						.assetsManager
+						.flush()
+						.then(() => {
+							return solution 
+						});
+				});
 		}
 
 		defineMiddleware (name, fn) {

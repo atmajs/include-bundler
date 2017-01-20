@@ -4,9 +4,7 @@ CssHandler.Parser = class CssParser extends BaseParser {
 		super(...arguments);
 	}
 	
-	getDependencies (content, ownerResource) {
-		
-		this.solution.assetsManager.rewriteCss(ownerResource, this.solution);
+	getDependencies (content, ownerResource) {		
 		return async_resolve({ dependencies: [] });
 	}
 

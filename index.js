@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-loadConfig().then(process);
+loadConfig().then(processBundler);
 
 
 function loadConfig () {
@@ -30,7 +30,7 @@ function loadConfig () {
 		});
 }
 
-function process (config) {
+function processBundler (config) {
 
 	validate(config);
 

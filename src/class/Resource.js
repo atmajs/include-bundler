@@ -82,6 +82,15 @@ var Resource = class_create({
 				.resolveBasic(includeData.url, includeData.type, parent);
 		}
 
+		this.hash = path_sliceHash(url);
+		if (this.hash) {
+			url = url.replace(this.hash, '');
+		}
+		this.query = path_sliceQuery(url);
+		if (this.query) {
+			url = url.replace(this.query, '');
+		}
+
 		// System paths
 		this.filename = path_toAbsolute(url, null, solution.opts.base);
 		this.directory = path_getDir(this.filename);
@@ -89,6 +98,13 @@ var Resource = class_create({
 		// Application paths
 		this.url = '/' + path_toRelative(this.filename, solution.opts.base);
 		this.location = path_getDir(this.url);
+
+		if (this.query) {
+			this.url += this.query;			
+		}
+		if (this.hash) {
+			this.url += this.hash;			
+		}
 
 		var mapped = solution.opts.mapResource(this);
 		if (mapped) {			
@@ -139,7 +155,7 @@ var Resource = class_create({
 		var opts = solution.opts;
 		var url = this.url;
 
-		var filename = url;
+		var filename = path_removeQuery(url);
 		var resource = new Resource({ type: this.type }, this, solution);
 		
 		if (settings == null || settings.relative !== true) {
@@ -161,7 +177,7 @@ var Resource = class_create({
 		} else {
 			url = path_combine(
 				opts.getOutputFolder(this.type), 
-				this.url
+				path_removeQuery(this.url)
 			);			
 		}
 

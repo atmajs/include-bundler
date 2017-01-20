@@ -1,7 +1,7 @@
 var CssAssets;
 (function(){
 	CssAssets = {
-		rewrite (resource, solution) {
+		rewrite (resource, targetResource, solution) {
 			var regexp = /url[\s]*\(('|")?([^)'"]+)('|")?\)/gi,
 				assets = [],
 				hash = {},
@@ -14,6 +14,18 @@ var CssAssets;
 					continue;
 				}
 				if (solution.assetsManager.shouldCopy(href) === false) {
+
+					if (solution.assetsManager.shouldRewritePath(href, resource, targetResource)) {
+						var asset = new Resource({ type: 'asset', url: href }, resource, solution);
+						content = replace(
+							href,
+							match,
+							content,
+							asset.url,
+							targetResource.url,
+							solution
+						);
+					}
 					continue;
 				}
 
@@ -23,14 +35,24 @@ var CssAssets;
 					hash[asset.filename] = 1;
 				}
 
-				var before = content.substring(0, match.index),
-					after = content.substring(match.index + match[0].length);
-
 				var assetUrl = asset.toTarget(solution).url;
-				var styleUrl = resource.toTarget(solution).url;
-				var relUrl = path_toRelative(assetUrl, styleUrl, "/");
-				var entry = match[0].replace(href, relUrl);
-				content = before + entry + after;
+				content = replace(
+					href, 
+					match, 
+					content, 
+					assetUrl, 
+					targetResource.url, 
+					solution
+				);
+
+				// var before = content.substring(0, match.index),
+				// 	after = content.substring(match.index + match[0].length);
+
+				// var assetUrl = asset.toTarget(solution).url;
+				// var styleUrl = targetResource.url;
+				// var relUrl = path_toRelative(assetUrl, styleUrl, "/");
+				// var entry = match[0].replace(href, relUrl);
+				// content = before + entry + after;
 			}
 			resource.content = content;
 
@@ -43,5 +65,19 @@ var CssAssets;
 			return true;
 		}
 		return /^[\w]{1,8}:\/\//.test(href);
+	}
+
+	function formatUrl (assetUrl, targetUrl) {
+		var styleUrl = targetUrl;
+		return path_toRelative(assetUrl, styleUrl, "/");
+	}
+
+	function replace (href, match, content, assetUrl, targetUrl, solution) {
+		var before = content.substring(0, match.index),
+			after = content.substring(match.index + match[0].length);
+
+		var relUrl = formatUrl(assetUrl, targetUrl);
+		var entry = match[0].replace(href, relUrl);
+		return before + entry + after;
 	}
 }());

@@ -82,6 +82,16 @@ var SolutionOpts;
 			},
 			mappings () {
 				return []
+			},
+			version (val, opts) {
+				if (typeof val === 'string') {
+					if (val[0] === '#') {
+						var path = val.replace('#{', '').replace('}', '');
+						var json = require(process.cwd() + '/package.json');
+						return obj_getProperty(json, path);
+					}
+				}
+				return val;
 			}
 		},
 		constructor: function(solution, opts_){
