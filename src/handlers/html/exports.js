@@ -6,5 +6,6 @@ var HtmlHandler;
 	// import ./HtmlParser.js
 	// import ./HtmlBuilder.js
 	// import ./HtmlRewriter.js
+	// import ./HtmlPathResolver.js
 
 }());

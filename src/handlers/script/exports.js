@@ -14,5 +14,6 @@ var ScriptHandler;
 	// import ./ScriptParser.js
 	// import ./ScriptRewriter.js
 	// import ./ScriptBuilder.js
+	// import ./ScriptPathResolver.js
 
 }());

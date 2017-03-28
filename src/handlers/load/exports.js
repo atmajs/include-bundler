@@ -7,5 +7,7 @@ var LoadHandler;
 	// import ./LoadParser.js
 	// import ./LoadRewriter.js
 	// import ./LoadBuilder.js
+	// import ./LoadPathResolver.js
+
 
 }());

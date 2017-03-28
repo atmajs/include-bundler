@@ -72,9 +72,9 @@ var Resource = class_create({
 
 		var url;
 		
-		var handler = solution.handlers.find(x => x.accepts && x.accepts(includeData.module));
-		if (handler && handler.resolvePath) {
-			url = handler.resolvePath(includeData, parent);
+		var pathResolver = solution.handlers.findPathResolver(includeData);
+		if (pathResolver) {
+			url = pathResolver.resolve(includeData, parent);
 		}
 		if (url == null) {
 			url = Include

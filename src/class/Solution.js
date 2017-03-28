@@ -6,6 +6,7 @@ var Solution = null;
 	// import ./SolutionOpts.js
 	// import ./OutputResources.js
 	// import ./Reporter.js
+	// import ./HandlersUtils.js
 
 	Solution = class Solution extends class_EventEmitter {
 		constructor (path, opts) {
@@ -17,7 +18,8 @@ var Solution = null;
 			this.outputResources = new OutputResources(this);
 			this.reporter = IReporter.create();
 
-			this.handlers = Handlers.map(Ctor => new Ctor(this));			
+			this.handlers = Handlers.map(Ctor => new Ctor(this));
+			Object.assign(this.handlers, HandlersUtils);	
 		}
 
 		getOptionsForResource (resource) {

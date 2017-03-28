@@ -89,9 +89,19 @@
 		static process (path, opts) {
 			var bundler = new Bundler(path, opts);
 			var solution = bundler.solution;
+			var start = Date.now();
 			return bundler
 				.build(opts)
 				.then(resources => {
+					var end = Date.now();
+					var seconds = ((end - start) / 1000).toFixed(2);
+					var treeInfo = res_getTreeInfo(resources);
+					var reporter = solution.reporter;
+					reporter
+						.info(`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color);
+					reporter
+						.info(treeInfo.treeString);
+					
 					resources.forEach(res => {
 						io.File.write(res.filename, res.content);
 					});

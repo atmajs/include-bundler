@@ -6,6 +6,7 @@ var CommonJsHandler;
 	// import ./CommonJsParser.js
 	// import ./CommonJsRewriter.js
 	// import ./CommonJsBuilder.js
+	// import ./CommonJsPathResolver.js
 
 	// import ./CommonJsBuilderSimplified.js
 

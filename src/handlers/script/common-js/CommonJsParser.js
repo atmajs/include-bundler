@@ -34,11 +34,17 @@ CommonJsHandler.Parser = class CommonJsParser extends BaseParser {
 		if (typeof path !== 'string') {
 			throw new Error('Path should be a string: ' + path);
 		}
+		// if (this._isNodeJsNative(path)) {
+		// 	//@TODO: Should we provide the shims for browser bilds?
+		// 	return null;
+		// }
 		var groups = Include.groupByType([ path ], this.solution.opts);
 		for(var type in groups) {
 			include[type].apply(include, groups[type]);
 		}
 		return include.includes;
 	}
+	// _isNodeJsNative (path) {
 
+	// }
 };
