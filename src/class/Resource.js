@@ -43,6 +43,7 @@ var Resource = class_create({
 		this.page = includeData.page;
 		this.asModules = [];
 		this.inPages = [];
+		this.source = null;
 
 		if (includeData.bundle) {
 			this.bundle = includeData.bundle;
@@ -131,6 +132,7 @@ var Resource = class_create({
 		res.embed = this.embed;
 		res.asModules = this.asModules;
 		res.inPages = this.inPages;
+		res.source = this.source;
 		return res;
 	},
 	toTarget (solution, settings) {
@@ -167,6 +169,7 @@ var Resource = class_create({
 		resource.location = path_getDir(url);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);
+		resource.source = this;
 		return resource;
 	},
 	_toOutputTarget (solution, settings) {
@@ -192,6 +195,7 @@ var Resource = class_create({
 		resource.location = path_getDir(url);
 		resource.filename = filename;
 		resource.directory = path_getDir(filename);
+		resource.source = this;
 		return resource;
 	},
 	toRelative (resource) {

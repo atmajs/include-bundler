@@ -34,9 +34,8 @@ class OutputResources {
 						type, 
 						solution: this.solution, 
 						resources: arr
-					});
-
-					this.items.push(item);
+					});					
+					this.items.push(item);					
 				});
 				
 			});
@@ -51,7 +50,7 @@ class OutputResources {
 		var all = this.items.map(x => x.resource).filter(x => x.embed !== true);
 		if (this.rootOutput) {
 			all.push(this.rootOutput);
-		}
+		}		
 		return all;
 	}
 }

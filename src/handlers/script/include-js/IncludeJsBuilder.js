@@ -50,8 +50,7 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 		if (resource.type !== 'js') {
 			return false;
 		}
-		var module = resource.getModule();	
-		
+		var module = resource.getModule();			
 		return module === 'includejs';
 	}
 

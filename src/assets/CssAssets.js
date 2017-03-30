@@ -1,7 +1,7 @@
 var CssAssets;
 (function(){
 	CssAssets = {
-		rewrite (resource, targetResource, solution) {
+		rewrite (resource, targetResource, solution) {			
 			var regexp = /url[\s]*\(('|")?([^)'"]+)('|")?\)/gi,
 				assets = [],
 				hash = {},

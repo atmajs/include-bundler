@@ -190,14 +190,13 @@ UTest({
 
 			mask.cfg('getFile', path => {
 				var resource = resources.find(x => path.indexOf(x.url) > -1);
-				is_(resource, 'Object');
+				is_(resource, 'Object', `Resource not found ${path}`);				
 				return (new mask.class.Deferred()).resolve(resource.content);
 			});
 
 			var template = mask.j(main.content).find('script').text();
-
 			mask
-				.renderAsync(template)
+				.renderAsync(template, {}, { filename: main.url })
 				.done(html => {
 					is_(html, 'String');
 					done();

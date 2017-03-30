@@ -2,7 +2,6 @@ var Builder;
 (function(){
 	Builder = {
 		build (resources, solution) {
-
 			return _middlewares
 				.run('buildResources', resources, solution)
 				.then(arr => {							
@@ -46,8 +45,7 @@ var Builder;
 
 					var handler = solution.handlers.find(x => x.rewriter.accepts(input.type) || x.rewriter.accepts(ext))				
 					if (handler == null || handler.rewriter.rewriteRoot == null) {
-						//throw new Error(`RootRewriter is not found for a resource ${main.url} and type ${main.type}`);
-
+						//throw new Error(`RootRewriter is not found for a resource ${input.url} and type ${input.type}`);
 						return;
 					}
 								
@@ -72,7 +70,7 @@ var Builder;
 					.run('buildBundle', outputItem, otherOutputItems)
 					.then(buildBundleInternal)
 			}
-			function buildBundleInternal (outputItem, otherOutputItems) {
+			function buildBundleInternal (outputItem, otherOutputItems) {				
 				if (outputItem.resource.content) {
 					return;
 				}

@@ -27,7 +27,7 @@ Templates['commonjs'] = class CommonJs extends ITemplate {
 			.concat([ root.content ])
 			.join('\n');
 
-		dependencies.forEach(x => x.embed = true);
+		dependencies.filter(x => x.type !== 'css').forEach(x => x.embed = true);
 		root.content = wrapRootModule(body);		
 	}
 };

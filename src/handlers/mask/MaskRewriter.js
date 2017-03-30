@@ -14,6 +14,21 @@ MaskHandler.Rewriter = class MaskRewriter extends BaseRewriter {
 				return;
 			}
 
+			if (ownerResource.source && ownerResource.location !== ownerResource.source.location) {
+				node
+					.nodes
+					.filter(x => path_isRelative(x.path))
+					.forEach(x => {
+						let ownerSource = ownerResource.source.url,
+							ownerTarget = ownerResource.url,
+							currentUrl = path_normalize(path_combine(path_getDir(ownerSource), x.path)),
+							targetUrl = path_toRelative(currentUrl, ownerTarget);
+
+						x.path = currentUrl;//targetUrl;
+					});
+	
+			}
+			
 			var page = parser._getPageForNode(node.nodes[0]);
 			if (page == null) {
 				return;
@@ -33,7 +48,10 @@ MaskHandler.Rewriter = class MaskRewriter extends BaseRewriter {
 					}
 					return 0;
 				})
-				.map(x => `import sync from '${x.url}';`)
+				.map(x => {
+					let url = x.url; //x.toRelative(ownerResource); 
+					return `import sync from '${url}';`
+				})
 				.join('');
 
 			var imports = mask.parse(template);

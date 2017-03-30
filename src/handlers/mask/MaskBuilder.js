@@ -15,7 +15,8 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 		})
 
 		arr = outputItem.resources.map(resource => {
-			return `module path="${resource.url}" { 
+			var url = resource.url;//resource.toRelative(outputItem.resource);
+			return `module path="${url}" { 
 				${resource.content}
 			}`
 		});
@@ -35,7 +36,7 @@ MaskHandler.Builder = class MaskRewriter extends BaseBuilder {
 		var imports = dependencies
 			.filter(x => x.type !== 'mask')
 			.map(x => {
-				var url = x.toRelative(resource);
+				var url = x.toRelative(resource);				
 				return `import sync from '${url}';`;
 			})
 			.join('\n');

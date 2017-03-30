@@ -1,6 +1,7 @@
 var Files =  {
-	'main.js': `
-		require('./styles/icons.less');
+	'main.html': `
+		<!DOCTYPE html>
+		<link rel='stylesheet' href='./styles/icons.less' />;
 	`,
 	'styles/icons.less': `
 		.gear { background: url("foodir/gear.png") center; }
@@ -15,19 +16,22 @@ UTest({
 	$teardown () {
 		Bundler.clearCache();
 	},
-	'!should get resource tree from files for same bases' () {
-		var bundler = new Bundler('main.js');
+	'should get resource tree from files for same bases' () {
+		var bundler = new Bundler('main.html');
 
-		return bundler.getResources().done((resources) => {
+		return bundler.build().done((resources) => {
 			var solution = bundler.solution;			
-			var urls = resources.map(x => x.url);
+			var urls = resources.map(x => x.filename);
+			eq_(urls.length, 2);
+			has_(urls[0], '/build/release/main_index.css');
+			has_(urls[1], '/build/release/main.html');
 
-			deepEq_(urls, [ "/styles/icons.less", "/main.js"]);
+			has_(resources[0].content, `"assets/styles/foodir/gear.png"`);
+			has_(resources[0].content, `"/styles/foodir/user.png"`);
 
-			var css = resources[0].content;
-			has_(css, '"../assets/styles/foodir/gear.png"');
-			has_(css, '"/styles/foodir/user.png"', 'Absolute path by same bases is not rewritten');
+			has_(resources[1].content, `"main_index.css"`);
 
+			
 			var assets = solution.assetsManager.getAssets();
 			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 1, 'Only when asset with relative path in less should be copied')
@@ -35,23 +39,28 @@ UTest({
 		});
 	},
 	'should get resource tree from files for different bases' () {
-		var bundler = new Bundler('main.js', { outputBase: 'dist' });
+		var bundler = new Bundler('main.html', { outputBase: 'dist' });
 
-		return bundler.getResources().done(resources => {
-			var solution = bundler.solution;
-			var urls = resources.map(x => x.url);
+		return bundler.build().done(resources => {
+			var solution = bundler.solution;			
+			var urls = resources.map(x => x.filename);
+			eq_(urls.length, 2);
+			has_(urls[0], '/dist/build/release/main_index.css');
+			has_(urls[1], '/dist/build/release/main.html');
 
-			deepEq_(urls, [ "/styles/icons.less", "/main.js" ]);
+			has_(resources[0].content, `"assets/styles/foodir/gear.png"`);
+			has_(resources[0].content, `"assets/styles/foodir/user.png"`);
+			
 
-			var css = resources[0].content;
-			has_(css, '"../assets/styles/foodir/gear.png"');
-			has_(css, '"../assets/styles/foodir/user.png"');
 
+			has_(resources[1].content, `"main_index.css"`);
+
+			
 			var assets = solution.assetsManager.getAssets();
-
 			var arr = assets.map(x => x.toTarget(solution).toJSON());
 			eq_(arr.length, 2, 'Only when asset with relative path in less should be copied')
-			eq_(arr[0].url, '/build/release/assets/styles/foodir/gear.png')
+			has_(arr[0].filename, '/dist/build/release/assets/styles/foodir/gear.png')
+			has_(arr[1].filename, '/dist/build/release/assets/styles/foodir/user.png')
 		});
 	}
 });

@@ -25,6 +25,7 @@ class HtmlSerializer extends BaseSerializer {
 			return;
 
 		arr.forEach(x => x.embed = true);
+
 		var html = arr
 			.map(x => x.content)
 			.join('\n');

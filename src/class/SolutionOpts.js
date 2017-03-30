@@ -107,7 +107,7 @@ var SolutionOpts;
 			}
 			if (this.type === '' && solution.path) {
 				this.type = this.getTypeForExt(path_getExtension(solution.path));
-			}
+			}			
 		},
 		getOutputFolder (type) {
 			if (type === 'asset') {
