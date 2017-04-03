@@ -76,10 +76,12 @@ var AstUtil;
 			if (scope == null) {
 				console.warn('Evaluate Node: Scope is undefined', node);
 			}
-
 			switch (node.TYPE) {
 			case 'String':
 			case 'Number':
+			case 'True':
+			case 'False':
+			case 'Boolean':
 				return node.value;
 			case 'Array':
 				return Array.from(node.elements).map(function(x) {

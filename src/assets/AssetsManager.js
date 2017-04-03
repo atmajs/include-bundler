@@ -15,19 +15,16 @@ var AssetsManager;
 			}
 		}
 		shouldCopy (href, parent) {
-			if (this.solution.opts.isSameBase() === false) {
-				return true;
+			if (withProtocol(href)) {
+				return false;
 			}
-			if (hrefIsAbsolute(href)) {
+			if (href[0] === '/' && this.solution.opts.isSameBase()) {
 				return false;
 			}
 			return true;
 		}
 		shouldRewritePath (href, ownerResource, targetResource) {
-			if (hrefIsAbsolute(href)) {
-				return false;
-			}
-			return true;
+			return this.shouldCopy(href);
 		}
 		getAssets () {
 			return this.assets;
@@ -59,13 +56,20 @@ var AssetsManager;
 	};
 
 	function hrefIsAbsolute(href) {
+		if (withProtocol(href)) {
+			return true;
+		}
+		if (href[0] === '/') {
+			return true;
+		}
+		return false;
+	}
+
+	function withProtocol (href) {		
 		if (/^\s*data:/.test(href)) {
 			return true;
 		}
 		if (/^[\w]{1,8}:\/\//.test(href)) {
-			return true;
-		}
-		if (href[0] === '/') {
 			return true;
 		}
 		return false;

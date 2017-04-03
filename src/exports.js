@@ -3,9 +3,8 @@
 	var mask = require('maskjs');
 	var assert = require('assert');
 	var logger = require('atma-logger');
-	//-(problem with local middlewares) var io = require('atma-io');
-			
-
+	var io = global.io || require('atma-io');
+	
 	// import ../node_modules/atma-utils/lib/utils.embed.js
 
 	// import ./utils/res.js

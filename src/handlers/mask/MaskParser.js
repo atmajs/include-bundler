@@ -58,8 +58,14 @@ MaskHandler.Parser = class MaskParser extends BaseParser {
 	_getDependenciesFromNode (node) {
 		var page = this._getPageForNode(node),
 			path = mask.Module.resolvePath(node, null, null, null, false),
-			type = mask.Module.getType(new mask.Module.Endpoint(path, node.contentType));
+			type = mask.Module.getType(new mask.Module.Endpoint(path, node.contentType));			
 
+		if (path[0] === '/') {
+			var base = mask.Module.cfg('base');
+			if (base) {
+				path = path_combine(base, path);
+			}
+		}
 		return [ this._createDependency(path, type, page) ];
 	}
 

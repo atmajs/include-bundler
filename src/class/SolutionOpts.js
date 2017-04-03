@@ -55,6 +55,11 @@ var SolutionOpts;
 			},
 			mappings: null,
 			varDefs: null,
+			parserIgnoreDependencies: [
+				'\\/bower_components\\/',
+				'\\/node_modules\\/',
+				'\\.min\\.'
+			]
 		},
 		resolvers: {
 			base (basePath) {
@@ -90,8 +95,14 @@ var SolutionOpts;
 						var json = require(process.cwd() + '/package.json');
 						return obj_getProperty(json, path);
 					}
+					if (val === 'random') {
+						return (Math.random() * 100000000 | 0).toString(32);
+					}
 				}
 				return val;
+			},
+			parserIgnoreDependencies (arr) {
+				return arr.map(x => new RegExp(x));
 			}
 		},
 		constructor: function(solution, opts_){

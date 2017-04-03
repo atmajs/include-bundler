@@ -3,7 +3,8 @@ var Include;
 
 	var lib = require('includejs/lib/include.node.module.js');
 	var Routes = lib.includeLib.Routes();
-	var PathResolver = lib.includeLib.PathResolver;
+	var PathResolver = lib.includeLib.PathResolver
+	var config = {};
 
 	Include = class_create({
 		constructor: function (resource) {
@@ -32,7 +33,15 @@ var Include;
 			return this;
 		},
 		cfg: function() {
-			lib.include.cfg.apply(lib.include, arguments);
+			if (arguments.length === 2) {
+				var key = arguments[0],
+					val = arguments[1];
+				config[key] = val;
+			}
+			if (arguments.length === 1) {
+				mask.obj.extend(config, arguments[0]);
+			}
+			var result = lib.include.cfg.apply(lib.include, arguments);
 			return this;
 		},
 		setBase: function(path){
@@ -49,6 +58,9 @@ var Include;
 			return this;
 		}
 	});
+	Include.getConfig = function () {
+		return config;
+	};
 
 
 	['js', 'css', 'load', 'lazy', 'mask'].forEach(type => {

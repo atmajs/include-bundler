@@ -133,13 +133,9 @@ var Loader;
 				});
 			},
 			shouldSkipChildren () {
-				if (/\.min\./.test(this.resource.filename)) {
-					return true;
-				}
-				if (/\/bower_components\//.test(this.resource.filename)) {
-					return true;
-				}
-				if (/\/node_modules\//.test(this.resource.filename)) {
+				var arr = this.solution.opts.parserIgnoreDependencies;
+				var shouldSkip = arr.some(rgx => rgx.test(this.resource.filename));
+				if (shouldSkip) {
 					return true;
 				}
 

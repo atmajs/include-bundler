@@ -126,8 +126,9 @@ var res_groupByType,
 	}());
 
 	(function(){
-		res_getTreeInfo = function (resource) {
-			var arr = flattern(resource);
+		/* Array of resources or root resource */
+		res_getTreeInfo = function (mix) {
+			var arr = Array.isArray(mix) ? mix : flattern(mix);
 
 			var paths = arr.map(x => {
 				var pages = x.inPages.map(page => `bg_white<black<${page}>>`.color).join(' ');

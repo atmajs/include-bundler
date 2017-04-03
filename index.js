@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var Bundler = require('./lib/bundler');
+
 loadConfig().then(processBundler);
 
 
@@ -34,7 +36,6 @@ function processBundler (config) {
 
 	validate(config);
 
-	var Bundler = require('./lib/bundler');
 	var path = config.file,
 		opts = config;
 

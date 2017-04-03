@@ -72,8 +72,10 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 		var cssRegister = this._serializeRegister(cssResources, 'css');
 		var loadRegister = this._serializeRegister(loadResources, 'load');
 		var version = this._serializeVersion();
+		var config = this._serializeConfig();
 		var heading = `
 		${version}
+		${config}
 		include.pauseStack();
 		${jsRegister}
 		${cssRegister}
@@ -88,6 +90,13 @@ IncludeJsHandler.Builder = class IncludeJsBuilder extends BaseBuilder {
 		var v = this.solution.opts.version;
 		if (!v) return '';
 		return `include.cfg('version', '${v}');`
+	}
+
+	_serializeConfig () {
+		var opts = Include.getConfig();
+		var json = JSON.stringify(opts);
+		if (json === '{}') return '';
+		return `include.cfg(${json});`
 	}
 
 	_serializeRegister (resources, type) {
