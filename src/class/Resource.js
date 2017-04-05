@@ -251,5 +251,14 @@ var Resource = class_create({
 			name = modules[0];
 		}
 		return name;
+	},
+
+	cdUrl (url) {
+		if (url[0] === '/' || path_isRelative(url) === false)
+			return url;
+
+		return path_combine(this.location, url);
 	}
+
+
 });

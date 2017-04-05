@@ -38,10 +38,11 @@ class StyleSerializer extends BaseSerializer {
 
 	rewrite ($, resource) {
 		this._inlineResources(
+			resource,
 			$,
 			'link[href][data-bundler-content="inline"]',
 			'href',
-			content => `<style>${content}</style>`
+			content => `<style>${content}</style>`			
 		);
 		this._rewriteStaticUrls(
 			resource,

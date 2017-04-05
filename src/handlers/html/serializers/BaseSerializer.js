@@ -60,7 +60,7 @@ class BaseSerializer {
 				if (!path || path_withProtocol(path))
 					return;
 
-				var resource = new Resource({url: path}, ownerResource, this.solution);
+				var resource = new Resource({url: path, module: 'html'}, ownerResource, this.solution);
 				var url = resource.toTarget(this.solution, { targetType: 'static' }).url;
 
 
@@ -68,7 +68,7 @@ class BaseSerializer {
 			});
 	}
 
-	_inlineResources ($, selector, pathAttrName, createHtmlFn) {
+	_inlineResources (ownerResource, $, selector, pathAttrName, createHtmlFn) {
 		var reporter = this.solution.reporter;
 		$(selector)
 			.each((i, el) => {
@@ -78,7 +78,7 @@ class BaseSerializer {
 					return;
 				}
 
-				var resource = new Resource({url: path}, resource, this.solution);
+				var resource = new Resource({url: path, module: 'html'}, ownerResource, this.solution);
 				if (io.File.exists(resource.filename) === false) {
 					reporter.error('File not found: ' + resource.filename);
 					return;

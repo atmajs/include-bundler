@@ -37,6 +37,7 @@ class ScriptSerializer extends BaseSerializer {
 
 	rewrite ($, resource) {
 		this._inlineResources(
+			resource,
 			$,
 			'script[src][data-bundler-content="inline"]',
 			'src',
