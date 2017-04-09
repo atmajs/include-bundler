@@ -34,7 +34,8 @@ var nodeCoreModules = ['assert', 'buffer', 'child_process', 'cluster', 'console'
     'process', 'punycode', 'querystring', 'readline', 'repl', 'stream', 'string_decoder', 'sys', 'timers', 
     'tls', 'tty', 'url', 'util', 'vm', 'zlib'];
 
-function nodeModuleResolve(path, location){
+function nodeModuleResolve(path, location_){
+	var location = location_.replace(/[\\\/]+$/, '');
 	var name = /^([\w\-]+)/.exec(path)[0];
 	var resource = path.substring(name.length + 1);
 	if (resource && hasExt(resource) === false) {
@@ -46,7 +47,7 @@ function nodeModuleResolve(path, location){
 		var nodeModules = current + '/node_modules/' + name + '/';
 		var pckg = nodeModules + 'package.json';
 		if (io.File.exists(pckg) === false) {
-			var next = current.replace(/[^\/]+$/, '');
+			var next = current.replace(/[^\/\\]+$/, '');
 			if (next === current) {
 				return root_ + 'package.json';
 			}
