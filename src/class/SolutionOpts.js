@@ -53,6 +53,7 @@ var SolutionOpts;
 				'css': 'css',
 				'load': 'load'
 			},
+			mappers: null,
 			mappings: null,
 			varDefs: null,
 			parserIgnoreDependencies: [
@@ -85,8 +86,11 @@ var SolutionOpts;
 			varDefs (varDefs) {
 				return new VarDefinitions(this.solution, varDefs);
 			},
-			mappings () {
+			mappers () {
 				return []
+			},
+			mappings (val) {
+				return val || {};
 			},
 			version (val, opts) {
 				if (typeof val === 'string') {
@@ -145,10 +149,16 @@ var SolutionOpts;
 		},
 		mapResource (resource_) {
 			var resource = resource_;
-			this.mappings.forEach(mapping => {
-				resource = mapping.map(resource);
+			this.mappers.forEach(mapper => {
+				resource = mapper.map(resource);
 			});
 			return resource;
+		},
+		toAppUrl (filename) {
+			return '/' + path_toRelative(filename, this.base);
+		},
+		fromAppUrl (url) {
+			return path_combine(this.base, url);
 		}
 	});
 

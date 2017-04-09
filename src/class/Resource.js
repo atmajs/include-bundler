@@ -70,6 +70,9 @@ var Resource = class_create({
 		if (includeData.url == null) {
 			return;
 		}
+		if (solution && solution.opts.mappings[includeData.url]) {
+			includeData.url = solution.opts.mappings[includeData.url];
+		}
 
 		var url;
 		
@@ -98,6 +101,9 @@ var Resource = class_create({
 
 		// Application paths
 		this.url = '/' + path_toRelative(this.filename, solution.opts.base);
+		if (url === 'baz') {
+			console.log(new Error().stack);
+		}
 		this.location = path_getDir(this.url);
 
 		if (this.query) {

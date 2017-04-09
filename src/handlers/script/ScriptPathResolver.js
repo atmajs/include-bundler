@@ -15,9 +15,9 @@ ScriptHandler.PathResolver = class ScriptPathResolver extends BasePathResolver {
 		return resolver != null;
 	}
 
-	resolve (includeData) {
+	resolve (includeData, parentResource) {
 		var resolver = this._getInnerResolver(includeData);		
-		return resolver.resolve(includeData);
+		return resolver.resolve(includeData, parentResource);
 	}
 
 	_getInnerResolver (includeData) {

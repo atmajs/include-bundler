@@ -4,7 +4,7 @@ IncludeJsHandler.Parser = class IncludeJsParser extends BaseParser {
 		super(...arguments);
 
 		if (this.solution.opts.package.module === 'includejs') {
-			this.solution.opts.mappings.push(...IncludeJsMappings);
+			this.solution.opts.mappers.push(...IncludeJsMappings);
 		}
 	}
 	
