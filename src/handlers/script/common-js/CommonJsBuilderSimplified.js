@@ -8,13 +8,13 @@ var CommonJsBuilderSimplified;
 			var rgx_EXPORTS = /module\.\s*exports/g;
 			var rgx_REQUIRE = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 
-			content = content.replace(rgx_EXPORTS, () => varId);
+			//content = content.replace(rgx_EXPORTS, () => varId);
 			content = replaceWithVarIds(content, resource, this.solution);
 
 			return Templates
 				.ModuleSimplified
-				.replace('%VAR_ID%', () => varId)
-				.replace('%MODULE%', () => content)
+				.replace(/%VAR_ID%/g, () => varId)
+				.replace(/%MODULE%/g, () => content)
 				;
 			
 		},
