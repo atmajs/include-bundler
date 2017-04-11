@@ -56,7 +56,8 @@ function processBundler (config) {
 			.process(path, opts)
 			.fail(error => {
 				console.error('Failed: ', error);
-				process.exit(1);
+				if (opts.watch !== true)
+					process.exit(1);
 			})
 			.done(x => console.log('Ready'));	
 	}

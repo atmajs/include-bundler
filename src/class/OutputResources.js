@@ -3,15 +3,14 @@ class OutputResources {
 	constructor (solution) {
 		this.solution = solution;
 		this.resources = [];
-
 		this.pagesInput = {};
 		this.items = [];
-
-		this.root = null;		
 	}
 
 	prepair (resources) {
-		
+		this.resources = [];
+		this.pagesInput = {};
+		this.items = [];
 		
 		this.rootInput = resources.pop();
 		this.rootOutput = this.rootInput.toTarget(this.solution);

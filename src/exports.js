@@ -10,6 +10,7 @@
 	// import ./utils/res.js
 	// import ./utils/arr.js
 	// import ./utils/path.js
+	// import ./utils/tree.js
 	// import ./utils/async.js
 
 	// import ./class/Resource.js
@@ -26,6 +27,7 @@
 	// import ./parser/Parser.js
 
 	// import ./loader/Loader.js
+	// import ./loader/Watcher.js
 	// import ./builder/Builder.js
 	// import ./handlers/
 
@@ -72,13 +74,49 @@
 		build (opts) {
 			var solution = this.solution,
 				type = solution.opts.type,
-				path = solution.path;
+				path = solution.path,
+				shouldRebuild = false,
+				isBuilding = false,
+				rootResource = null;
+
+
+			function build(resource) {
+				isBuilding = true;
+				var resources = res_flattern(resource);				
+				return tree_async({
+					resources,
+					reporter: solution.reporter,
+					action: () => Builder.build(resources, solution),
+					message: (treeInfo, seconds) => 
+						`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color
+				}).done(buildComplete);
+			}
+			function buildComplete () {
+				isBuilding = false;
+				if (shouldRebuild) {
+					shouldRebuild = false;
+					build(rootResource);
+				}
+			}
+			function rebuild() {
+				if (isBuilding) {
+					shouldRebuild = true;
+					return;
+				}
+				build(rootResource);
+			}
 			
 			return Loader
 				.load(type, path, opts, solution)
-				.then(resource => res_flattern(resource))
-				.then(resources => Builder.build(resources, solution))
-				;
+				.then(resource => {
+					rootResource = resource;
+					if (opts.watch === true) {
+						Watcher
+							.watch(resource, solution)
+							.on('changed', rebuild);
+					}
+					return build(resource);
+				});
 		}
 
 		static build (path, opts) {
@@ -88,18 +126,10 @@
 		static process (path, opts) {
 			var bundler = new Bundler(path, opts);
 			var solution = bundler.solution;
-			var start = Date.now();
+			
 			return bundler
 				.build(opts)
 				.then(resources => {
-					var end = Date.now();
-					var seconds = ((end - start) / 1000).toFixed(2);
-					var treeInfo = res_getTreeInfo(resources);
-					var reporter = solution.reporter;
-					reporter
-						.info(`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color);
-					reporter
-						.info(treeInfo.treeString);
 					
 					resources.forEach(res => {
 						io.File.write(res.filename, res.content);

@@ -6,7 +6,8 @@ var res_groupByType,
 	res_getPage,
 	res_flattern,
 	res_getTreeInfo,
-	res_walk;
+	res_walk,
+	res_find;
 (function(){
 
 	(function(){
@@ -322,4 +323,15 @@ var res_groupByType,
 			}
 		}		
 	};
+
+	res_find = function (res, matcher) {
+		var out = null;
+		res_walk(res, x => {
+			if (matcher(x)) {
+				out = x;
+				return false;
+			}
+		});
+		return out;
+	}
 }());	

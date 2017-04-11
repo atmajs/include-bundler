@@ -2,7 +2,13 @@ var Loader;
 (function(){
 
 	Loader = {
+		opts: null,
+		solution: null,
+
 		load (type, path, opts, solution) {
+			this.opts = opts;
+			this.solution = solution;
+
 			var includeData = { type: type, url: path, module: 'root', page: solution.opts.mainPage };
 			var start = Date.now();
 			return ResourceLoader
@@ -19,8 +25,17 @@ var Loader;
 					return loader.resource;
 				});
 		},
+		loadResource (resource) {
+			return ResourceLoader
+				.loadResource(resource, this.opts, this.solution)
+				.then(loader => loader.resource);
+		},
 		clearCache () {
 			ResourceLoader.clearCache();
+			return this;
+		},
+		removeCached (filename) {
+			ResourceLoader.clearCacheSingle(filename);
 			return this;
 		},
 		getTypeFromPath (path) {
@@ -60,8 +75,20 @@ var Loader;
 				
 				return loader;
 			},
+			loadResource (resource, opts, solution) {
+				var loader = __loaders[resource.filename];
+				if (loader == null) {
+					loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
+					loader.process();
+				}
+				return loader;
+			},
 			clearCache () {
 				__loaders = {};
+				return ResourceLoader;
+			},
+			clearCacheSingle (filename) {
+				delete __loaders[filename];
 				return ResourceLoader;
 			},
 			definePageForAll (name, resource) {				
