@@ -16,7 +16,7 @@ var Solution = null;
 			this.opts = new SolutionOpts(this, opts || {});
 			this.assetsManager = new AssetsManager(this);
 			this.outputResources = new OutputResources(this);
-			this.reporter = IReporter.create();
+			this.reporter = IReporter.create(this.opts);
 
 			this.handlers = Handlers.map(Ctor => new Ctor(this));
 			Object.assign(this.handlers, HandlersUtils);	

@@ -9,8 +9,7 @@ var CommonJsBuilderSimplified;
 			var rgx_REQUIRE = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 			//content = content.replace(rgx_EXPORTS, () => varId);
-			content = replaceWithVarIds(content, resource, this.solution);
-
+			content = replaceWithVarIds(content, resource, this.solution);			
 			return Templates
 				.ModuleSimplified
 				.replace(/%VAR_ID%/g, () => varId)

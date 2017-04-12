@@ -24,7 +24,7 @@ UTest({
 			var html = `
 				<script type='text/mask'>
 					import Foo from './foo';
-					import from 'Controller.x2' is js;
+					import from 'Controller.x2' is script;
 
 					View name='about' { import from './my'; }
 				</script>

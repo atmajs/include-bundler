@@ -29,7 +29,10 @@ function parse (code, expect) {
 		eq_(deps.length, expect.length)
 
 		deps.forEach((x, index) => {
+			var url = expect[index].url;
+			delete expect[index].url;
 			has_(x, expect[index]);
+			has_(x.url, url);
 		})
 
 		dfr.resolve();

@@ -1,5 +1,8 @@
 class IReporter {
-	static create () {
+	static create (opts) {
+		if (opts.silent === true) {
+			return new SilentReporter();
+		}
 		return new ConsoleReporter();
 	}
 };
@@ -36,5 +39,23 @@ class ConsoleReporter {
 		})
 
 		return dfr;
+	}
+}
+
+
+class SilentReporter {
+	error (...args) {
+	}
+	warn (...args) {
+	}
+	log (...args) {
+	}
+	info (...args) {
+	}
+	print (...args) {
+	}
+
+	treeTime(action, messageProvider, resources) {
+		return action();
 	}
 }

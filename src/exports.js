@@ -31,7 +31,7 @@
 	// import ./builder/Builder.js
 	// import ./handlers/
 
-	module.exports = class Bundler {
+	module.exports = class Bundler extends mask.class.EventEmitter {
 		static clearCache() {
 			Loader.clearCache();
 			return Bundler;
@@ -41,7 +41,8 @@
 		}
 
 		constructor (path, opts) {
-			this.solution = new Solution(path, opts);			
+			super();
+			this.solution = new Solution(path, opts);
 		}
 
 		getResourceTree (opts) {
@@ -77,7 +78,9 @@
 				path = solution.path,
 				shouldRebuild = false,
 				isBuilding = false,
-				rootResource = null;
+				isRebuilding = false,
+				rootResource = null,
+				self = this;
 
 
 			function build(resource) {
@@ -91,11 +94,17 @@
 						`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color
 				}).done(buildComplete);
 			}
-			function buildComplete () {
+			function buildComplete (resources) {
 				isBuilding = false;
 				if (shouldRebuild) {
 					shouldRebuild = false;
+					isRebuilding = true;
 					build(rootResource);
+					return;
+				}
+				if (isRebuilding) {
+					isRebuilding = false;
+					self.emit('rebuild', resources);
 				}
 			}
 			function rebuild() {
@@ -103,6 +112,7 @@
 					shouldRebuild = true;
 					return;
 				}
+				isRebuilding = true;
 				build(rootResource);
 			}
 			
@@ -110,7 +120,7 @@
 				.load(type, path, opts, solution)
 				.then(resource => {
 					rootResource = resource;
-					if (opts.watch === true) {
+					if (opts && opts.watch === true) {
 						Watcher
 							.watch(resource, solution)
 							.on('changed', rebuild);
@@ -126,21 +136,24 @@
 		static process (path, opts) {
 			var bundler = new Bundler(path, opts);
 			var solution = bundler.solution;
-			
+
+			function builderComplete (resources) {
+				resources.forEach(res => {
+					io.File.write(res.filename, res.content);
+				});
+				return solution
+					.assetsManager
+					.flush()
+					.then(() => {
+						return solution 
+					});
+			}
+			if (opts && opts.watch === true) {
+				bundler.on('rebuild', builderComplete);
+			}			
 			return bundler
 				.build(opts)
-				.then(resources => {
-					
-					resources.forEach(res => {
-						io.File.write(res.filename, res.content);
-					});
-					return solution
-						.assetsManager
-						.flush()
-						.then(() => {
-							return solution 
-						});
-				});
+				.then(builderComplete);
 		}
 
 		defineMiddleware (name, fn) {

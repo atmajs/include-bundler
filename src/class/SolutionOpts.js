@@ -60,7 +60,10 @@ var SolutionOpts;
 				'\\/bower_components\\/',
 				'\\/node_modules\\/',
 				'\\.min\\.'
-			]
+			],
+
+			silent: false,
+			watch: false
 		},
 		resolvers: {
 			base (basePath) {

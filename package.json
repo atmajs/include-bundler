@@ -39,12 +39,6 @@
     "uglify-js": "^2.6.2"
   },
   "atma": {
-    "plugins": [
-      "atma-loader-babel"
-    ],
-    "settings": {
-      "atma-loader-babel": {}
-    },
     "tasks": {
       "watch": {
         "files": "src/**",
@@ -59,7 +53,6 @@
     }
   },
   "devDependencies": {
-    "atma": "latest",
-    "maskjs": "^0.57.4"
+    "atma": "latest"    
   }
 }
