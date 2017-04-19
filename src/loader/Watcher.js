@@ -27,8 +27,11 @@ var Watcher;
 		},
 
 		changed (filename) {
-			this.solution.reporter.info(`File changed bold<cyan<${path_getFile(filename)}>>`.color);			
 			var changeId = ++this.changeId;
+			var reporter = this.solution.reporter;
+
+			reporter.info(`File changed bold<cyan<${path_getFile(filename)}>>`.color);			
+			
 
 			Loader.removeCached(filename);
 
@@ -40,13 +43,22 @@ var Watcher;
 
 			Loader
 				.loadResource(resource)
-				.then((resource) => {
-					this.bind(resource);
+				.then(
+					(resource) => {
+						this.bind(resource);
 
-					if (this.changeId === changeId) {
-						this.emit('changed');
-					}
-				});
+						if (this.changeId === changeId) {
+							this.emit('changed');
+						}
+					}, 
+					(error) => {						
+						if (this.changeId !== changeId) {
+							return;
+						}
+						reporter.error(`Resource errored ${filename}`);
+						reporter.error(error);
+						reporter.log('yellow<Watcher resumed...>'.color);
+					});
 		}
 	});
 

@@ -92,7 +92,7 @@
 					action: () => Builder.build(resources, solution),
 					message: (treeInfo, seconds) => 
 						`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color
-				}).done(buildComplete);
+				}).done(buildComplete).fail(buildFailed);
 			}
 			function buildComplete (resources) {
 				isBuilding = false;
@@ -105,6 +105,20 @@
 				if (isRebuilding) {
 					isRebuilding = false;
 					self.emit('rebuild', resources);
+				}
+			}
+			function buildFailed (error) {
+				isBuilding = false;
+				if (isRebuilding) {
+					solution.reporter.error('red<Build Failed>'.color);
+					solution.reporter.error(error);
+					isRebuilding = false;
+				}				
+				if (shouldRebuild) {
+					shouldRebuild = false;
+					isRebuilding = true;
+					build(rootResource);
+					return;	
 				}
 			}
 			function rebuild() {
