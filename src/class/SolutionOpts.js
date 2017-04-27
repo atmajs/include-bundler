@@ -61,7 +61,9 @@ var SolutionOpts;
 				'\\/node_modules\\/',
 				'\\.min\\.'
 			],
+			dynamicDependencies: [
 
+			],
 			silent: false,
 			watch: false
 		},
@@ -109,6 +111,9 @@ var SolutionOpts;
 				return val;
 			},
 			parserIgnoreDependencies (arr) {
+				return arr.map(x => new RegExp(x));
+			},
+			dynamicDependencies (arr) {
 				return arr.map(x => new RegExp(x));
 			}
 		},

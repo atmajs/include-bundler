@@ -1,13 +1,14 @@
 {
   "name": "app-bundler",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "",
   "main": "lib/bundler.js",
   "bin": {
     "app-bundler": "index.js"
   },
   "scripts": {
-    "test": "atma test"
+    "test": "atma test",
+    "watch": "atma run watch"
   },
   "repository": {
     "type": "git",

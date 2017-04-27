@@ -18,6 +18,7 @@ var Parser;
 
 			function _runMiddlewares (deps) {
 				getDependenciesExternal(deps, resource, solution)
+					.then((deps) => filterDynamicDeps(deps, solution))
 					.done(deps => dfr.resolve(deps))
 					.fail(error => dfr.reject(error))
 					;
@@ -43,5 +44,13 @@ var Parser;
 			.run('parseDependencies', resource, deps, solution)
 			.then(() => deps)
 			;
+	}
+	function filterDynamicDeps(info, solution) {		
+		info.dependencies = info.dependencies.filter(dep => isDynamicDependency(dep, solution) === false);
+		return info;
+	}
+	function isDynamicDependency(dep, solution) {
+		var arr = solution.opts.dynamicDependencies;
+  		return arr.length !== 0 && arr.some(rgx => rgx.test(dep.url));
 	}
 }());
