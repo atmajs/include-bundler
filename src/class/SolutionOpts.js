@@ -23,15 +23,16 @@ var SolutionOpts;
 				types: [ 'module', 'bundle'],
 
 				moduleWrapper: 'iif',
-				moduleWrappers: ['umd', 'iif'],
+				moduleWrappers: ['umd', 'iif', 'script'],
 				moduleName: '',
 			},
 			extensions: {
 				'': { type: 'js'},
 				
-				'js': { type: 'js' },
+				'js':  { type: 'js' },
 				'es6': { type: 'js' },
 				'jsx': { type: 'js' },
+				'ts':  { type: 'js' },
 
 				'mask': { type: 'mask' },
 
@@ -115,6 +116,12 @@ var SolutionOpts;
 			},
 			dynamicDependencies (arr) {
 				return arr.map(x => new RegExp(x));
+			},
+			extensions (opts) {
+				if (opts === this.defaults.extensions) {
+					return opts;
+				}
+				return Object.assign(this.defaults.extensions, opts);
 			}
 		},
 		constructor: function(solution, opts_){

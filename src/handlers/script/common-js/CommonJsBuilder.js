@@ -71,6 +71,8 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 			case 'umd':
 				body = this.wrapWithUMD(body);
 				break;
+			case 'script':
+				break;
 			default:
 				throw new Error('Uknown module wrapper: ' + wrapper);
 		}		
