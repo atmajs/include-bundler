@@ -122,6 +122,24 @@ var SolutionOpts;
 					return opts;
 				}
 				return Object.assign(this.defaults.extensions, opts);
+			},
+			defaultExtensions (opts) {
+				if (opts === this.defaults.defaultExtensions) {
+					return opts;
+				}
+				/** REFACTOR **/
+				Include.prototype.cfg('extentionDefault', opts);
+				for (var type in opts) {
+					switch (type) {
+						case 'js':
+							mask.Module.cfg('ext.script', opts[type]);
+							break;
+						case 'css':
+							mask.Module.cfg('ext.style', opts[type]);
+							break;
+					}
+				}
+				return Object.assign(this.defaults.defaultExtensions, opts);	
 			}
 		},
 		constructor: function(solution, opts_){
