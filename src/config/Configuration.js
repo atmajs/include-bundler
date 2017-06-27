@@ -3,13 +3,18 @@ class Configuration {
 		this.opts = {};
 	}
 
-	define (key, defaultVal) {
-		this.opts[key] = {
-			default: defaultVal,
-			value: defaultVal
-		};
+	define (key, value) {
+		let obj = this.opts[key];
+		if (obj == null) {
+			this.opts[key] = {
+				default: value,
+				value: value
+			};
+		} else {
+			obj.value = value;
+		}
 		if (key === 'middlewares') {
-			io.File.registerExtensions(defaultVal);
+			io.File.registerExtensions(value);
 		}
 	}
 

@@ -35,7 +35,7 @@
 		static clearCache() {
 			Loader.clearCache();
 			return Bundler;
-		}
+		}		
 		static get Config () {
 			return _config;
 		}

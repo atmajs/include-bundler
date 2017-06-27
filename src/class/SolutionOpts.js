@@ -56,6 +56,7 @@ var SolutionOpts;
 			},
 			mappers: null,
 			mappings: null,
+			middlewares: null,
 			varDefs: null,
 			parserIgnoreDependencies: [
 				'\\/bower_components\\/',
@@ -98,6 +99,9 @@ var SolutionOpts;
 			mappings (val) {
 				return val || {};
 			},
+			middlewares (val) {
+				_config.define('middlewares', val);
+			},
 			version (val, opts) {
 				if (typeof val === 'string') {
 					if (val[0] === '#') {
@@ -121,7 +125,8 @@ var SolutionOpts;
 				if (opts === this.defaults.extensions) {
 					return opts;
 				}
-				return Object.assign(this.defaults.extensions, opts);
+				let def = Object.create(this.defaults.extensions);
+				return Object.assign(def, opts);
 			},
 			defaultExtensions (opts) {
 				if (opts === this.defaults.defaultExtensions) {
@@ -139,7 +144,8 @@ var SolutionOpts;
 							break;
 					}
 				}
-				return Object.assign(this.defaults.defaultExtensions, opts);	
+				let def = Object.create(this.defaults.defaultExtensions);
+				return Object.assign(def, opts);
 			}
 		},
 		constructor: function(solution, opts_){
