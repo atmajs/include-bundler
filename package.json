@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "atma test",
-    "watch": "atma run watch"
+    "watch": "atma run watch",
+    "build": "atma run import"
   },
   "repository": {
     "type": "git",
