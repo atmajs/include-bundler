@@ -66,6 +66,17 @@ var Loader;
 				if (loader == null) {
 					loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
 					loader.process();
+				} else {
+					// Try to find the resource in ancestors
+					var x = parent;
+					while(x != null) {
+						if (x.filename === resource.filename) {
+							var dfr = new class_Dfr;
+							resource.content = x.content;
+							return dfr.resolve({ resource: resource });
+						}
+						x = x.parent;
+					}
 				}
 				if (includeData.page) {
 					loader.done(() => {
