@@ -140,7 +140,7 @@
 								.on('changed', rebuild);
 						}
 						return build(resource)
-							.then(() => solution.runScripts('postbuild'))
+							.then((result) => solution.runScripts('postbuild', result))
 					});
 			}
 			return solution
