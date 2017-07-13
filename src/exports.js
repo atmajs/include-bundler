@@ -82,7 +82,7 @@
 				rootResource = null,
 				self = this;
 
-
+			
 			function build(resource) {
 				isBuilding = true;
 				var resources = res_flattern(resource);				
@@ -129,18 +129,23 @@
 				isRebuilding = true;
 				build(rootResource);
 			}
-			
-			return Loader
-				.load(type, path, opts, solution)
-				.then(resource => {
-					rootResource = resource;
-					if (opts && opts.watch === true) {
-						Watcher
-							.watch(resource, solution)
-							.on('changed', rebuild);
-					}
-					return build(resource);
-				});
+			function start () {
+				return Loader
+					.load(type, path, opts, solution)
+					.then(resource => {
+						rootResource = resource;
+						if (opts && opts.watch === true) {
+							Watcher
+								.watch(resource, solution)
+								.on('changed', rebuild);
+						}
+						return build(resource)
+							.then(() => solution.runScripts('postbuild'))
+					});
+			}
+			return solution
+				.runScripts('prebuild')
+				.then(start);			
 		}
 
 		static build (path, opts) {

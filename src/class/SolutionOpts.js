@@ -66,6 +66,12 @@ var SolutionOpts;
 			dynamicDependencies: [
 
 			],
+			prebuild: [
+
+			],
+			postbuild: [
+
+			],
 			silent: false,
 			watch: false
 		},

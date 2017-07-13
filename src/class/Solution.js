@@ -33,6 +33,21 @@ var Solution = null;
 		isMainResource (resource) {
 			return this.outputResources.rootInput === resource;
 		}
+
+		runScripts (name) {
+			return async_run(() => {
+				let arr = this.opts[name];
+				if (arr == null || arr.length === 0) {
+					return;
+				}
+				return async_waterfall(arr, function(path) {
+					let mix = require(class_Uri.combine(process.cwd(), path));
+					if (mix && mix.process) {
+						return mix.process();
+					}
+				});
+			})
+		}
 	};
 
 }());
