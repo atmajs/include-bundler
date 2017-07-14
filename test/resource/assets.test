@@ -17,7 +17,7 @@ UTest({
 		Bundler.clearCache();
 	},
 	'should get resource tree from files for same bases' () {
-		var bundler = new Bundler('main.html');
+		var bundler = new Bundler('main.html', { silent: true });
 
 		return bundler.build().done((resources) => {
 			var solution = bundler.solution;			
@@ -39,7 +39,7 @@ UTest({
 		});
 	},
 	'should get resource tree from files for different bases' () {
-		var bundler = new Bundler('main.html', { outputBase: 'dist' });
+		var bundler = new Bundler('main.html', { outputBase: 'dist', silent: true  });
 
 		return bundler.build().done(resources => {
 			var solution = bundler.solution;			

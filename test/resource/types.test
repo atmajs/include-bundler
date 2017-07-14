@@ -36,7 +36,7 @@ UTest({
 	},
 	'should get resource tree with different types' () {
 
-		return Bundler.getResourceTree('root.js').done(resource => {
+		return Bundler.getResourceTree('root.js', {silent: true}).done(resource => {
 
 			var expect = {
 				url: '/root.js',
@@ -71,7 +71,7 @@ UTest({
 	},
 	'should flattern resource tree with different types' () {
 
-		return Bundler.getResources('root.js').done(resources => {
+		return Bundler.getResources('root.js', {silent: true}).done(resources => {
 			var arr = resources.map(x => x.url);
 			var expect = [
 				'/styles/app.css',

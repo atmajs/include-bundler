@@ -33,15 +33,10 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 
 		var body = '';
 
-		// if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
-		// 	opts.commonjs.hasHeading = true;	
-
-		// 	var mainUrl = this.solution.outputResources.rootInput.url;
-
-		// 	body = Templates
-		// 		.Header
-		// 		.replace('%ROOT_DIR%', () => mainUrl);
-		// }
+		if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
+			opts.commonjs.hasHeading = true;
+			body = this.getHeaderContent();
+		}
 
 		var {url, content} = resource;
 
@@ -65,9 +60,8 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 	buildRoot (root, outputDependencies) {
 		outputDependencies.forEach(x => x.embed = true);
 
-		var header = this.getHeaderContent();
 		var content = this.getRootContent(root, outputDependencies);
-		var body = header + '\n' + outputDependencies
+		var body = outputDependencies
 			.map(x => x.content)
 			.concat([ content ])
 			.join('\n');

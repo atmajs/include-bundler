@@ -76,7 +76,7 @@ UTest({
 			},
 			'should get nested scripts' () {
 				
-				return Bundler.getResources('index-deep.html').done(resources => {
+				return Bundler.getResources('index-deep.html', { silent: true }).done(resources => {
 
 					eq_(resources.length, 3);
 					has_(resources[0].toJSON(), {type: 'js', url: '/bar.js', asModules: ['commonjs']});
@@ -86,7 +86,7 @@ UTest({
 			},
 			'should ignore nested scripts' () {
 				
-				return Bundler.getResources('index-single.html').done(resources => {
+				return Bundler.getResources('index-single.html', { silent: true }).done(resources => {
 
 					eq_(resources.length, 2);
 					return;

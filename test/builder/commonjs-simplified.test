@@ -29,7 +29,8 @@ UTest({
 						commonjs: {
 							output: 'simplified'
 						}
-					}
+					},
+					silent: true
 				})
 				.done(resources => {			
 					eq_(resources.length, 1);
@@ -65,7 +66,8 @@ UTest({
 						commonjs: {
 							output: 'simplified'
 						}
-					}
+					},
+					silent: true
 				})
 				.done(resources => {			
 					eq_(resources.length, 1);

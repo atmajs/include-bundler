@@ -85,7 +85,7 @@ UTest({
 		breakOnError: true
 	},
 	'should bundle mask' () {
-		return Bundler.build('main.mask', {}).done(resources => {
+		return Bundler.build('main.mask', {silent: true}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
 		
@@ -102,7 +102,7 @@ UTest({
 	'should get mask resources for html' () {
 		
 		return Bundler
-			.getResources('index.html')
+			.getResources('index.html', {silent: true})
 			.then(arr => arr.map(x => x.toJSON(false)))
 			.done(arr => {			
 				eq_(arr.length, 4);
@@ -115,7 +115,7 @@ UTest({
 			});
 	},
 	'should bundle mask in html page' () {
-		return Bundler.build('index.html').done(resources => {
+		return Bundler.build('index.html', {silent: true}).done(resources => {
 			
 			eq_(resources.length, 1);
 			eq_(resources[0].type, 'html');
@@ -171,7 +171,7 @@ UTest({
 			})
 	},
 	'should test pages in html page' (done) {
-		Bundler.build('pages.html').done(resources => {
+		Bundler.build('pages.html', {silent: true}).done(resources => {
 			
 			eq_(resources.length, 3);
 			var urls = resources.map(x => x.url);
@@ -204,7 +204,7 @@ UTest({
 		});
 	},
 	'should test mask scripts' (done) {
-		Bundler.build('scripts.mask').done(resources => {
+		Bundler.build('scripts.mask', {silent: true}).done(resources => {
 			
 			eq_(resources.length, 2);
 			var urls = resources.map(x => x.url);
@@ -247,7 +247,7 @@ UTest({
 					import from './button.css';
 					import Clickable from '/compos/Clickable';
 					define Button extends Clickable {
-						h4 > '~[ $.getFoo() ]'
+						h4 > '~[ this.getFoo() ]'
 					}
 					Button;
 				`,
@@ -269,7 +269,7 @@ UTest({
 		},
 
 		'should test deps' () {
-			var bundler = new Bundler('button.mask');
+			var bundler = new Bundler('button.mask', {silent: true});
 			return bundler
 				.getResources()
 				.then(result => {
@@ -285,7 +285,7 @@ UTest({
 
 		'should test build' (done) {
 
-			Bundler.build('button.mask').done(resources => {
+			Bundler.build('button.mask', {silent: true}).done(resources => {
 
 				
 				eq_(resources.length, 2);

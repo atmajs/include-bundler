@@ -126,7 +126,7 @@ var Resource = class_create({
 	},
 	clone () {
 		var res = new Resource();
-		res.resources = this.resource;
+		res.resources = this.resources;
 		res.parent = this.parent;
 		res.filename = this.filename;
 		res.directory = this.directory;

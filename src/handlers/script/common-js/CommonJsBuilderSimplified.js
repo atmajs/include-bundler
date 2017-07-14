@@ -2,17 +2,27 @@ var CommonJsBuilderSimplified;
 (function(){
 	CommonJsBuilderSimplified = {
 		wrapModule (resource) {
-			
 			var varId = getVarId(resource);
 			var content = resource.content;
 			
 			content = replaceWithVarIds(content, resource, this.solution);			
-			return Templates
+			content = Templates
 				.ModuleSimplified
 				.replace(/%VAR_ID%/g, () => varId)
 				.replace(/%MODULE%/g, () => content)
 				;
-			
+			var opts = this.solution.opts;
+			if (opts.commonjs == null) {
+				opts.commonjs = {
+					addHeading: true,
+					hasHeading: false
+				}
+			};
+			if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
+				opts.commonjs.hasHeading = true;
+				content = this.getHeaderContent() + content;
+			}
+			return content;
 		},
 
 		getRootContent (root) {

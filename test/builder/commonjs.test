@@ -38,6 +38,7 @@ UTest({
 	},
 	'should bundle commonjs scripts' () {
 		return Bundler.build('main.js', { 
+			silent: true,
 			module: 'commonjs',
 		}).done(resources => {
 			eq_(resources.length, 1);
@@ -52,7 +53,7 @@ UTest({
 	},
 	'should get script resources for html' () {
 		return Bundler
-			.getResources('index.html')
+			.getResources('index.html', { silent: true })
 			.then(arr => arr.map(x => x.toJSON(false)))
 			.done(arr => {			
 				eq_(arr.length, 4);
@@ -71,12 +72,13 @@ UTest({
 	'should bundle scripts in html page' () {
 		return Bundler.build('index.html', {
 			module: 'commonjs',
+			silent: true,
 		}).done(resources => {
 			
 			eq_(resources.length, 2);
 			eq_(resources[0].type, 'js');
 			var script = resources[0];
-
+		
 			eval(script.content);			
 			eq_(typeof getData, 'function');
 			deepEq_(getData(), {
@@ -91,7 +93,8 @@ UTest({
 	'should bundle scripts in html with overriden mainOutputPath' () {
 		return Bundler.build('index.html', {
 			module: 'commonjs',
-			outputMain: '{filename}.{build}.{ext}'
+			outputMain: '{filename}.{build}.{ext}',
+			silent: true,
 		}).done(resources => {
 			eq_(resources[1].url, '/index.release.html');
 			has_(resources[1].content, 'src="build/release/main_index.js"');			

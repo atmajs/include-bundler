@@ -61,7 +61,7 @@ UTest({
 		},		
 		'should get files' () {
 			return Bundler
-				.getResources('index.html')
+				.getResources('index.html', { silent: true })
 				.then(arr => arr.map(x => x.toJSON(false)))
 				.done(arr => {			
 					eq_(arr.length, 3);
@@ -80,6 +80,7 @@ UTest({
 		'should build files' () {
 			return Bundler.build('index.html', {
 				module: 'includejs',
+				silent: true
 			}).done(resources => {
 
 				eq_(resources.length, 2);
@@ -117,7 +118,7 @@ UTest({
 		},		
 		'should get files' () {
 			return Bundler
-				.getResources('index.html')
+				.getResources('index.html', {silent: true})
 				.then(arr => arr.map(x => x.toJSON(false)))
 				.done(arr => {			
 					eq_(arr.length, 5);
@@ -139,6 +140,7 @@ UTest({
 		'should build files' () {
 			return Bundler.build('index.html', {
 				module: 'includejs',
+				silent: true
 			}).done(resources => {
 
 				eq_(resources.length, 3);
@@ -192,7 +194,8 @@ UTest({
 				.getResources('index.html', {
 					package: {
 						module: 'includejs'
-					}
+					},
+					silent: true
 				})
 				.then(arr => arr.map(x => x.toJSON(false)))
 				.done(arr => {			
@@ -223,7 +226,8 @@ UTest({
 			return Bundler.build('index.html', {
 				package: {
 					module: 'includejs'
-				}
+				},
+				silent: true
 			}).done(resources => {
 
 				eq_(resources.length, 3);

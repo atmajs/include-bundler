@@ -17,7 +17,7 @@ UTest({
 		TestHelper.registerFiles(Files);
 	},
 	'should get resource tree from files' () {
-		return Bundler.getResourceTree('main-amd.js').done(resource => {
+		return Bundler.getResourceTree('main-amd.js', {silent: true}).done(resource => {
 
 			var expect = {
 				url: '/main-amd.js',
@@ -36,7 +36,7 @@ UTest({
 		})
 	},
 	'should flattern tree' () {
-		return Bundler.getResources('main-amd.js').done(resources => {
+		return Bundler.getResources('main-amd.js', {silent: true}).done(resources => {
 			var urls = resources.map(x => x.url);
 			deepEq_(urls, [
 				'/qux.js',
