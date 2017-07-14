@@ -5,10 +5,7 @@ var CommonJsBuilderSimplified;
 			
 			var varId = getVarId(resource);
 			var content = resource.content;
-			var rgx_EXPORTS = /module\.\s*exports/g;
-			var rgx_REQUIRE = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
-
-			//content = content.replace(rgx_EXPORTS, () => varId);
+			
 			content = replaceWithVarIds(content, resource, this.solution);			
 			return Templates
 				.ModuleSimplified
@@ -19,11 +16,22 @@ var CommonJsBuilderSimplified;
 		},
 
 		getRootContent (root) {
-			var content = root.content,
-				rootInput = this.solution.outputResources.rootInput;
-
-			return replaceWithVarIds(content, rootInput, this.solution);
+			var rootInput = this.solution.outputResources.rootInput,
+				content = replaceWithVarIds(root.content, rootInput, this.solution);
+			
+			return content;
+		},
+		getHeaderContent () {
+			var resources = this
+				.solution
+				.outputResources
+				.items
+				.map(x => x.resources)
+				.reduce((aggr, x) => aggr.concat(x), []);
+			
+			return getModuleVars(resources);
 		}
+
 	};
 
 	function replaceWithVarIds(content, resource, solution) {
@@ -41,5 +49,8 @@ var CommonJsBuilderSimplified;
 	function getVarId (resource) {
 		var str = resource.url.replace(/\.\w+$/, '');
 		return str.replace(/[^\w\d]/g, '_');
+	}
+	function getModuleVars (resources) {
+		return resources.map(getVarId).sort().map(x => `var ${x} = {};`).join('\n') + '\n';
 	}
 }());

@@ -89,7 +89,8 @@
 				return tree_async({
 					resources,
 					reporter: solution.reporter,
-					action: () => Builder.build(resources, solution),
+					action: () => 
+						Builder.build(resources, solution),
 					message: (treeInfo, seconds) => 
 						`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color
 				}).done(buildComplete).fail(buildFailed);

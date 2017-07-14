@@ -7,6 +7,7 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		if (opts && opts.output === 'simplified') {
 			this.wrapModule = CommonJsBuilderSimplified.wrapModule;
 			this.getRootContent = CommonJsBuilderSimplified.getRootContent;
+			this.getHeaderContent = CommonJsBuilderSimplified.getHeaderContent;
 		}
 	}
 
@@ -32,15 +33,15 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 
 		var body = '';
 
-		if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
-			opts.commonjs.hasHeading = true;	
+		// if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
+		// 	opts.commonjs.hasHeading = true;	
 
-			var mainUrl = this.solution.outputResources.rootInput.url;
+		// 	var mainUrl = this.solution.outputResources.rootInput.url;
 
-			body = Templates
-				.Header
-				.replace('%ROOT_DIR%', () => mainUrl);
-		}
+		// 	body = Templates
+		// 		.Header
+		// 		.replace('%ROOT_DIR%', () => mainUrl);
+		// }
 
 		var {url, content} = resource;
 
@@ -53,11 +54,20 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 		return body + module;
 	}
 
-	buildRoot (root, dependencies) {
-		dependencies.forEach(x => x.embed = true);
+	getHeaderContent () {
+		var mainUrl = this.solution.outputResources.rootInput.url;
 
-		var content = this.getRootContent(root);
-		var body = dependencies
+		return Templates
+			.Header
+			.replace('%ROOT_DIR%', () => mainUrl);
+	}
+
+	buildRoot (root, outputDependencies) {
+		outputDependencies.forEach(x => x.embed = true);
+
+		var header = this.getHeaderContent();
+		var content = this.getRootContent(root, outputDependencies);
+		var body = header + '\n' + outputDependencies
 			.map(x => x.content)
 			.concat([ content ])
 			.join('\n');

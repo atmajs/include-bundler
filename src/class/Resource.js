@@ -19,6 +19,8 @@ var Resource = class_create({
 	asModules: null,
 	inPages: null,
 
+	isCyclic: false,
+
 	constructor: function (includeData, parent, solution) {
 		if (arguments.length === 0)
 			return;
@@ -139,6 +141,7 @@ var Resource = class_create({
 		res.asModules = this.asModules;
 		res.inPages = this.inPages;
 		res.source = this.source;
+		res.isCyclic = this.isCyclic;
 		return res;
 	},
 	toTarget (solution, settings) {

@@ -68,15 +68,11 @@ var Loader;
 					loader.process();
 				} else {
 					// Try to find the resource in ancestors
-					var x = parent;
-					while(x != null) {
-						if (x.filename === resource.filename) {
-							var dfr = new class_Dfr;
-							resource.content = x.content;
-							return dfr.resolve({ resource: resource });
-						}
-						x = x.parent;
-					}
+					var res = this.tryGetCyclicRoot(resource);
+					if (res != null) {
+						solution.reporter.warn(`Caution. Cyclic dependency detected. '${includeData.url}' in '${parent.url}'`);
+						return async_resolve({ resource: res })
+					}					
 				}
 				if (includeData.page) {
 					loader.done(() => {
@@ -112,6 +108,18 @@ var Loader;
 
 					res.inPages.push(name);
 				});
+			},
+			tryGetCyclicRoot (resource) {
+				var x = resource.parent;
+				while(x != null) {
+					if (x.filename === resource.filename) {
+						let res = x.clone();
+						res.isCyclic = true;						
+						return res;
+					}
+					x = x.parent;
+				}
+				return null;
 			}
 		};
 		var TreeLoader = class_create(class_Dfr, {
@@ -166,7 +174,7 @@ var Loader;
 				})
 				.fail(error => this.reject(error))
 				.done(resources => {
-					this.resource.resources = resources;
+					this.resource.resources.push(...resources);
 					this.resolve(this);
 				});
 			},

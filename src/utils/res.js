@@ -101,7 +101,10 @@ var res_groupByType,
 		}
 		function toArray(resource, out) {
 			if (resource.resources) {
-				resource.resources.forEach(x => toArray(x, out));
+				resource
+					.resources
+					.filter(x => x.isCyclic !== true)
+					.forEach(x => toArray(x, out));
 			}
 			out['push'](resource);
 			return out;

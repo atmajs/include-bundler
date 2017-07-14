@@ -5,10 +5,10 @@ var tree_async;
 			dfr = workerInfo.action(),
 			reporter = workerInfo.reporter;
 
-		dfr.done(() => {
+		dfr.done(resources => {
 			var end = Date.now();
 			var seconds = ((end - start) / 1000).toFixed(2);
-			var treeInfo = res_getTreeInfo(workerInfo.resources);
+			var treeInfo = res_getTreeInfo(resources);
 			reporter
 				.info(workerInfo.message(treeInfo, seconds));
 			reporter
