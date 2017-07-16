@@ -323,11 +323,15 @@ var res_groupByType,
 		var imax = arr.length,
 			i = -1;
 		while(++i < imax) {
-			result = res_walk(arr[i], fn);
+			var x = arr[i];
+			if (x.isCyclic === true) {
+				continue;
+			}
+			result = res_walk(x, fn);
 			if (result === false) {
 				return result;
 			}
-		}		
+		}
 	};
 
 	res_find = function (res, matcher) {
