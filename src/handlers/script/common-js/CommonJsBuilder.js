@@ -96,10 +96,7 @@ CommonJsHandler.Builder = class CommonJsBuilder extends BaseBuilder {
 	
 	wrapWithUMD (body) {
 		var opts = this.solution.opts.package;
-		var name = opts.moduleName;
-		if (!name) {
-			throw Error('`moduleName` option is not set. Should be used for UMD wrapper');
-		}
+		var name = opts.moduleName || '';
 		return Templates
 			.UMD
 			.replace('%MODULE%', () => body)

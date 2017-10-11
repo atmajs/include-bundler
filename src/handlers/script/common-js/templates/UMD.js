@@ -19,7 +19,9 @@
     	return;
     }
 
-    _global[_name] = _module.exports;
+	if (_name) {
+		_global[_name] = _module.exports;
+	}
 
 }(function(module, global){
 	%MODULE%
