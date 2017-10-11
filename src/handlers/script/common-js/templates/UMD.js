@@ -6,7 +6,7 @@
 			exports: {}
 		};
 
-	factory(_module, _global);
+	factory(_module, _module.exports, _global);
 
 	if (typeof define === 'function' && define.amd) {
         define([], function () {
@@ -23,6 +23,6 @@
 		_global[_name] = _module.exports;
 	}
 
-}(function(module, global){
+}(function(module, exports, global){
 	%MODULE%
 }));
