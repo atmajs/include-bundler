@@ -5,9 +5,11 @@ class StyleSerializer extends BaseSerializer {
 	}
 
 	removeDependencies ($) {
+		let reader = new StyleLinkReader();
 		$('link[href]')
-			.filter(function(i, x){
-				return x.attribs['data-bundler'] !== 'ignore';
+			.filter((i, el) => {
+				let $el = $(el);
+				return $el.attr('data-bundler') !== 'ignore' && reader.canHandle($el);
 			})
 			.each((i, el) => {
 				this._replaceWithPlaceholder($(el), 'css');
