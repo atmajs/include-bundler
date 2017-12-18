@@ -160,7 +160,7 @@ var SolutionOpts;
 			this.paths = [ solution.path ];
 			var opts = opts_ || {};
 			for (var key in this.defaults) {
-				var val = opts[key] || this.defaults[key];
+				var val = opts[key] != null ? opts[key] : this.defaults[key];
 				this[key] = val;
 			}
 			for (var key in this.resolvers) {
