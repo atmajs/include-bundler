@@ -15,6 +15,7 @@ var SolutionOpts;
 			outputMain: 'build/{build}/{filename}.{ext}',
 			outputSources: 'build/{build}',
 			outputAssets: 'build/{build}/assets',
+			outputShareBase: null,
 			package: {
 				module: 'commonjs', 
 				modules: ['commonjs', 'includejs', 'global'],
@@ -176,6 +177,9 @@ var SolutionOpts;
 			return this.outputSources;
 		},		
 		isSameBase () {
+			if (this.outputShareBase === false) {
+				return false;
+			}
 			return this.base === this.outputBase;
 		},
 		getExtForType (type) {

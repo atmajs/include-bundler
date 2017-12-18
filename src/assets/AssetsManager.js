@@ -48,7 +48,7 @@ var AssetsManager;
 				io
 					.File
 					.copyToAsync(asset.filename, target.filename)
-					.then(next, error => dfr.reject(error));
+					.then(next, error => dfr.reject(`AssetsManager can't copy a file ${asset.filename} to ${target.filename}`));
 			}
 			next();
 			return dfr; 
