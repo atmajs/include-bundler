@@ -1,60 +1,70 @@
 {
-  "name": "app-bundler",
-  "version": "0.0.40",
-  "description": "",
-  "main": "lib/bundler.js",
-  "bin": {
-    "app-bundler": "index.js"
-  },
-  "scripts": {
-    "test": "atma test",
-    "watch": "atma run watch",
-    "build": "atma run import"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/atmajs/app-bundler.git"
-  },
-  "keywords": [
-    "module",
-    "commonjs",
-    "includejs",
-    "bundle",
-    "build",
-    "package",
-    "compiler"
-  ],
-  "author": "Alex Kit",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atmajs/app-bundler/issues"
-  },
-  "homepage": "https://github.com/atmajs/app-bundler",
-  "dependencies": {
-    "appcfg": "^0.2.42",
-    "atma-io": ">=0.2.18",
-    "atma-logger": "^1.0.2",
-    "atma-utils": "^0.1.8",
-    "cheerio": "^0.20.0",
-    "includejs": "^0.10.28",
-    "maskjs": ">=0.57.7",
-    "uglify-es": "^3.0.23"
-  },
-  "atma": {
-    "tasks": {
-      "watch": {
-        "files": "src/**",
-        "actions": [
-          "import"
-        ]
-      },
-      "import": {
-        "files": "src/exports.js",
-        "output": "lib/bundler.js"
-      }
+    "name": "app-bundler",
+    "version": "0.0.42",
+    "description": "",
+    "main": "lib/bundler.js",
+    "bin": {
+        "app-bundler": "index.js"
+    },
+    "scripts": {
+        "test": "atma test",
+        "watch": "atma custom tools/build --watch",
+        "build": "atma custom tools/build && atma custom tools/build --cli"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/atmajs/app-bundler.git"
+    },
+    "keywords": [
+        "module",
+        "commonjs",
+        "includejs",
+        "bundle",
+        "build",
+        "package",
+        "compiler"
+    ],
+    "author": "Alex Kit",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/atmajs/app-bundler/issues"
+    },
+    "homepage": "https://github.com/atmajs/app-bundler",
+    "dependencies": {
+        "appcfg": "^0.2.42",
+        "atma-io": ">=0.2.18",
+        "atma-logger": "^1.0.2",
+        "atma-utils": "^0.1.13",
+        "cheerio": "^0.20.0",
+        "includejs": "^0.10.28",
+        "maskjs": "^0.64.27",
+        "uglify-es": "^3.3.0"
+    },
+    "atma": {
+        "plugins": [
+            "atma-loader-ts"
+        ],
+        "tasks": {
+            "bin": {
+                "action": "import",
+                "files": "src/bin/index.js",
+                "output": "index-x.js"
+            }
+        },
+        "settings": {
+            "atma-loader-ts": {
+                "typescript": {
+                    "compilerOptions": {
+                        "noEmitHelpers": true,
+                        "importHelpers": true
+                    }
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^8.5.2",
+        "atma": "^0.10.90",
+        "tslib": "^1.8.1"
     }
-  },
-  "devDependencies": {
-    "atma": "latest"
-  }
 }

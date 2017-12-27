@@ -1,0 +1,344 @@
+import { Solution } from './Solution';
+import { ResourceMapping } from './ResourceMapping';
+import { path_getExtension, path_toAbsolute, path_resolveCurrent, path_toRelative, path_combine } from "../utils/path";
+import { obj_getProperty } from 'atma-utils';
+import { Include } from './Include';
+import { mask } from '../global'
+import { VarDefinitions } from './VarDefinitions';
+import { Configuration } from '../config/Configuration';
+
+interface IPackageOptions {
+	module?: 'commonjs' | 'includejs' | 'global'
+	type?: 'module' | 'bundle'
+	moduleWrapper?: 'umd' | 'iif' | 'script'
+	moduleName?: ''
+	[key: string]: any
+}
+interface IExtensionTypes {
+	[ext: string]: {
+		type: 'js' | 'mask' | 'css' | 'html' | 'data' | 'asset'
+	}
+}
+interface IDefaultExtension {
+	js?: string
+	mask?: string
+	css?: string
+	load?: string
+}
+export interface ISolutionOptions {
+	
+		build?: string
+		type?: string
+		base?: string
+		version?: string
+		
+		mainPage?: string
+		mainBundle?: string
+
+		outputBase?: string
+		outputAppBase?: string
+		outputMain?: string
+		outputSources?: string
+		outputAssets?: string
+		outputShareBase?: boolean
+		package?: IPackageOptions
+		extensions?: IExtensionTypes
+		defaultExtensions?: IDefaultExtension 
+		mappers?: null
+		mappings?: null
+		middlewares?: null
+		varDefs?: null
+		parserIgnoreDependencies?: string[]
+		dynamicDependencies?: string[]
+		prebuild?: string[]
+		postbuild?: string []
+		silent?: boolean
+		watch?: boolean
+		minify?: boolean
+}
+
+export class SolutionOptsBase {
+	build: string
+	type: string
+	base: string
+	version: string
+	
+	mainPage: string
+	mainBundle: string
+
+	outputBase: string
+	outputAppBase: string
+	outputMain: string
+	outputSources: string
+	outputAssets: string
+	outputShareBase: boolean
+	package: IPackageOptions
+	extensions: IExtensionTypes
+	defaultExtensions: IDefaultExtension 
+	mappings: any
+	middlewares: any
+	varDefs: VarDefinitions
+	parserIgnoreDependencies: string[]
+	dynamicDependencies: string[]
+	prebuild: string[]
+	postbuild: string []
+	silent: boolean
+	watch: boolean
+	minify: boolean
+	mappers: ResourceMapping[] = []
+}
+
+export class SolutionOpts extends SolutionOptsBase {
+		defaults: SolutionOptsBase = {
+			build: 'release',
+			type: '',
+			base: '',
+			version: null,
+			
+			mainPage: 'main',
+			mainBundle: '',
+
+			outputBase: '',
+			outputAppBase: '/',
+			outputMain: 'build/{build}/{filename}.{ext}',
+			outputSources: 'build/{build}',
+			outputAssets: 'build/{build}/assets',
+			outputShareBase: null,
+			package: {
+				module: 'commonjs', 
+				modules: ['commonjs', 'includejs', 'global'],
+
+				type: 'module',
+				types: [ 'module', 'bundle'],
+
+				moduleWrapper: 'iif',
+				moduleWrappers: ['umd', 'iif', 'script'],
+				moduleName: '',
+			},
+			extensions: {
+				'': { type: 'js'},
+				
+				'js':  { type: 'js' },
+				'es6': { type: 'js' },
+				'jsx': { type: 'js' },
+				'ts':  { type: 'js' },
+
+				'mask': { type: 'mask' },
+
+				'css': { type: 'css' },
+				'less': { type: 'css' },
+				'scss': { type: 'css' },
+				'sass': { type: 'css' },
+
+				'html': { type: 'html' },
+				'json': { type: 'data' },
+
+				'jpg': { type: 'asset' },
+				'png': { type: 'asset' },
+				'mp4': { type: 'asset' },
+			},
+			defaultExtensions: {
+				'js': 'js',
+				'mask': 'mask',
+				'css': 'css',
+				'load': 'load'
+			},
+			mappers: null,
+			mappings: null,
+			middlewares: null,
+			varDefs: null,
+			parserIgnoreDependencies: [
+				'\\/bower_components\\/',
+				'\\/node_modules\\/',
+				'\\.min\\.'
+			],
+			dynamicDependencies: [
+
+			],
+			prebuild: [
+
+			],
+			postbuild: [
+
+			],
+			silent: false,
+			watch: false,
+			minify: false
+		}
+		resolvers = {
+			base (basePath) {
+				return basePath
+					? path_toAbsolute(basePath)
+					: path_resolveCurrent();
+			},
+			outputBase (outputBase, opts) {
+				return outputBase
+					? path_toAbsolute(outputBase)
+					: opts.base;
+			},
+			outputMain: prepairPath,
+			outputSources: prepairPath,
+			outputAssets: prepairPath,
+			package: function(packageOpts) {
+				if (packageOpts == null) {
+					return this.package;
+				}
+				var opts = Object.create(this.defaults.package);
+				return Object.assign(opts, packageOpts);
+			},
+			varDefs (varDefs) {
+				return new VarDefinitions(this.solution, varDefs);
+			},
+			mappers () {
+				return []
+			},
+			mappings (val) {
+				return val || {};
+			},
+			middlewares (val) {
+				Configuration.Instance.define('middlewares', val);
+			},
+			version (val, opts) {
+				if (typeof val === 'string') {
+					if (val[0] === '#') {
+						var path = val.replace('#{', '').replace('}', '');
+						var json = require(process.cwd() + '/package.json');
+						return obj_getProperty(json, path);
+					}
+					if (val === 'random') {
+						return (Math.random() * 100000000 | 0).toString(32);
+					}
+				}
+				return val;
+			},
+			parserIgnoreDependencies (arr) {
+				return arr.map(x => new RegExp(x));
+			},
+			dynamicDependencies (arr) {
+				return arr.map(x => new RegExp(x));
+			},
+			extensions (opts) {
+				if (opts === this.defaults.extensions) {
+					return opts;
+				}
+				let def = Object.create(this.defaults.extensions);
+				return Object.assign(def, opts);
+			},
+			defaultExtensions (opts) {
+				if (opts === this.defaults.defaultExtensions) {
+					return opts;
+				}
+				/** REFACTOR **/
+				Include.prototype.cfg('extentionDefault', opts);
+				for (var type in opts) {
+					switch (type) {
+						case 'js':
+							mask.Module.cfg('ext.script', opts[type]);
+							break;
+						case 'css':
+							mask.Module.cfg('ext.style', opts[type]);
+							break;
+					}
+				}
+				let def = Object.create(this.defaults.defaultExtensions);
+				return Object.assign(def, opts);
+			}
+		}
+
+		paths: string[]
+		type: string
+
+		constructor (public solution: Solution, opts_: ISolutionOptions){
+			super();
+			this.paths = [ solution.path ];
+			var opts = opts_ || {};
+			for (var key in this.defaults) {
+				var val = opts[key] != null ? opts[key] : this.defaults[key];
+				this[key] = val;
+			}
+			for (var key in this.resolvers) {
+				this[key] = this.resolvers[key].call(this, this[key], this);
+			}
+			if (this.type === '' && solution.path) {
+				this.type = this.getTypeForExt(path_getExtension(solution.path));
+			}			
+		}
+		getOutputFolder (type) {
+			if (type === 'asset') {
+				return this.outputAssets;
+			}
+			return this.outputSources;
+		}
+		isSameBase () {
+			if (this.outputShareBase === false) {
+				return false;
+			}
+			return this.base === this.outputBase;
+		}
+		getExtForType (type) {
+			var match = this.defaultExtensions[type];
+			if (match == null) 
+				throw new Error('Type is not supported: ' + type);
+
+			return match;
+		}
+		getTypeForExt (ext) {			
+			var match = this.extensions[ext];
+			if (match == null) 
+				throw new Error('Extension is not configurated: ' + ext);
+
+			return match.type;
+		}
+		mapResource (resource_) {
+			var resource = resource_;
+			this.mappers.forEach(mapper => {
+				resource = mapper.map(resource);
+			});
+			return resource;
+		}
+		toAppUrl (filename) {
+			return '/' + path_toRelative(filename, this.base);
+		}
+		fromAppUrl (url) {
+			return path_combine(this.base, url);
+		}
+
+		ctx: any = {}
+	};
+
+	function prepairPath(path, opts) {
+		return interpolateStr(path, opts);
+	}
+	function interpolateStr(str, opts) {
+		return str.replace(/{(\w+)}/g, (full, name) => {
+			var x = opts[name];
+			if (x != null) {
+				return x;
+			}
+			switch (name) {
+				case 'filename':
+					var path = opts.paths[0];
+					if (path === '') 
+						return opts.mainPage;
+
+					var match = /([^/\\]+)\.\w+$/.exec(path);
+					if (match) {
+						return match[1];
+					}
+					throw new Error('Filename can`t be parsed from: ' + opts.paths.join(','));
+				case 'ext':
+					var path = opts.paths[0];
+					if (path === '') 
+						return opts.type;
+
+					var match = /\.(\w+)$/.exec(path);
+					if (match) {
+						return match[1];
+					}
+					throw new Error('Extension can`t be parsed from: ' + opts.paths.join(','));
+				default:
+					throw new Error('Unknown interpolation key: ' + name);
+			}
+		});
+	}
+

@@ -1,0 +1,6 @@
+{
+    "app-bundler": {
+        "file": "index.html",
+        "outputBase": "../temp/"
+    }
+}

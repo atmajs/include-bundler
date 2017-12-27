@@ -36,8 +36,7 @@ UTest({
 					eq_(resources.length, 1);
 					var main = resources[0];
 
-					eq_(main.url, '/build/release/main.js');
-
+					eq_(main.url, '/build/release/main.js');				
 					var module = {};			
 					eval(main.content);
 					deepEq_(module.exports.letters, ['a', 'b']);
