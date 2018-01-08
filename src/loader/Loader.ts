@@ -6,17 +6,25 @@ import { Parser } from '../parser/Parser';
 import * as assert from 'assert'
 import { Resource } from '../class/Resource';
 import { Configuration } from '../config/Configuration';
+import { Solution } from '../class/Solution';
+import { IDependency, IDependencies } from '../class/IDependency';
 
 export const Loader = {
 	opts: null,
 	solution: null,
 
-	load(type, path, opts, solution) {
+	load(type: string, path: string, opts, solution: Solution) {
 		this.opts = opts;
 		this.solution = solution;
 
-		var includeData = { type: type, url: path, module: 'root', page: solution.opts.mainPage };
-		var start = Date.now();
+		let includeData: IDependency = { 
+			type: type, 
+			url: path, 
+			module: 'root', 
+			page: solution.opts.mainPage 
+		};
+
+		let start = Date.now();
 		return ResourceLoader
 			.load(includeData, null, opts, solution)
 			.then(loader => {
@@ -64,7 +72,7 @@ var types = {
 };
 
 namespace ResourceLoader {
-	export function load(includeData, parent, opts, solution) {
+	export function load(includeData: IDependency, parent: Resource, opts, solution: Solution) {
 		var resource = new Resource(includeData, parent, solution);
 		var loader = __loaders[resource.filename];
 		if (loader == null) {
@@ -127,7 +135,7 @@ namespace ResourceLoader {
 	}
 
 	class TreeLoader extends class_Dfr {
-		constructor(public resource, public opts, public solution) {
+		constructor(public resource: Resource, public opts, public solution: Solution) {
 			super();			
 		}
 		process() {
@@ -163,10 +171,12 @@ namespace ResourceLoader {
 				.getDependencies(this.resource, this.solution)
 				.then(result => this.loadChildren(result), error => this.reject(error));
 		}
-		loadChildren(result) {
+		loadChildren(result: IDependencies) {
+
 			assert(Array.isArray(result.dependencies), `Expects array of dependencies for ${this.resource.url}`);
 
 			this.resource.meta = obj_extend(this.resource.meta, result.meta);
+			this.resource.dependencies = result.dependencies;
 
 			var deps = result.dependencies;
 			async_waterfall(deps, dep => {

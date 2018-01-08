@@ -1,4 +1,5 @@
 import { BaseRewriter } from "../../base/BaseRewriter";
+import { Resource } from "../../../class/Resource";
 
 export class IncludeJsRewriter extends BaseRewriter {
 
@@ -6,7 +7,7 @@ export class IncludeJsRewriter extends BaseRewriter {
 
 	}
 
-	rewriteResource (resource) {
+	rewriteResource (resource: Resource) {
 		if (resource.getModule() === 'global' && resource && resource.meta && resource.meta.includejs && resource.meta.includejs.hasIncludes) {
 			resource.asModules = ['includejs'];
 		}

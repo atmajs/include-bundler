@@ -6,6 +6,7 @@ import { CommonJsHandler } from './common-js/CommonJsHandler';
 import { AmdJsHandler } from './amd-js/AmdJsHandler';
 import { IncludeJsHandler } from './include-js/IncludeJsHandler';
 import { MaskJsHandler } from './mask-js/MaskJsHandler';
+import { OutputItem } from '../../class/OutputResources';
 
 export class ScriptBuilder extends BaseBuilder {
 
@@ -17,12 +18,12 @@ export class ScriptBuilder extends BaseBuilder {
 		new MaskJsHandler.Builder(this.solution, this.handler)
 	]
 	
-	createModule (outputItem, otherOutputItems) {
+	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
 		var out = outputItem.resources.map(res => {
 
 			var builder = this.builders.find(x => x.accepts(res));
 			if (builder == null)
-				throw new Error('Builder is not found for ' + res.url);
+				throw new Error('Module Builder not found for ' + res.url);
 
 			return builder.wrapModule(res, outputItem, otherOutputItems);
 		});
@@ -33,7 +34,7 @@ export class ScriptBuilder extends BaseBuilder {
 	buildRoot (resource, dependencies) {
 		var builder = this.builders.find(x => x.accepts(resource));
 		if (builder == null)
-			throw new Error('Builder is not found for ' + resource.url);
+			throw new Error('Root Builder not found for ' + resource.url);
 
 		return builder.buildRoot(resource, dependencies);
 	}

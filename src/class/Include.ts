@@ -16,6 +16,7 @@ export class Include {
 	route: any
 	namespace: string
 	module: string
+	pos?: number
 
 	constructor(resource?: { url: string, location?: string }) {
 		if (resource) {

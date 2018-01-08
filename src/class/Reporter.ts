@@ -1,12 +1,18 @@
 import { res_getTreeInfo } from '../utils/res'
 
-export class IReporter {
+export abstract class IReporter {
 	static create (opts) {
 		if (opts.silent === true) {
 			return new SilentReporter();
 		}
 		return new ConsoleReporter();
 	}
+
+	abstract error (...args);
+	abstract warn (...args);
+	abstract log (...args);
+	abstract info (...args);
+	abstract print (...args);
 };
 
 class ConsoleReporter {

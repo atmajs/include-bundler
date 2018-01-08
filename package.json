@@ -9,7 +9,8 @@
     "scripts": {
         "test": "atma test",
         "watch": "atma custom tools/build --watch",
-        "build": "atma custom tools/build && atma custom tools/build --cli"
+        "build": "atma custom tools/build && atma custom tools/build --cli",
+        "server": "atma server"
     },
     "repository": {
         "type": "git",
@@ -65,6 +66,7 @@
     "devDependencies": {
         "@types/node": "^8.5.2",
         "atma": "^0.10.90",
+        "selenium-query": "^0.50.35",
         "tslib": "^1.8.1"
     }
 }

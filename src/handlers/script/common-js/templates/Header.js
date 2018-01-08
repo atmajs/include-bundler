@@ -52,6 +52,6 @@ var __register, __require, require;
 	require = __require;
 
 	if (__nativeRequire == null) {
-		global.require = __require;
+		__global.require = __require;
 	}
 }());

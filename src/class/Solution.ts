@@ -6,6 +6,7 @@ import { IReporter } from "./Reporter";
 import { HandlersUtils } from "./HandlersUtils";
 import { OutputResources } from './OutputResources';
 import { Handlers } from '../handlers/exports'
+import { BaseHandler } from '../handlers/base/BaseHandler';
 
 let solution = null;
 
@@ -15,8 +16,8 @@ export class Solution extends class_EventEmitter {
 	opts: SolutionOpts
 	assetsManager
 	outputResources
-	reporter
-	handlers
+	reporter: IReporter
+	handlers: BaseHandler[]
 
 	constructor(path: string, opts: ISolutionOptions = <any>{}) {
 		super();

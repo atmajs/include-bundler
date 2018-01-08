@@ -11,12 +11,13 @@ import {
 } from '../utils/path';
 import { Include } from './Include';
 import { Solution } from './Solution';
+import { IDependency } from './IDependency';
+import { HandlersUtils } from './HandlersUtils';
 
 
 export class Resource {
 
 	resources: Resource[] = []
-	parent: Resource
 
 	filename: string = ''
 	directory: string = ''
@@ -43,10 +44,9 @@ export class Resource {
 	isCyclic: boolean = false
 
 	meta: any = null
+	dependencies: IDependency[]
 
-	solution: Solution
-
-	constructor (includeData?, parent?, solution?) {
+	constructor (includeData?, public parent?: Resource, public solution?: Solution) {
 		if (arguments.length === 0)
 			return;
 
@@ -101,7 +101,7 @@ export class Resource {
 
 		var url;
 		
-		var pathResolver = solution.handlers.findPathResolver(includeData);
+		var pathResolver = HandlersUtils.findPathResolver(solution.handlers, includeData);
 		if (pathResolver) {
 			url = pathResolver.resolve(includeData, parent);
 		}
@@ -204,7 +204,7 @@ export class Resource {
 		resource.source = this;
 		return resource;
 	}
-	_toOutputTarget (solution, settings) {
+	_toOutputTarget (solution: Solution, settings) {
 		var opts = solution.opts;
 		var url;
 		if (solution.isMainResource(this)) {
@@ -253,7 +253,7 @@ export class Resource {
 			resources: deep === false ? void 0 : this.resources.map(x => x.toJSON())
 		};
 	}
-	setModuleType (type) {
+	setModuleType (type: string) {
 		if (this.isModuleType(type)) {
 			return;
 		}
@@ -263,11 +263,11 @@ export class Resource {
 			.splice(0, 0, type)
 			.join(',');
 	}
-	isModuleType (type) {
+	isModuleType (type: string) {
 		return this.module.indexOf(type) !== -1;
 	}
 
-	getModule (solution) {
+	getModule (solution?: Solution) {
 		var modules = this.asModules;
 		if (modules == null || modules.length === 0) {
 			return null;
@@ -285,7 +285,7 @@ export class Resource {
 		return name;
 	}
 
-	cdUrl (url) {
+	cdUrl (url: string) {
 		if (url[0] === '/' || path_isRelative(url) === false)
 			return url;
 

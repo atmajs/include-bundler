@@ -3,6 +3,7 @@ import { CommonJsBuilderSimplified } from './CommonJsBuilderSimplified';
 import { Solution } from '../../../class/Solution';
 import { Templates } from './templates/Templates';
 import { BaseScriptBuilder } from '../base/BaseScriptBuilder';
+import { Resource } from '../../../class/Resource';
 
 export class CommonJsBuilder extends BaseScriptBuilder {
 
@@ -29,7 +30,7 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 		return module === 'commonjs';
 	}
 
-	wrapModule (resource) {
+	wrapModule (resource: Resource) {
 		var opts = this.solution.opts;
 		if (opts.ctx.commonjs == null) {
 			opts.ctx.commonjs = {

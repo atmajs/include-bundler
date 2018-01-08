@@ -19,18 +19,18 @@ var path_getDir,
 			path_resolveCurrent = function(){
 				if (current_ != null) return current_;
 
-				var fn = 'baseURI' in global.document
+				var fn = 'baseURI' in window.document
 						? fromBase
 						: fromLocation;
 				return (current_ = path_sliceFilename(fn()));
 			};
 			function fromBase() {
-				var path = global.document.baseURI;
+				var path = window.document.baseURI;
 				var i = path.indexOf('?');
 				return i === -1 ? path : path.substring(0, i);
 			}
 			function fromLocation() {
-				return global.location.origin + global.location.pathname;
+				return window.location.origin + window.location.pathname;
 			}
 		}
 		else {
