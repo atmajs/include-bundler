@@ -104,6 +104,8 @@ namespace ResourceLoader {
 	}
 	export function clearCache() {
 		__loaders = {};
+		let cacheCleaner = Configuration.Instance.get('clearFileCache');
+		cacheCleaner && cacheCleaner();
 		return ResourceLoader;
 	}
 	export function clearCacheSingle(filename) {

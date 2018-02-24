@@ -1,10 +1,13 @@
 import { io } from '../global'
 
 export const FileActions = {
-	readFile: function (path, opts) {		
+	readFile (path, opts) {		
 		return io.File.readAsync(path, opts)
 	},
-	writeFile: function(path, content, opts){
+	writeFile (path, content, opts){
 		return io.File.writeAsync(path, content, opts);
+	},
+	clearFileCache () {
+		io.File.clearCache();
 	}
 };

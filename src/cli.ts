@@ -103,6 +103,8 @@ namespace Process {
         if (opts.middlewares) {
             Bundler.Config.define('middlewares', opts.middlewares);
         }
+        Bundler.clearCache();
+        
         if (opts.configuration) {
             var Configurator = require(config.configuration);
             return Configurator.process(Bundler).then(() => {

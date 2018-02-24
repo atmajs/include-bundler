@@ -1,6 +1,6 @@
 {
     "name": "app-bundler",
-    "version": "0.0.42",
+    "version": "0.0.43",
     "description": "",
     "main": "lib/bundler.js",
     "bin": {
@@ -33,7 +33,7 @@
     "homepage": "https://github.com/atmajs/app-bundler",
     "dependencies": {
         "appcfg": "^0.2.42",
-        "atma-io": ">=0.2.18",
+        "atma-io": ">=0.2.40",
         "atma-logger": "^1.0.2",
         "atma-utils": "^0.1.13",
         "cheerio": "^0.20.0",
