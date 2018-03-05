@@ -68,6 +68,8 @@ export class SolutionOptsBase {
 
 	outputBase: string
 	outputAppBase: string
+
+	output: string
 	outputMain: string
 	outputSources: string
 	outputAssets: string
@@ -100,9 +102,10 @@ export class SolutionOpts extends SolutionOptsBase {
 
 			outputBase: '',
 			outputAppBase: '/',
-			outputMain: 'build/{build}/{filename}.{ext}',
-			outputSources: 'build/{build}',
-			outputAssets: 'build/{build}/assets',
+			output: '',
+			outputMain: '{output}/build/{build}/{filename}.{ext}',
+			outputSources: '{output}/build/{build}',
+			outputAssets: '{output}/build/{build}/assets',
 			outputShareBase: null,
 			package: {
 				module: 'commonjs', 

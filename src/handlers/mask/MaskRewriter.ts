@@ -2,10 +2,11 @@ import { BaseRewriter } from "../base/BaseRewriter";
 import { path_isRelative, path_normalize, path_toRelative, path_combine, path_getDir } from "../../utils/path";
 import { MaskParser } from "./MaskParser";
 import { mask } from '../../global'
+import { Resource } from "../../class/Resource";
 
 export class MaskRewriter extends BaseRewriter {
 
-	rewritePartial (content, ownerResource) {
+	rewritePartial (content, ownerResource: Resource) {
 		var parser = this.handler.parser as MaskParser;
 		var ast = parser._parse(content, ownerResource);
 		var found = false;

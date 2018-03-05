@@ -1,7 +1,8 @@
 import { BaseBuilder } from '../base/BaseBuilder';
+import { OutputItem } from '../../class/OutputResources';
 export class MaskBuilder extends BaseBuilder {
 
-	createModule (outputItem, otherOutputItems) {
+	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
 		var out = [], arr;
 
 		otherOutputItems.forEach(item => {
@@ -12,7 +13,11 @@ export class MaskBuilder extends BaseBuilder {
 		})
 
 		arr = outputItem.resources.map(resource => {
-			var url = resource.url;//resource.toRelative(outputItem.resource);
+			/*
+			* @TODO consider to use relative paths instead of applications root
+			*/
+			//-let url = resource.toRelative(outputItem.resource);
+			let url = resource.url;
 			return `module path="${url}" { 
 				${resource.content}
 			}`

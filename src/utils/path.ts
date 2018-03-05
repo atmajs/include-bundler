@@ -71,8 +71,9 @@ export function path_resolveUrl(path, base) {
 export function path_isRelative(path) {
 	return rgx_PROTOCOL.test(path) === false;
 };
-export function path_toRelative(path, anchor, base?) {
-	var path_ = path_resolveUrl(path_normalize(path), base),
+export function path_toRelative(path: string, anchor: string, base?: string) {
+	
+	let path_ = path_resolveUrl(path_normalize(path), base),
 		absolute_ = path_resolveUrl(path_normalize(anchor), base);
 
 	if (path_getExtension(absolute_) !== '') {

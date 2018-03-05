@@ -78,8 +78,8 @@ UTest({
 			eq_(resources.length, 2);
 			eq_(resources[0].type, 'js');
 			var script = resources[0];
-		
-			eval(script.content);			
+
+			global.eval(script.content);			
 			eq_(typeof getData, 'function');
 			deepEq_(getData(), {
 				letters: ['a', 'b']
