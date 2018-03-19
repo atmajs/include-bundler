@@ -179,7 +179,9 @@ export class SolutionOpts extends SolutionOptsBase {
 			minify: false,
 			options: {
 				mask: {
-					base: ''
+					Module: {
+						base: ''
+					}
 				}
 			}
 		}
