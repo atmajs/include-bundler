@@ -38,7 +38,7 @@
         "atma-utils": "^0.1.13",
         "cheerio": "^0.20.0",
         "includejs": "^0.10.28",
-        "maskjs": "^0.64.27",
+        "maskjs": "^0.64.41",
         "uglify-es": "^3.3.0"
     },
     "atma": {
