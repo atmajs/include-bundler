@@ -43,7 +43,9 @@ export class Resource {
 
 	isCyclic: boolean = false
 
-	meta: any = null
+	meta?: {
+		hasPages?: boolean
+	} = null
 	dependencies: IDependency[]
 
 	constructor (includeData?, public parent?: Resource, public solution?: Solution) {
@@ -51,13 +53,13 @@ export class Resource {
 			return;
 
 		if (includeData == null) {
-			includeData = { type: solution.type };
+			includeData = { type: solution && solution.opts.type };
 		}
 		if (includeData.type == null) {
 			if (includeData.url) {
 				includeData.type = solution.opts.getTypeForExt(path_getExtension(includeData.url));
 			} else {
-				includeData.type = solution.type;
+				includeData.type = solution && solution.opts.type;
 			}
 		}
 

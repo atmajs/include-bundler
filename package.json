@@ -45,13 +45,6 @@
         "plugins": [
             "atma-loader-ts"
         ],
-        "tasks": {
-            "bin": {
-                "action": "import",
-                "files": "src/bin/index.js",
-                "output": "index-x.js"
-            }
-        },
         "settings": {
             "include": {
                 "amd": true,

@@ -6,6 +6,7 @@ import { Include } from './Include';
 import { mask } from '../global'
 import { VarDefinitions } from './VarDefinitions';
 import { Configuration } from '../config/Configuration';
+import { obj_deepDefaults } from '../utils/obj';
 
 interface IPackageOptions {
 	module?: 'commonjs' | 'includejs' | 'global'
@@ -25,6 +26,13 @@ interface IDefaultExtension {
 	css?: string
 	load?: string
 }
+export interface IAdditionOptions {
+	mask?: {
+		Module?: any,
+		[key: string]: any
+	}
+}
+
 export interface ISolutionOptions {
 	
 		build?: string
@@ -50,6 +58,7 @@ export interface ISolutionOptions {
 		varDefs?: null
 		parserIgnoreDependencies?: string[]
 		dynamicDependencies?: string[]
+		options?: IAdditionOptions
 		prebuild?: string[]
 		postbuild?: string []
 		silent?: boolean
@@ -88,6 +97,7 @@ export class SolutionOptsBase {
 	watch: boolean
 	minify: boolean
 	mappers: ResourceMapping[] = []
+	options?: IAdditionOptions = {}
 }
 
 export class SolutionOpts extends SolutionOptsBase {
@@ -166,7 +176,12 @@ export class SolutionOpts extends SolutionOptsBase {
 			],
 			silent: false,
 			watch: false,
-			minify: false
+			minify: false,
+			options: {
+				mask: {
+					base: ''
+				}
+			}
 		}
 		resolvers = {
 			base (basePath) {
@@ -245,6 +260,22 @@ export class SolutionOpts extends SolutionOptsBase {
 				}
 				let def = Object.create(this.defaults.defaultExtensions);
 				return Object.assign(def, opts);
+			},
+			options (opts: IAdditionOptions) {
+				if (opts == null) {
+					return {};
+				}
+				if (opts.mask) {
+					if (opts.mask.Module) {
+						for (let key in opts.mask.Module) {
+							mask.Module.cfg(key, opts.mask.Module[key]);
+						}
+					}
+					for (let key in opts.mask) if (key !== 'Module') {						
+						mask.cfg(key, opts.mask.Module[key]);
+					}
+				}
+				return opts;
 			}
 		}
 
@@ -254,12 +285,11 @@ export class SolutionOpts extends SolutionOptsBase {
 		constructor (public solution: Solution, opts_: ISolutionOptions){
 			super();
 			this.paths = [ solution.path ];
-			var opts = opts_ || {};
-			for (var key in this.defaults) {
-				var val = opts[key] != null ? opts[key] : this.defaults[key];
-				this[key] = val;
+			let opts = opts_ || {};
+			for (let key in this.defaults) {
+				this[key] = obj_deepDefaults(opts[key], this.defaults[key]);
 			}
-			for (var key in this.resolvers) {
+			for (let key in this.resolvers) {
 				this[key] = this.resolvers[key].call(this, this[key], this);
 			}
 			if (this.type === '' && solution.path) {

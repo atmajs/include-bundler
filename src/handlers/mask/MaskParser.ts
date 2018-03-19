@@ -10,9 +10,7 @@ import { mask } from '../../global'
 export class MaskParser extends BaseParser {
 
 	constructor (public solution: Solution, public handler: BaseHandler) {
-		super(solution, handler);
-
-		mask.Module.cfg('base', '');
+		super(solution, handler);		
 	}
 	
 	getDependencies (content, ownerResource) {
@@ -70,10 +68,11 @@ export class MaskParser extends BaseParser {
 			type = mask.Module.getType(new mask.Module.Endpoint(path, node.contentType));			
 
 		if (path[0] === '/') {
-			var base = mask.Module.cfg('base');
-			if (base) {
-				path = path_combine(base, path);
-			}
+			// @NextIteration base will be handled in mask.Module.resolvePath
+			// var base = mask.Module.cfg('base');
+			// if (base) {
+			// 	path = path_combine(base, path);
+			// }
 		}		
 		return [ this._createDependency(path, type, page) ];
 	}

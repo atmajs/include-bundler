@@ -1,4 +1,4 @@
-# JavaScript Application Bundler
+# HTML, Mask, JavaScript Application Bundler
 
 > Supports: `CommonJS`, [`MaskJS`](https://github.com/atmajs/maskjs), [`IncludeJS`](https://github.com/atmajs/includejs), `AMD`
 
@@ -24,7 +24,7 @@ Build your CommonJS libraries and apps into one single module file.
 
 The Application Bundler targets module systems, that do not require incremental builds. Have it simple: develop your web applications without any bundler, and then, only for production, build you app. No more huge `task` and `config` files.
 
-# `3` Preporcessors: `babel`, `less`, `scss`, `yml`
+# `3` Preporcessors: `babel`, `less`, `scss`, `yml`, `typescript` and many more
 
 All preprocessors are decoupled from the Bundler. We use [`atma-io`](https://github.com/atmajs/atma-io) to load and write dependencies. That means, just include any file middleware as a plugin for `atma-io`.
 

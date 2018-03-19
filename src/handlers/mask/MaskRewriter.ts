@@ -67,7 +67,7 @@ export class MaskRewriter extends BaseRewriter {
 		});
 	}
 
-	rewriteResource (resource) {
+	rewriteResource (resource: Resource) {
 		var meta = resource.meta;
 		if (meta != null && meta.hasPages === false) {
 			return;
@@ -79,17 +79,20 @@ export class MaskRewriter extends BaseRewriter {
 		}
 	}
 
-	rewriteRoot (resourceInput, resourceOutput) {
+	rewriteRoot (resourceInput: Resource, resourceOutput: Resource) {
 		var ast = (this.handler.parser as MaskParser)._parse(resourceInput.content);
 		mask.TreeWalker.walk(ast, (node) => {
-			if (node.tagName !== 'import')
+			if (node.tagName !== 'import') {
 				return;
-
-			if (path_isRelative(node.path) === false)
+			}
+			if (node.path == null || path_isRelative(node.path) === false) {
 				return;
-
-			var path = path_combine(path_getDir(resourceInput.url), node.path);
-			
+			}
+			if (node.path[0] === '@') {
+				// MaskJS prefixed path
+				return;
+			}
+			let path = path_combine(path_getDir(resourceInput.url), node.path);
 			node.path = path_toRelative(path, resourceOutput.url);
 		});
 
