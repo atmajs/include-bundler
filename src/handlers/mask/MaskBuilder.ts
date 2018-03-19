@@ -45,7 +45,7 @@ export class MaskBuilder extends BaseBuilder {
 
 		
 		
-		resource.content = `${imports}\n${body}\n${resource.content}`;
+		resource.content = `${body}\n${imports}\n${resource.content}`;
 	}
 
 	accepts (type) {
