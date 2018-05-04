@@ -1,6 +1,7 @@
 import { Solution } from "../../class/Solution";
 import { BaseHandler } from "./BaseHandler";
 import * as assert from 'assert'
+import { Resource } from "../../class/Resource";
 
 export abstract class BaseRewriter {
 	constructor (public solution: Solution, public handler: BaseHandler) {
@@ -15,6 +16,8 @@ export abstract class BaseRewriter {
 	rewriteResource (resource): void {
 		throw Error('Not implemented');
 	}
+
+	abstract rewriteRoot (resourceInput: Resource, resourceOutput: Resource) : void
 
 	accepts (type): boolean {
 		throw Error('Not implemented');

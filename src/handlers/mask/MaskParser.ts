@@ -4,8 +4,9 @@ import { path_combine } from '../../utils/path';
 import { BaseParser } from "../base/BaseParser";
 import { async_resolve } from "../../utils/async";
 import { Resource } from '../../class/Resource';
-import { IDependency } from '../../class/IDependency';
 import { mask } from '../../global'
+import { ResourceInfo } from '../../class/ResourceInfo';
+import { color } from '../../utils/color';
 
 export class MaskParser extends BaseParser {
 
@@ -19,7 +20,7 @@ export class MaskParser extends BaseParser {
 		this._forEachImports(ast, imports => {
 			arr.push(...imports);
 		});		
-		return async_resolve({ dependencies: arr }) as PromiseLike<{dependencies: IDependency[]}>;
+		return async_resolve({ dependencies: arr }) as PromiseLike<{dependencies: ResourceInfo[]}>;
 	}
 
 	accepts (type) {
@@ -36,7 +37,7 @@ export class MaskParser extends BaseParser {
 
 		function toMessage (warning) {
 			var msg = '';
-			if (resource) msg += `yellow<${resource.url}>\n`.color;
+			if (resource) msg += color(`yellow<${resource.url}>\n`);
 			msg += warning.message;
 			return msg;
 		}

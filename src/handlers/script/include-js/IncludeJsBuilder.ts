@@ -2,9 +2,33 @@ import { arr_flattern } from '../../../utils/arr';
 import { Include } from '../../../class/Include';
 import { res_getPage } from '../../../utils/res';
 import { BaseScriptBuilder } from '../base/BaseScriptBuilder';
+import { Resource } from '../../../class/Resource';
+import { Solution } from '../../../class/Solution';
+import { OutputItem } from '../../../class/OutputResources';
 
 export class IncludeJsBuilder extends BaseScriptBuilder {
 
+	wrapScriptlessModule (otherOutputItems) {
+		var allResources = arr_flattern(otherOutputItems.map(x => x.resources));
+
+		var jsResources = allResources.filter(x => this.accepts(x));
+		var cssResources = allResources.filter(x => x.type === 'css');
+		var loadResources = allResources.filter(x => x.type === 'load');
+
+		var jsRegister = this._serializeRegister(jsResources, 'js');
+		var cssRegister = this._serializeRegister(cssResources, 'css');
+		var loadRegister = this._serializeRegister(loadResources, 'load');
+		return `
+			${jsRegister}
+			${cssRegister}
+			${loadRegister}
+		`;
+	}
+	isMainBuilder(solution: Solution): boolean {
+		const KEY = 'includejs';
+		const packageInfo = solution.opts.package;
+		return packageInfo.module === KEY || packageInfo.moduleName === KEY;
+	}
 	wrapModule (resource, outputItem, otherOutputItems) {
 		var opts = this.solution.opts;
 		var page = res_getPage(resource, opts);
@@ -43,29 +67,22 @@ export class IncludeJsBuilder extends BaseScriptBuilder {
 		return body;
 	}
 
-	buildRoot (resource, dependencies) {
-
-	}
-
-	accepts (resource) {
+	accepts (resource: Resource) {
 		if (resource.type !== 'js') {
 			return false;
 		}
-		var module = resource.getModule();			
+		const  module = resource.getModule();			
 		return module === 'includejs';
 	}
 
 
-	_createHeading (builderOpts, resource, outputItem, otherOutputItems) {
+	private _createHeading (builderOpts, resource: Resource, outputItem: OutputItem, otherOutputItems: OutputItem[]) {
 		var outputItems = [outputItem, ...otherOutputItems];
 		var allResources = arr_flattern(outputItems.map(x => x.resources));
 
 		var jsResources = allResources.filter(x => this.accepts(x));
 		var cssResources = allResources.filter(x => x.type === 'css');
 		var loadResources = allResources.filter(x => x.type === 'load');
-
-
-
 
 		builderOpts.lastItem = jsResources[jsResources.length - 1];
 
@@ -75,32 +92,31 @@ export class IncludeJsBuilder extends BaseScriptBuilder {
 		var version = this._serializeVersion();
 		var config = this._serializeConfig();
 		var heading = `
-		${version}
-		${config}
-		include.pauseStack();
-		${jsRegister}
-		${cssRegister}
-		${loadRegister}
+			${version}
+			${config}
+			include.pauseStack();
+			${jsRegister}
+			${cssRegister}
+			${loadRegister}
 		`;
-
 
 		return heading;
 	}
 
-	_serializeVersion () {
+	private _serializeVersion () {
 		var v = this.solution.opts.version;
 		if (!v) return '';
 		return `include.cfg('version', '${v}');`
 	}
 
-	_serializeConfig () {
+	private _serializeConfig () {
 		var opts = Include.getConfig();
 		var json = JSON.stringify(opts);
 		if (json === '{}') return '';
 		return `include.cfg(${json});`
 	}
 
-	_serializeRegister (resources, type) {
+	private _serializeRegister (resources, type) {
 		var paths = resources
 			.filter(x => x.type === type)
 			.map(x => {

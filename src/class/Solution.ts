@@ -14,8 +14,8 @@ let solution = null;
 export class Solution extends class_EventEmitter {
 	path: string
 	opts: SolutionOpts
-	assetsManager
-	outputResources
+	assetsManager: AssetsManager
+	outputResources: OutputResources
 	reporter: IReporter
 	handlers: BaseHandler[]
 

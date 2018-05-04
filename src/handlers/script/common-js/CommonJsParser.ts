@@ -2,7 +2,7 @@ import { AstUtil } from '../utils/AstUtil';
 import { Include } from '../../../class/Include';
 import { BaseParser } from "../../base/BaseParser";
 import { class_Dfr } from 'atma-utils';
-import { IDependency, IDependencies } from '../../../class/IDependency';
+import { ResourceInfo } from '../../../class/ResourceInfo';
 
 export class CommonJsParser extends BaseParser {
 
@@ -22,7 +22,7 @@ export class CommonJsParser extends BaseParser {
 		});
 
 		info.dependencies.forEach(x => x.module = 'commonjs');
-		return new class_Dfr().resolve(info) as PromiseLike<IDependencies>;
+		return new class_Dfr().resolve(info) as PromiseLike<ResourceInfo>;
 	}
 
 	_process (node, scope) {

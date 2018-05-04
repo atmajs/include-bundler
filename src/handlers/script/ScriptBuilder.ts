@@ -19,16 +19,25 @@ export class ScriptBuilder extends BaseBuilder {
 	]
 	
 	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
-		var out = outputItem.resources.map(res => {
+		let code = '';
+		let resArr = outputItem.resources;
+		if (resArr == null || resArr.length === 0) {
+			let builder = this.builders.find(x => x.isMainBuilder(this.solution));
+			if (builder == null) {
+				console.warn('No main ScriptBuilder is found');
+			}
+			code = builder.wrapScriptlessModule(otherOutputItems);
+		} else {
+			const out = resArr.map(res => {
+				let builder = this.builders.find(x => x.accepts(res));
+				if (builder == null)
+					throw new Error('Module Builder not found for ' + res.url);
 
-			var builder = this.builders.find(x => x.accepts(res));
-			if (builder == null)
-				throw new Error('Module Builder not found for ' + res.url);
-
-			return builder.wrapModule(res, outputItem, otherOutputItems);
-		});
-		
-		outputItem.resource.content = out.join('\n');
+				return builder.wrapModule(res, outputItem, otherOutputItems);
+			});
+			code = out.join('\n');
+		}
+		outputItem.resource.content = code;
 	}
 
 	buildRoot (resource, dependencies) {

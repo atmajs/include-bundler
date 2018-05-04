@@ -15,7 +15,7 @@ export function path_getFile(path) {
 	}
 	return path;
 };
-export function path_getExtension(path) {
+export function path_getExtension(path: string) {
 	var query = path.indexOf('?');
 	if (query !== -1) {
 		path = path.substring(0, query);
@@ -24,17 +24,17 @@ export function path_getExtension(path) {
 	return match == null ? '' : match[1];
 };
 
-export function path_appendQuery(path, key, val) {
+export function path_appendQuery(path: string, key: string, val: string) {
 	var conjunctor = path.indexOf('?') === -1 ? '?' : '&';
 	return path + conjunctor + key + '=' + val;
 };
 
-export function path_withProtocol(path) {
+export function path_withProtocol(path: string) {
 	return /^\/\/|^file:|^https?:|^ftps?:/i.test(path);
 };
 
 
-var current_;
+var current_: string;
 
 export function path_resolveCurrent() {
 	if (current_ != null) return current_;

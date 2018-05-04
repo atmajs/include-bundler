@@ -13,6 +13,7 @@ import { ISolutionOptions } from './class/SolutionOpts';
 import { res_flattern } from './utils/res';
 import { tree_async } from './utils/tree';
 import { Builder } from './builder/Builder';
+import { color } from './utils/color';
 
 export class Bundler extends class_EventEmitter {
 	solution: Solution
@@ -77,7 +78,7 @@ export class Bundler extends class_EventEmitter {
 				action: () => 
 					Builder.build(resources, solution),
 				message: (treeInfo, seconds) => 
-					`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color
+					color(`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`)
 			}).done(buildComplete).fail(buildFailed);
 		}
 		function buildComplete (resources) {
@@ -96,7 +97,7 @@ export class Bundler extends class_EventEmitter {
 		function buildFailed (error) {
 			isBuilding = false;
 			if (isRebuilding) {
-				solution.reporter.error('red<Build Failed>'.color);
+				solution.reporter.error(color('red<Build Failed>'));
 				solution.reporter.error(error);
 				isRebuilding = false;
 			}				
@@ -150,7 +151,7 @@ export class Bundler extends class_EventEmitter {
 				.assetsManager
 				.flush()
 				.then(() => {
-					return solution 
+					return Promise.resolve(solution) 
 				});
 		}
 		if (opts && opts.watch === true) {
@@ -167,7 +168,7 @@ export class Bundler extends class_EventEmitter {
 
 	static get Parser () {
 		return { 
-			getDependencies (content, opts = { type : 'js'}) {
+			getDependencies (content, opts: ISolutionOptions = { type : 'js'}) {
 				if (typeof opts === 'string') opts = { type: opts };
 
 				var solution = new Solution('', opts);

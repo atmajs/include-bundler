@@ -6,7 +6,6 @@ import { CommonJsHandler } from './common-js/CommonJsHandler';
 import { AmdJsHandler } from './amd-js/AmdJsHandler';
 import { IncludeJsHandler } from './include-js/IncludeJsHandler';
 import { BaseParser } from "../base/BaseParser";
-import { IDependency } from '../../class/IDependency';
 
 export class ScriptParser extends BaseParser {
 	parsers = [
@@ -39,7 +38,7 @@ export class ScriptParser extends BaseParser {
 		return async_whenAll(dfrs).then(results => {
 			let arr = arr_flattern(results);
 			return ResourceInfo.merge(...arr);
-		}) as PromiseLike<{dependencies: IDependency[]}>;
+		}) as PromiseLike<{dependencies: ResourceInfo[]}>;
 	}
 
 	accepts (type) {

@@ -1,7 +1,7 @@
-import { IDependency } from '../../class/IDependency';
 import { Solution } from "../../class/Solution";
 import { BaseHandler } from "./BaseHandler";
 import * as assert from 'assert'
+import { ResourceInfo } from '../../class/ResourceInfo';
 
 export abstract class BaseParser {
 
@@ -10,7 +10,7 @@ export abstract class BaseParser {
 		assert(handler instanceof BaseHandler, 'BaseHandler expected for the Parser');
 	}
 
-	getDependencies (content, ownerResource): {dependencies: IDependency[]} | PromiseLike<{dependencies: IDependency[]}> {
+	getDependencies (content, ownerResource): {dependencies: ResourceInfo[]} | PromiseLike<{dependencies: ResourceInfo[]}> {
 		throw new Error('Not implemented');
 	}
 

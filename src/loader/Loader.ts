@@ -8,6 +8,7 @@ import { Resource } from '../class/Resource';
 import { Configuration } from '../config/Configuration';
 import { Solution } from '../class/Solution';
 import { IDependency, IDependencies } from '../class/IDependency';
+import { color } from '../utils/color';
 
 export const Loader = {
 	opts: null,
@@ -33,7 +34,7 @@ export const Loader = {
 				var treeInfo = res_getTreeInfo(loader.resource);
 				var reporter = solution.reporter;
 				reporter
-					.info(`Loaded bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`.color);
+					.info(color(`Loaded bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`));
 				reporter
 					.info(treeInfo.treeString);
 				return loader.resource;
@@ -149,8 +150,8 @@ namespace ResourceLoader {
 			function toMessage(path) {
 				var parts = path.replace(/^\/+/, '').split('/');
 				var name = parts.pop();
-				parts = parts.map(x => `bold<${x}>`.color);
-				name = `green<${name}>`.color;
+				parts = parts.map(x => color(`bold<${x}>`));
+				name = color(`green<${name}>`);
 				parts.push(name);
 				return parts.join('/');
 			}
@@ -159,7 +160,7 @@ namespace ResourceLoader {
 			var reader = Configuration.Instance.get('readFile');
 			reader(this.resource.filename, this.opts).done(content => {
 				var end = Date.now();
-				this.solution.reporter.print(` cyan<${end - start}> ms \n`.color);
+				this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
 				this.resource.content = content;
 				this.processChildren();
 			}).fail(error => this.reject(error));

@@ -1,15 +1,16 @@
 import { BaseScriptBuilder } from "../base/BaseScriptBuilder";
+import { Resource } from "../../../class/Resource";
 
 export class MaskJsBuilder extends BaseScriptBuilder {
 
-	wrapModule (resource) {
+	wrapModule (resource: Resource) {
 		return Templates
 			.module
 			.replace('%URL%', () => resource.url)
 			.replace('%CONTENT%', () => resource.content);
 	}
 	
-	accepts (resource) {		
+	accepts (resource: Resource) {		
 		return resource.type === 'js' && resource.getModule() === 'mask';
 	}
 	

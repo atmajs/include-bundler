@@ -3,7 +3,7 @@ import { Include } from '../../../class/Include';
 import { ResourceMapping } from '../../../class/ResourceMapping';
 import { BaseParser } from "../../base/BaseParser";
 import { class_Dfr } from 'atma-utils';
-import { IDependency, IDependencies } from '../../../class/IDependency';
+import { ResourceInfo } from '../../../class/ResourceInfo';
 
 export class IncludeJsParser extends BaseParser {
 
@@ -17,7 +17,9 @@ export class IncludeJsParser extends BaseParser {
 	
 	getDependencies (ast, ownerResource) {
 		
-		var info: IDependencies = {
+		var info = <ResourceInfo> {
+			type: null,
+			url: null,
 			dependencies: [],
 			meta: {
 				includejs: {
@@ -42,7 +44,7 @@ export class IncludeJsParser extends BaseParser {
 			info.meta.includejs.hasExports = true;
 		}
 
-		return new class_Dfr().resolve(info) as PromiseLike<IDependencies>;
+		return new class_Dfr().resolve(info) as PromiseLike<ResourceInfo>;
 
 	}
 

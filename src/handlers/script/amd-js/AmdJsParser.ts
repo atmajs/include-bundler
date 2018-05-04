@@ -1,8 +1,8 @@
 import { BaseParser } from "../../base/BaseParser";
 import { AstUtil } from "../utils/AstUtil";
 import { class_Dfr } from "atma-utils";
-import { IDependency } from "../../../class/IDependency";
 import { Include } from "../../../class/Include";
+import { ResourceInfo } from "../../../class/ResourceInfo";
 
 export class AmdJsParser extends BaseParser {
 
@@ -22,7 +22,7 @@ export class AmdJsParser extends BaseParser {
 			return true;
 		});
 
-		return new class_Dfr().resolve(info) as PromiseLike<{dependencies: IDependency[]}>;
+		return new class_Dfr().resolve(info) as PromiseLike<{dependencies: ResourceInfo[]}>;
 
 	}
 

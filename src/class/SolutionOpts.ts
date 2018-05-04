@@ -7,17 +7,20 @@ import { mask } from '../global'
 import { VarDefinitions } from './VarDefinitions';
 import { Configuration } from '../config/Configuration';
 import { obj_deepDefaults } from '../utils/obj';
+import { ResourceType } from './ResourceInfo';
+
+
 
 interface IPackageOptions {
 	module?: 'commonjs' | 'includejs' | 'global'
 	type?: 'module' | 'bundle'
 	moduleWrapper?: 'umd' | 'iif' | 'script'
-	moduleName?: ''
+	moduleName?: string
 	[key: string]: any
 }
 interface IExtensionTypes {
 	[ext: string]: {
-		type: 'js' | 'mask' | 'css' | 'html' | 'data' | 'asset'
+		type: ResourceType
 	}
 }
 interface IDefaultExtension {
@@ -26,6 +29,7 @@ interface IDefaultExtension {
 	css?: string
 	load?: string
 }
+
 export interface IAdditionOptions {
 	mask?: {
 		Module?: any,
@@ -36,7 +40,7 @@ export interface IAdditionOptions {
 export interface ISolutionOptions {
 	
 		build?: string
-		type?: string
+		type?: ResourceType
 		base?: string
 		version?: string
 		
@@ -89,7 +93,7 @@ export class SolutionOptsBase {
 	mappings: any
 	middlewares: any
 	varDefs: VarDefinitions
-	parserIgnoreDependencies: string[]
+	parserIgnoreDependencies: (string | RegExp)[]
 	dynamicDependencies: string[]
 	prebuild: string[]
 	postbuild: string []
@@ -100,7 +104,9 @@ export class SolutionOptsBase {
 	options?: IAdditionOptions = {}
 }
 
+
 export class SolutionOpts extends SolutionOptsBase {
+		
 		defaults: SolutionOptsBase = {
 			build: 'release',
 			type: '',
@@ -282,7 +288,7 @@ export class SolutionOpts extends SolutionOptsBase {
 		}
 
 		paths: string[]
-		type: string
+		type: ResourceType
 
 		constructor (public solution: Solution, opts_: ISolutionOptions){
 			super();
@@ -294,7 +300,7 @@ export class SolutionOpts extends SolutionOptsBase {
 			for (let key in this.resolvers) {
 				this[key] = this.resolvers[key].call(this, this[key], this);
 			}
-			if (this.type === '' && solution.path) {
+			if (!this.type && solution.path) {
 				this.type = this.getTypeForExt(path_getExtension(solution.path));
 			}			
 		}

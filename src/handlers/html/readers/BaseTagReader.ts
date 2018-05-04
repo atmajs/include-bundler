@@ -1,5 +1,5 @@
 import { Solution } from '../../../class/Solution';
-import { IDependency } from '../../../class/IDependency';
+import { ResourceInfo } from '../../../class/ResourceInfo';
 
 export abstract class BaseTagReader {
 	constructor (public solution: Solution) {
@@ -10,7 +10,7 @@ export abstract class BaseTagReader {
 		throw Error('Not implemented')
 	}
 
-	read (el): IDependency[] | PromiseLike<IDependency[]> {
+	read (el): ResourceInfo[] | PromiseLike<ResourceInfo[]> {
 		throw Error('Not implemented')
 	}
 }

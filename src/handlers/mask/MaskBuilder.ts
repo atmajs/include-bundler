@@ -1,5 +1,7 @@
 import { BaseBuilder } from '../base/BaseBuilder';
 import { OutputItem } from '../../class/OutputResources';
+import { ResourceInfo } from '../../class/ResourceInfo';
+import { Resource } from '../../class/Resource';
 export class MaskBuilder extends BaseBuilder {
 
 	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
@@ -28,7 +30,7 @@ export class MaskBuilder extends BaseBuilder {
 		outputItem.resource.content = out.join('\n');
 	}
 
-	buildRoot (resource, dependencies) {
+	buildRoot (resource: Resource, dependencies: Resource[]) {
 
 		var maskDeps = dependencies.filter(x => x.type === 'mask');
 

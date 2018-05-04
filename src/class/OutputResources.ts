@@ -13,7 +13,7 @@ export class OutputResources {
 		
 	}
 
-	prepair (resources) {
+	prepair (resources: Resource[]) {
 		this.resources = [];
 		this.pagesInput = {};
 		this.items = [];
@@ -28,12 +28,12 @@ export class OutputResources {
 
 			Object.keys(this.pagesInput[page]).forEach(bundle => {
 
-				var resources = this.pagesInput[page][bundle];
-				var byType = res_groupResourcesByType(resources, this.solution.opts);
+				let resources = this.pagesInput[page][bundle];
+				let byType = res_groupResourcesByType(resources, this.solution.opts);
 				Object.keys(byType).forEach(type => {
 
-					var arr = byType[type];
-					var item = new OutputItem({
+					let arr = byType[type];
+					let item = new OutputItem({
 						page, 
 						bundle, 
 						type, 
@@ -42,6 +42,17 @@ export class OutputResources {
 					});					
 					this.items.push(item);					
 				});
+
+				if (byType['js'] == null) {
+					let item = new OutputItem({
+						page, 
+						bundle, 
+						type: 'js', 
+						solution: this.solution, 
+						resources: []
+					});					
+					this.items.push(item);
+				}
 				
 			});
 		})

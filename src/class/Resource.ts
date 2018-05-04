@@ -11,8 +11,8 @@ import {
 } from '../utils/path';
 import { Include } from './Include';
 import { Solution } from './Solution';
-import { IDependency } from './IDependency';
 import { HandlersUtils } from './HandlersUtils';
+import { ResourceInfo, ResourceMeta, ResourceType } from './ResourceInfo';
 
 
 export class Resource {
@@ -29,7 +29,7 @@ export class Resource {
 	hash: string = ''
 	namespace: string = ''
 
-	type: string = ''
+	type: ResourceType = null
 	bundle: string = 'index'
 	module: string = ''
 	page: string = ''
@@ -43,23 +43,24 @@ export class Resource {
 
 	isCyclic: boolean = false
 
-	meta?: {
-		hasPages?: boolean
-	} = null
-	dependencies: IDependency[]
+	meta?: ResourceMeta = null
+	dependencies: ResourceInfo[]
 
-	constructor (includeData?, public parent?: Resource, public solution?: Solution) {
+	constructor (includeData?: ResourceInfo, public parent?: Resource, public solution?: Solution) {
 		if (arguments.length === 0)
 			return;
 
 		if (includeData == null) {
-			includeData = { type: solution && solution.opts.type };
+			includeData = <ResourceInfo> { 
+				type: solution && solution.opts.type || null, 
+				url: null 
+			};
 		}
 		if (includeData.type == null) {
 			if (includeData.url) {
 				includeData.type = solution.opts.getTypeForExt(path_getExtension(includeData.url));
 			} else {
-				includeData.type = solution && solution.opts.type;
+				includeData.type = solution && solution.opts.type || null;
 			}
 		}
 
@@ -192,7 +193,7 @@ export class Resource {
 		var url = this.url;
 
 		var filename = path_removeQuery(url);
-		var resource = new Resource({ type: this.type }, this, solution);
+		var resource = new Resource({ type: this.type, url: null }, this, solution);
 		
 		if (settings == null || settings.relative !== true) {
 			url = path_combine(solution.opts.outputAppBase, url);

@@ -3,6 +3,7 @@ import { class_EventEmitter } from 'atma-utils';
 import { Loader } from './Loader';
 import { res_flattern, res_find } from '../utils/res';
 import { path_getFile } from '../utils/path';
+import { color } from '../utils/color';
 
 export const Watcher = {
 	watch(resource, solution) {
@@ -29,14 +30,14 @@ class WatcherFactory extends class_EventEmitter {
 
 
 		toWatch.forEach(filename => this.watchers[filename] = new FileWatcher(filename, this));
-		this.solution.reporter.info(`Watching bold<cyan<${toWatch.length}>> files`.color);
+		this.solution.reporter.info(color(`Watching bold<cyan<${toWatch.length}>> files`));
 	}
 
 	changed(filename) {
 		var changeId = ++this.changeId;
 		var reporter = this.solution.reporter;
 
-		reporter.info(`File changed bold<cyan<${path_getFile(filename)}>>`.color);
+		reporter.info(color(`File changed bold<cyan<${path_getFile(filename)}>>`));
 
 
 		Loader.removeCached(filename);
@@ -63,7 +64,7 @@ class WatcherFactory extends class_EventEmitter {
 				}
 				reporter.error(`Resource errored ${filename}`);
 				reporter.error(error);
-				reporter.log('yellow<Watcher resumed...>'.color);
+				reporter.log(color('yellow<Watcher resumed...>'));
 			});
 	}
 };

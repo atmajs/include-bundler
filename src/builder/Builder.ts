@@ -1,9 +1,11 @@
 import { _middlewares } from '../class/Middlewares';
 import { path_getExtension } from '../utils/path';
 import { async_map, async_run, async_whenAll } from '../utils/async';
+import { Solution } from '../class/Solution';
+import { Resource } from '../class/Resource';
 
 export const Builder = {
-	build(resources, solution) {
+	build(resources: Resource[], solution: Solution) {
 		return _middlewares
 			.run('buildResources', resources, solution)
 			.then(arr => {
