@@ -23,10 +23,10 @@ export class ScriptBuilder extends BaseBuilder {
 		let resArr = outputItem.resources;
 		if (resArr == null || resArr.length === 0) {
 			let builder = this.builders.find(x => x.isMainBuilder(this.solution));
-			if (builder == null) {
-				console.warn('No main ScriptBuilder is found');
+			if (builder) {
+				code = builder.wrapScriptlessModule(otherOutputItems);
 			}
-			code = builder.wrapScriptlessModule(otherOutputItems);
+			
 		} else {
 			const out = resArr.map(res => {
 				let builder = this.builders.find(x => x.accepts(res));
