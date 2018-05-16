@@ -39,6 +39,7 @@ export class MaskBuilder extends BaseBuilder {
 		var body = maskDeps.map(x => x.content).join('\n');
 		var imports = dependencies
 			.filter(x => x.type !== 'mask')
+			.filter(x => Boolean(x.content))
 			.map(x => {
 				var url = x.toRelative(resource);				
 				return `import sync from '${url}';`;

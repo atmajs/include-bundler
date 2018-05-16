@@ -63,7 +63,12 @@ export class OutputResources {
 	}
 
 	getAll () {
-		var all = this.items.map(x => x.resource).filter(x => x.embed !== true);
+		var all = this
+			.items
+			.map(x => x.resource)
+			.filter(x => x.embed !== true)
+			.filter(x => Boolean(x.content));
+
 		if (this.rootOutput) {
 			all.push(this.rootOutput);
 		}		

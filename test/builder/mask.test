@@ -88,7 +88,7 @@ UTest({
 		return Bundler.build('main.mask', {silent: true}).done(resources => {
 			eq_(resources.length, 1);
 			var main = resources[0];
-		
+			
 			eq_(main.type, 'mask'); 
 			eq_(main.url, '/build/release/main.mask');
 
