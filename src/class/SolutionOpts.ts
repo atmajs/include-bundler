@@ -14,7 +14,8 @@ import { ResourceType } from './ResourceInfo';
 interface IPackageOptions {
 	module?: 'commonjs' | 'includejs' | 'global'
 	type?: 'module' | 'bundle'
-	moduleWrapper?: 'umd' | 'iif' | 'script'
+	moduleWrapper?: 'umd' | 'iif' | 'script' | 'custom'
+	moduleWrapperCustomPath?: string
 	moduleName?: string
 	[key: string]: any
 }
@@ -131,7 +132,7 @@ export class SolutionOpts extends SolutionOptsBase {
 				types: [ 'module', 'bundle'],
 
 				moduleWrapper: 'iif',
-				moduleWrappers: ['umd', 'iif', 'script'],
+				moduleWrappers: ['umd', 'iif', 'script', 'custom'],
 				moduleName: '',
 			},
 			extensions: {

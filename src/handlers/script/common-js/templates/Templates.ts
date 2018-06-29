@@ -1,3 +1,5 @@
+import { io } from "../../../../global";
+
 export const Templates = {
 	Module: `
 // import ./Module.js
@@ -14,4 +16,11 @@ export const Templates = {
 	UMD: `
 // import ./UMD.js
 `,
+	load (path: string) {
+		let template = io.File.read(path);
+		if (!template) {
+			throw new Error(`Custom Wrapper Module not found: ${path}`)
+		}
+		return template;
+	}
 };

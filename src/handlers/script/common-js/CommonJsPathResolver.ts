@@ -29,10 +29,12 @@ export class CommonJsPathResolver extends BasePathResolver {
 };
 
 
-var nodeCoreModules = ['assert', 'buffer', 'child_process', 'cluster', 'console', 'constants', 
+const nodeCoreModules = [
+	'assert', 'buffer', 'child_process', 'cluster', 'console', 'constants', 
     'crypto', 'dgram', 'dns', 'domain', 'events', 'fs', 'http', 'https', 'module', 'net', 'os', 'path', 
     'process', 'punycode', 'querystring', 'readline', 'repl', 'stream', 'string_decoder', 'sys', 'timers', 
-    'tls', 'tty', 'url', 'util', 'vm', 'zlib'];
+	'tls', 'tty', 'url', 'util', 'vm', 'zlib'
+];
 
 function nodeModuleResolve(path, location_){
 	var location = location_.replace(/[\\\/]+$/, '');

@@ -83,6 +83,9 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 			case 'umd':
 				body = this.wrapWithUMD(body);
 				break;
+			case 'custom':
+				body = this.wrapWithCustom(body);
+				break;
 			case 'script':
 				break;
 			default:
@@ -109,6 +112,14 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 			.UMD
 			.replace('%MODULE%', () => body)
 			.replace('%NAME%', () => name)
+			;
+	}
+	wrapWithCustom (body) {
+		let opts = this.solution.opts.package;
+		let template = Templates.load(opts.moduleWrapperCustomPath);
+		
+		return template
+			.replace('/**MODULE**/', () => body)
 			;
 	}
 };
