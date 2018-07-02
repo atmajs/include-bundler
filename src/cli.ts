@@ -1,6 +1,7 @@
 import { Bundler } from './Bundler'
 import { ISolutionOptions } from './class/SolutionOpts'
 import * as config from 'appcfg'
+import { obj_setProperty } from 'atma-utils';
 
 export = function run () {
     Config
@@ -57,9 +58,28 @@ namespace Config {
         if (isMultiConfig(config)) {
 
             let common = config.common || {};
-
             let bundles = Object.keys(config.apps).map(name => {
-                return Object.assign({ name }, common, config.apps[name]);
+                let obj = Object.assign({ name }, common, config.apps[name]);
+                for (let key in config) {
+                    if (key === 'apps' || key === 'common') {
+                        continue;
+                    }
+                    let prop = key;
+                    let dot = prop.indexOf('.');
+                    if (dot === -1) {
+                        obj[prop] = config[prop];
+                        continue;
+                    }                    
+                    let hostName = key.substring(0, dot);
+                    if (hostName in config.apps) {
+                        if (hostName !== name) {
+                            continue;
+                        }
+                        prop = prop.substring(dot + 1);
+                    }
+                    obj_setProperty(obj, prop, config[key]);
+                }
+                return obj;
             });
             return bundles;
         }
