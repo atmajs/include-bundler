@@ -3,7 +3,6 @@ import { _middlewares } from './class/Middlewares';
 import { Parser } from './parser/Parser';
 import { Resource } from './class/Resource';
 import { AssetsManager } from './assets/AssetsManager';
-import { mask } from './global'
 import { Loader } from './loader/Loader'
 import { class_EventEmitter } from 'atma-utils';
 import { Solution } from './class/Solution';
@@ -20,6 +19,15 @@ export class Bundler extends class_EventEmitter {
 
 	static clearCache() {
 		Loader.clearCache();
+
+		if (io.File.middlewares) {
+			for (let key in io.File.middlewares) {
+				let midd = io.File.middlewares;
+				if (midd.clearTemp) {
+					midd.clearTemp();
+				}
+			}
+		}
 		return Bundler;
 	}		
 	static get Config () {
