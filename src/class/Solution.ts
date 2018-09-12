@@ -19,6 +19,8 @@ export class Solution extends class_EventEmitter {
 	reporter: IReporter
 	handlers: BaseHandler[]
 
+	iteration: {[key: string]: any} = {}
+
 	constructor(path: string, opts: ISolutionOptions = <any>{}) {
 		super();
 		

@@ -344,8 +344,6 @@ export class SolutionOpts extends SolutionOptsBase {
 		fromAppUrl (url) {
 			return path_combine(this.base, url);
 		}
-
-		ctx: any = {}
 	};
 
 	function prepairPath(path, opts) {

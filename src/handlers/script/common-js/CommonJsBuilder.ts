@@ -31,9 +31,9 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 	}
 
 	wrapModule (resource: Resource) {
-		var opts = this.solution.opts;
-		if (opts.ctx.commonjs == null) {
-			opts.ctx.commonjs = {
+		var opts = this.solution.iteration;
+		if (opts.commonjs == null) {
+			opts.commonjs = {
 				addHeading: true,
 				hasHeading: false
 			}
@@ -41,8 +41,8 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 
 		var body = '';
 
-		if (opts.ctx.commonjs.hasHeading === false && opts.ctx.commonjs.addHeading === true) {			
-			opts.ctx.commonjs.hasHeading = true;
+		if (opts.commonjs.hasHeading === false && opts.commonjs.addHeading === true) {			
+			opts.commonjs.hasHeading = true;
 			body = this.getHeaderContent();
 		}
 

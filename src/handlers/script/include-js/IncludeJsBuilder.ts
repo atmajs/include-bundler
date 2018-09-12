@@ -32,19 +32,20 @@ export class IncludeJsBuilder extends BaseScriptBuilder {
 	wrapModule (resource, outputItem, otherOutputItems) {
 		var opts = this.solution.opts;
 		var page = res_getPage(resource, opts);
+		var iteration = this.solution.iteration;
 		
-		if (opts.ctx.includejs == null) {
-			opts.ctx.includejs = {};							
+		if (iteration.includejs == null) {
+			iteration.includejs = {};							
 		}
-		if (opts.ctx.includejs[page] == null) {
-			opts.ctx.includejs[page] = {
+		if (iteration.includejs[page] == null) {
+			iteration.includejs[page] = {
 				addHeading: true,
 				hasHeading: false,
 				lastItem: null
 			};
 		}
 
-		var builderOpts = opts.ctx.includejs[page];
+		var builderOpts = iteration.includejs[page];
 		var body = '';
 
 		if (builderOpts.hasHeading === false && builderOpts.addHeading === true) {			

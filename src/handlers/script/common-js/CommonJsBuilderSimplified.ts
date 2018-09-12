@@ -1,9 +1,10 @@
 import { Resource } from "../../../class/Resource";
 import { Templates } from "./templates/Templates";
+import { CommonJsBuilder } from "./CommonJsBuilder";
 
 
 export const CommonJsBuilderSimplified = {
-	wrapModule(resource) {
+	wrapModule(this: CommonJsBuilder, resource) {
 		var varId = getVarId(resource);
 		var content = resource.content;
 
@@ -13,7 +14,7 @@ export const CommonJsBuilderSimplified = {
 			.replace(/%VAR_ID%/g, () => varId)
 			.replace(/%MODULE%/g, () => content)
 			;
-		var opts = this.solution.opts;
+		var opts = this.solution.iteration;
 		if (opts.commonjs == null) {
 			opts.commonjs = {
 				addHeading: true,

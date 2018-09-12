@@ -20,9 +20,9 @@ export class Bundler extends class_EventEmitter {
 	static clearCache() {
 		Loader.clearCache();
 
-		if (io.File.middlewares) {
-			for (let key in io.File.middlewares) {
-				let midd = io.File.middlewares;
+		if (io.File.middleware) {
+			for (let key in io.File.middleware) {
+				let midd = io.File.middleware[key];
 				if (midd.clearTemp) {
 					midd.clearTemp();
 				}
@@ -122,6 +122,7 @@ export class Bundler extends class_EventEmitter {
 				return;
 			}
 			isRebuilding = true;
+			solution.iteration = {};
 			build(rootResource);
 		}
 		function start () {
