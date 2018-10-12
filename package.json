@@ -74,7 +74,7 @@
     },
     "devDependencies": {
         "@types/node": "^8.5.2",
-        "atma": "^0.10.90",
+        "atma": "^0.11.7",
         "selenium-query": "^0.50.35",
         "tslib": "^1.8.1"
     }
