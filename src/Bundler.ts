@@ -136,6 +136,7 @@ export class Bundler extends class_EventEmitter {
 							.on('changed', rebuild);
 					}
 					return build(resource)
+						.then((result) => solution.onBuildReady(result))
 						.then((result) => solution.runScripts('postbuild', result))
 				});
 		}

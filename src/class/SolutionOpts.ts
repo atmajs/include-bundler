@@ -69,6 +69,7 @@ export interface ISolutionOptions {
 		silent?: boolean
 		watch?: boolean
 		minify?: boolean
+		copyFiles: { [source: string]: string }
 }
 
 export class SolutionOptsBase {
@@ -103,6 +104,7 @@ export class SolutionOptsBase {
 	minify: boolean
 	mappers: ResourceMapping[] = []
 	options?: IAdditionOptions = {}
+	copyFiles: { [source: string]: string } = null;
 }
 
 
@@ -190,7 +192,8 @@ export class SolutionOpts extends SolutionOptsBase {
 						base: ''
 					}
 				}
-			}
+			},
+			copyFiles: null
 		}
 		resolvers = {
 			base (basePath) {

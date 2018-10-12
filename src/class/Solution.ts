@@ -61,4 +61,11 @@ export class Solution extends class_EventEmitter {
 			}).then(() => resolve(...args), reject);
 		})
 	}
+
+	onBuildReady (result) {
+		for (let source in this.opts.copyFiles) {
+			io.File.copyTo(source, this.opts.copyFiles[source]);
+		}
+		return result;
+	}
 };
