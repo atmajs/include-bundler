@@ -13,8 +13,8 @@ function build () {
         type: 'js',
         outputMain: lib === 'api' ? 'lib/bundler.js' : 'lib/cli.js',
         middlewares: {
-            'ts': ['importer:read', 'atma-loader-ts:read'],
-            'js': ['importer:read']
+            'ts': ['atma-io-middleware-importer:read', 'atma-loader-ts:read'],
+            'js': ['atma-io-middleware-importer:read']
         },
         defaultExtensions: {
             "js": "ts"

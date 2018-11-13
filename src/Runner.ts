@@ -1,7 +1,6 @@
 import { Bundler } from './Bundler'
-import { ensureBundlesConfig, IBundle } from './config/MultiBundle'
+import { ensureBundlesConfig, IBundle, IMultiBundle } from './config/MultiBundle'
 import { ISolutionOptions } from './class/SolutionOpts';
-import { resolve } from 'dns';
 
 
 interface IBundlerFunction {
@@ -19,7 +18,7 @@ function mainBundlerFunction (path: string, opts: ISolutionOptions) {
 
 export namespace Runner {
 
-    export function run (config: any, bundleFn: IBundlerFunction = mainBundlerFunction): PromiseLike<IBundleResult[]> {
+    export function run (config: IMultiBundle | IBundle, bundleFn: IBundlerFunction = mainBundlerFunction): PromiseLike<IBundleResult[]> {
         let bundles = ensureBundlesConfig(config);
 
         return processMany(bundles, bundleFn)
