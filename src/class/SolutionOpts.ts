@@ -12,7 +12,7 @@ import { ResourceType } from './ResourceInfo';
 
 
 interface IPackageOptions {
-	module?: 'commonjs' | 'includejs' | 'global'
+	module?: 'commonjs' | 'includejs' | 'global' | 'import'
 	type?: 'module' | 'bundle'
 	moduleWrapper?: 'umd' | 'iif' | 'script' | 'custom'
 	moduleWrapperCustomPath?: string
@@ -46,7 +46,8 @@ export interface ISolutionOptions {
 		version?: string
 		
 		mainPage?: string
-		mainBundle?: string
+        mainBundle?: string
+        mainContent?: string
 
 		outputBase?: string
 		outputAppBase?: string
@@ -69,7 +70,7 @@ export interface ISolutionOptions {
 		silent?: boolean
 		watch?: boolean
 		minify?: boolean
-		copyFiles: { [source: string]: string }
+		copyFiles?: { [sourcePath: string]: string }
 }
 
 export class SolutionOptsBase {
@@ -80,7 +81,7 @@ export class SolutionOptsBase {
 	
 	mainPage: string
 	mainBundle: string
-
+    mainContent: string
 	outputBase: string
 	outputAppBase: string
 
@@ -117,7 +118,8 @@ export class SolutionOpts extends SolutionOptsBase {
 			version: null,
 			
 			mainPage: 'main',
-			mainBundle: '',
+            mainBundle: '',
+            mainContent: null,
 
 			outputBase: '',
 			outputAppBase: '/',
@@ -128,7 +130,7 @@ export class SolutionOpts extends SolutionOptsBase {
 			outputShareBase: null,
 			package: {
 				module: 'commonjs', 
-				modules: ['commonjs', 'includejs', 'global'],
+				modules: ['commonjs', 'includejs', 'global', 'import'],
 
 				type: 'module',
 				types: [ 'module', 'bundle'],

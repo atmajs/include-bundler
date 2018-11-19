@@ -34,7 +34,7 @@ export class Resource {
 	module: string = ''
 	page: string = ''
 
-	
+	/** Target Resource will contain the Source Resource */
 	source: Resource = null
 
 	embed: boolean = false
@@ -62,9 +62,9 @@ export class Resource {
 			} else {
 				includeData.type = solution && solution.opts.type || null;
 			}
-		}
-
-		this.parent = parent;
+        }
+        
+        this.parent = parent;
 		this.type = includeData.type;
 		this.content = includeData.content;
 		this.namespace = includeData.namespace;
@@ -280,7 +280,7 @@ export class Resource {
 			return modules[0];
 		}
 
-		var arr = ['global', 'commonjs', 'amd', 'includejs'];
+		var arr = ['global', 'commonjs', 'amd', 'includejs', 'import'];
 		var name = arr.find(name => modules.indexOf(name) !== -1);
 		if (name == null) {
 			name = modules[0];

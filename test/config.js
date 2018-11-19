@@ -1,7 +1,7 @@
 module.exports = {
 	suites: {
 		'node': {
-			env: [ 'lib/bundler.js::Bundler', 'test/TestHelper.js' ],
+			env: [ 'lib/bundler.js::Bundler' ],
 			tests: 'test/**.test'
 		}
 	}

@@ -1,0 +1,270 @@
+import { TestHelper } from '../TestHelper'
+import { Bundler } from '../../src/Bundler'
+
+declare var UTest, eq_, deepEq_, has_;
+
+var Files =  {
+    'a.js': `
+        import './b'
+        export const A = '[a]'
+    `,
+    'b.js': `
+        import './e'
+        import './d'        
+        export const B = '[b]'
+    `,
+    'c.js': `
+        import './d' 
+        export const C = '[c]'
+    `,
+    'd.js': `
+        export const D = '[d]'
+    `,
+    'e.js': `
+        export const E = '[e]'
+    `,
+    'lf': `
+        import { D } from './d'
+        export const F = '[f]'
+    `
+};
+
+//var Bundler;
+UTest({
+	$before () {
+		TestHelper.registerFiles(Files);		
+		Bundler.clearCache();
+	},
+	$after () {
+		TestHelper.clearFiles(Files);
+	},
+	$teardown () {
+		Bundler.clearCache();		
+	},
+	$config: {
+		breakOnError: true
+    },
+    'should serialize simple export' () {
+        
+        return Bundler.build('main.js', { 
+            mainContent: `import 'e.js';`,
+            //silent: true,
+			package: {
+                module: 'import'
+            },
+		}).done(resources => {
+			eq_(resources.length, 1);
+			var main = resources[0];
+
+			eq_(main.url, '/build/release/main.js');
+            let expect = `
+                (function(){
+                    var E;
+                    (function(){            
+                        E = '[e]'        
+                    }());        
+                }());
+            `;
+            Helpers.compareLines(main.content, expect);
+
+		});        
+    },
+	async 'should serialize simple re-export' () {
+        let content = `export * from 'e.js';`;        
+        let code = await Helpers.$process(content);
+        let expect = `            
+            var E;
+            (function(){            
+                E = '[e]'        
+            }());               
+        `;
+        Helpers.compareLines(code, expect);
+    },
+    async 'should serialize simple import' () {
+        let content = `import 'c.js';`;        
+        let code = await Helpers.$process(content);
+        
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['d', 'c']);
+
+        let expect = `
+            (function(){
+                var C;
+                (function(){
+                    var D;
+                    (function(){
+                        D = '[d]'
+                    }());
+                    C = '[c]'
+                }());
+            }());
+        `;
+        Helpers.compareLines(code, expect);
+    },
+    async 'should serialize simple import 2' () {
+        let content = `import './b'`;
+        let code = await Helpers.$process(content);
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['e', 'd', 'b']);
+
+        let expect = `
+            (function(){
+                var B;
+                (function(){
+                    var E;
+                    (function(){
+                        E = '[e]'
+                    }());
+                    var D;
+                    (function(){
+                        D = '[d]'
+                    }());
+                    B = '[b]'
+                }());
+            }());
+        `;
+        Helpers.compareLines(code, expect);
+    },
+    async 'should serialize simple import and export' () {
+        let content = `import 'c.js';\nexport const Foo = C`;        
+        let code = await Helpers.$process(content);
+        
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['d', 'c']);
+
+        let expect = `
+            var Foo;
+            (function(){
+                var C;
+                (function(){
+                    var D;
+                    (function(){
+                        D = '[d]'
+                    }());
+                    C = '[c]'
+                }());
+                Foo = C
+            }());
+        `;
+        Helpers.compareLines(code, expect);
+
+    },
+    async 'should serialize all to global scope' () {
+        let content = `import { A } from './a';\nexport const Foo = A;`;
+        let code = await Helpers.$process(content);
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['e', 'd', 'b', 'a']);
+        
+        let expect = `
+        var Foo;
+        (function(){
+            var A;
+            (function(){
+                var B;
+                (function(){
+                    var E;
+                    (function(){
+                        E = '[e]'
+                    }());
+                    var D;
+                    (function(){
+                        D = '[d]'
+                    }());
+                    B = '[b]'
+                }());
+                A = '[a]'
+            }());
+            Foo = A;
+        }());
+        `;
+        Helpers.compareLines(code, expect);
+    },
+    async 'should serialize to scope' () {
+        let content = `import 'b.js';`;        
+        let code = await Helpers.$process(content);
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['e', 'd', 'b']);
+        has_(code, /function[^\[]+\[d]/)
+    },
+    async 'should extract both scoped imports to outer' () {
+        let content = `import './b'; \nimport './lf';`;        
+        let code = await Helpers.$process(content);
+        let letters = Helpers.$extractLetters(code);
+        deepEq_(letters, ['d', 'e', 'b', 'f']);
+
+        let expect = `
+            (function(){
+                var D;
+                (function(){
+                    D = '[d]'
+                }());
+                var B;
+                (function(){
+                    var E;
+                    (function(){
+                        E = '[e]'
+                    }());
+                    B = '[b]'
+                }());
+                var F;
+                (function(){
+                    F = '[f]'
+                }());
+            }());   
+        `;
+        Helpers.compareLines(code, expect);
+
+    }
+})
+
+
+
+namespace Helpers {
+    export async function $process (str: string) {
+        let resources = await Bundler.build('main.js', { 
+            mainContent: str,
+            silent: true,
+			package: {
+                module: 'import'
+            },
+        });
+        
+        return resources[0].content;
+    }
+    export function $extractLetters (code: string) {
+        let letters = [];
+        code.replace(/\[(\w)+\]/g, (full, letter) => {
+            letters.push(letter);
+            return full;
+        });
+        return letters;
+    }
+    export function compareLines (a: string, b: string) {
+        function getLines (str) {
+            let arr = str
+                .split(/\n/g)
+                .map((x, i) => ({line:i, str: x.trim()}))
+                .filter(x => !!x.str);
+            return arr;
+        }
+        let aLines = getLines(a);
+        let bLines = getLines(b);
+        eq_(aLines.length, bLines.length, `
+            Lines should be equal.
+            A:${a}
+            B:${b}
+        `);
+
+        for (let i = 0; i < aLines.length; i++) {
+            let aLine = aLines[i];
+            let bLine = bLines[i];
+            eq_(aLine.str, bLine.str, `
+                Lines are not equal at ${i}.
+            `)
+            if (aLine.str !== bLine.str) {
+                break;
+            }
+        }
+        
+    }
+}

@@ -6,20 +6,30 @@ import { CommonJsHandler } from './common-js/CommonJsHandler';
 import { AmdJsHandler } from './amd-js/AmdJsHandler';
 import { IncludeJsHandler } from './include-js/IncludeJsHandler';
 import { BaseParser } from "../base/BaseParser";
+import { ImportJsHandler } from './import-js/ImportJsHandler';
+
 
 export class ScriptParser extends BaseParser {
 	parsers = [
 		new CommonJsHandler.Parser(this.solution, this.handler),
 		new AmdJsHandler.Parser(this.solution, this.handler),
-		new IncludeJsHandler.Parser(this.solution, this.handler),
+        new IncludeJsHandler.Parser(this.solution, this.handler),
+        new ImportJsHandler.Parser(this.solution, this.handler),
 	];
 
 	
 	getDependencies (content, ownerResource) {
-		var opts = {
+		let opts = {
 			filename: ownerResource.filename
-		};
-		var ast;
+        };
+
+        let asTextDfrs = this
+            .parsers
+            .filter(x => x.asText === true)
+            .map(parser => parser.getDependencies(content, ownerResource));
+
+        
+		let ast;
 		try {
 			ast = AstUtil.parse(content, opts);
 		} catch (error) {
@@ -34,7 +44,13 @@ export class ScriptParser extends BaseParser {
 			return async_reject(error);
 		}
 
-		var dfrs = this.parsers.map(parser => parser.getDependencies(ast, ownerResource));
+        let dfrs = this
+            .parsers
+            .filter(x => x.asText !== true)
+            .map(parser => parser.getDependencies(ast, ownerResource));
+
+        dfrs.unshift(...asTextDfrs);
+        
 		return async_whenAll(dfrs).then(results => {
 			let arr = arr_flattern(results);
 			return ResourceInfo.merge(...arr);

@@ -5,10 +5,10 @@ import { class_Dfr } from "atma-utils";
 import { Solution } from "../class/Solution";
 
 import * as assert from 'assert';
-import { IDependency, IDependencies } from '../class/IDependency';
+import { ResourceInfo } from '../class/ResourceInfo';
 
 export const Parser = {
-	getDependencies(resource, solution): PromiseLike<IDependencies> {
+	getDependencies(resource, solution): PromiseLike<ResourceInfo> {
 		assert(resource != null, 'Resource is empty');
 		assert(solution instanceof Solution, 'Solution is not passed');
 
@@ -26,7 +26,7 @@ export const Parser = {
 				.fail(error => dfr.reject(error))
 				;
 		}
-		return dfr as PromiseLike<IDependencies>;
+		return dfr as any;
 	}
 };
 

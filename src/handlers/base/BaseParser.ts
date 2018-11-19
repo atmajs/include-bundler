@@ -5,12 +5,14 @@ import { ResourceInfo } from '../../class/ResourceInfo';
 
 export abstract class BaseParser {
 
+    asText: boolean
+
 	constructor (public solution: Solution, public handler: BaseHandler) {
 		assert(solution instanceof Solution, 'Solution expected for Parser');		
 		assert(handler instanceof BaseHandler, 'BaseHandler expected for the Parser');
 	}
 
-	getDependencies (content, ownerResource): {dependencies: ResourceInfo[]} | PromiseLike<{dependencies: ResourceInfo[]}> {
+	getDependencies (content, ownerResource): PromiseLike<ResourceInfo> {
 		throw new Error('Not implemented');
 	}
 

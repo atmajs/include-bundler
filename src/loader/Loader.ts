@@ -9,16 +9,18 @@ import { Configuration } from '../config/Configuration';
 import { Solution } from '../class/Solution';
 import { IDependency, IDependencies } from '../class/IDependency';
 import { color } from '../utils/color';
+import { ResourceInfo, ResourceType } from '../class/ResourceInfo';
 
 export const Loader = {
 	opts: null,
 	solution: null,
 
-	load(type: string, path: string, opts, solution: Solution) {
+	load(type: ResourceType, path: string, opts, solution: Solution) {
 		this.opts = opts;
-		this.solution = solution;
+        this.solution = solution;
+        
 
-		let includeData: IDependency = { 
+		let includeData: ResourceInfo = { 
 			type: type, 
 			url: path, 
 			module: 'root', 
@@ -73,7 +75,7 @@ var types = {
 };
 
 namespace ResourceLoader {
-	export function load(includeData: IDependency, parent: Resource, opts, solution: Solution) {
+	export function load(includeData: ResourceInfo, parent: Resource, opts, solution: Solution) {
 		var resource = new Resource(includeData, parent, solution);
 		var loader = __loaders[resource.filename];
 		if (loader == null) {
@@ -81,7 +83,7 @@ namespace ResourceLoader {
 			loader.process();
 		} else {
 			// Try to find the resource in ancestors
-			var res = this.tryGetCyclicRoot(resource);
+			var res = tryGetCyclicRoot(resource);
 			if (res != null) {
 				solution.reporter.warn(`Caution. Cyclic dependency detected. '${includeData.url}' in '${parent.url}'`);
 				return async_resolve({ resource: res })
@@ -154,14 +156,19 @@ namespace ResourceLoader {
 				name = color(`green<${name}>`);
 				parts.push(name);
 				return parts.join('/');
-			}
+            }
+            if (this.resource.parent == null && this.solution.opts.mainContent) {
+                this.resource.content = this.solution.opts.mainContent;
+                this.processChildren();
+                return;
+            }
 
 			var start = Date.now();
 			var reader = Configuration.Instance.get('readFile');
 			reader(this.resource.filename, this.opts).done(content => {
 				var end = Date.now();
 				this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
-				this.resource.content = content;
+                this.resource.content = content;
 				this.processChildren();
 			}).fail(error => this.reject(error));
 		}
@@ -174,7 +181,7 @@ namespace ResourceLoader {
 				.getDependencies(this.resource, this.solution)
 				.then(result => this.loadChildren(result), error => this.reject(error));
 		}
-		loadChildren(result: IDependencies) {
+		loadChildren(result: ResourceInfo) {
 
 			assert(Array.isArray(result.dependencies), `Expects array of dependencies for ${this.resource.url}`);
 
@@ -185,7 +192,10 @@ namespace ResourceLoader {
 			async_waterfall(deps, dep => {
 				return ResourceLoader
 					.load(dep, this.resource, this.opts, this.solution)
-					.then(loader => loader.resource);
+					.then(loader => {
+                        dep.resource = loader.resource;
+                        return loader.resource;
+                    });
 			})
 				.fail(error => this.reject(error))
 				.done(resources => {
@@ -195,7 +205,7 @@ namespace ResourceLoader {
 		}
 		shouldSkipChildren() {
 			var arr = this.solution.opts.parserIgnoreDependencies;
-			var shouldSkip = arr.some(rgx => rgx.test(this.resource.filename));
+			var shouldSkip = arr.some(rgx => (rgx as RegExp).test(this.resource.filename));
 			if (shouldSkip) {
 				return true;
 			}

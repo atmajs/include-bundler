@@ -145,7 +145,7 @@ export class Bundler extends class_EventEmitter {
 			.then(start);			
 	}
 
-	static build (path, opts) {
+	static build (path: string, opts: ISolutionOptions) {
 		return new Bundler(path, opts).build(opts);
 	}
 

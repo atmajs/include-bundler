@@ -37,7 +37,7 @@ export class CommonJsParser extends BaseParser {
 			throw new Error('Path should be a string: ' + path);
 		}
 		if (this._isNodeJsNative(path)) {
-			//@TODO: Should we provide the shims for browser bilds?
+			//@TODO: Should we provide the shims for browser builds?
 			return null;
 		}
 		let groups = Include.groupByType([ path ], this.solution.opts);

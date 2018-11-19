@@ -4,6 +4,9 @@ import { OutputItem } from "../../../class/OutputResources";
 import { Solution } from "../../../class/Solution";
 
 export abstract class BaseScriptBuilder extends BaseBuilder {
+    /** When a module has no js script, only other resource imports. 
+     *  You may want to add some resource registration code
+     */
     wrapScriptlessModule (otherOutputItems: OutputItem[]) {
 		return '';
 	}

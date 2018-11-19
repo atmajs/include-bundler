@@ -7,6 +7,8 @@ import { AmdJsHandler } from './amd-js/AmdJsHandler';
 import { IncludeJsHandler } from './include-js/IncludeJsHandler';
 import { MaskJsHandler } from './mask-js/MaskJsHandler';
 import { OutputItem } from '../../class/OutputResources';
+import { Resource } from '../../class/Resource';
+import { ImportJsHandler } from './import-js/ImportJsHandler';
 
 export class ScriptBuilder extends BaseBuilder {
 
@@ -15,7 +17,8 @@ export class ScriptBuilder extends BaseBuilder {
 		new CommonJsHandler.Builder(this.solution, this.handler),
 		new AmdJsHandler.Builder(this.solution, this.handler),
 		new IncludeJsHandler.Builder(this.solution, this.handler),
-		new MaskJsHandler.Builder(this.solution, this.handler)
+        new MaskJsHandler.Builder(this.solution, this.handler),
+        new ImportJsHandler.Builder(this.solution, this.handler),
 	]
 	
 	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
@@ -40,7 +43,7 @@ export class ScriptBuilder extends BaseBuilder {
 		outputItem.resource.content = code;
 	}
 
-	buildRoot (resource, dependencies) {
+	buildRoot (resource: Resource, dependencies) {
 		var builder = this.builders.find(x => x.accepts(resource));
 		if (builder == null)
 			throw new Error('Root Builder not found for ' + resource.url);

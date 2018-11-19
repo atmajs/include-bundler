@@ -12,8 +12,7 @@
 		  "./types/"
 		],
 		"types": [
-          "node",
-          "color"
+          "node"
 		],
 		"declaration": true,
 		"target":"es5",

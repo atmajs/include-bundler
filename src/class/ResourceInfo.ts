@@ -1,4 +1,6 @@
-export type ResourceType = 'js' | 'mask' | 'css' | 'html' | 'data' | 'asset';
+import { Resource } from './Resource';
+
+export type ResourceType = 'js' | 'mask' | 'css' | 'html' | 'data' | 'asset' | 'load';
 
 export class ResourceMeta {
     hasPages?: boolean
@@ -8,6 +10,11 @@ export class ResourceMeta {
         hasExports: boolean,
         hasResponseObject: boolean,
         responseAccessors: any
+    }
+    import?: {
+        exports?: ExportNode[]
+        imports?: ImportNode[],
+        import?: ImportNode
     }
 }
 
@@ -19,13 +26,16 @@ export class ResourceInfo {
     bundle?: string
     module?: string
     pos?: number
+    length?: number
     
     content?: string
     namespace?: string
 	
 	dependencies?: ResourceInfo[] = []
     meta?: ResourceMeta
-	
+    resource?: Resource
+    import?: ImportNode
+    
 	static merge(...infos: ResourceInfo[]) {		
 		const result = new ResourceInfo;
 
@@ -46,4 +56,23 @@ export class ResourceInfo {
 		});
 		return result;
 	}
+}
+
+export class ImportNode<T = any> {
+    position: number
+    length: number
+    str: string
+    path: string
+    refs: string[]
+    type: 'full' | 'refs'
+    scopeLess: boolean
+    module: T
+    exportAll: boolean;
+}
+export class ExportNode {
+    position: number
+    length: number
+    str: string
+    ref: string
+    type: 'const' | 'function'
 }
