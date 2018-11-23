@@ -24,7 +24,7 @@ export class ImportJsParser extends BaseParser {
             res.import = imp;
             return res;
         });        
-        return {
+        return <ResourceInfo> {
             dependencies: deps,
             meta: {
                 import: {

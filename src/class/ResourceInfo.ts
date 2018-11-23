@@ -74,5 +74,5 @@ export class ExportNode {
     length: number
     str: string
     ref: string
-    type: 'const' | 'function'
+    type: 'ref' | 'function'
 }

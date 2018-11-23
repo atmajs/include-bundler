@@ -61,7 +61,11 @@ export class Include {
 	routes(arg) {
 		if (arg == null) {
 			return Routes.getRoutes();
-		}
+        }
+
+        // register namespaces at include, used later in resolve url
+        lib.include.routes(arg);
+
 		for (var key in arg) {
 			Routes.register(key, arg[key], this);
 		}

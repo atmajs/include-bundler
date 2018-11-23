@@ -1,11 +1,11 @@
-import { Compiler } from 'atma-io-middleware-base';
-import { ImportNode, ExportNode, ModuleFile } from './ModuleFile';
+import { ModuleFile } from './ModuleFile';
 import * as io from 'atma-io'
+import { ImportNode, ExportNode } from '../../../class/ResourceInfo';
 
 declare type File = InstanceType<typeof io.File>;
 
 let Rgx = {
-    check: /^[ \t]*((import\s+(from|["']))|(export\s+(const|function|\*)))/m,
+    check: /^[ \t]*((import((\s*\{[^\}]+}\s*from)|\s+from|\s+["']))|(export\s+(const|let|var|function|\*)))/m,
     Imports: {
         full: {
             rgx: /^[ \t]*import\s*['"]([^'"]+)['"][\t ;]*[\r\n]{0,2}/gm,
@@ -44,14 +44,14 @@ let Rgx = {
         },
     },
     Exports: {
-        const: {
-            rgx: /^[ \t]*export\s*const\s+([\w\d_$]+)/gm,
+        ref: {
+            rgx: /^[ \t]*export\s*(const|let|var)\s+([\w\d_$]+)/gm,
             map (match: RegExpMatchArray) {
                 let $export = new ExportNode();
                 $export.position = match.index;
                 $export.length = match[0].length;
-                $export.type = 'const';
-                $export.ref = match[1];
+                $export.type = 'ref';
+                $export.ref = match[2];
                 return $export;
             }
         },

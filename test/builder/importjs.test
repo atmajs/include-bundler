@@ -26,7 +26,10 @@ var Files =  {
     'lf': `
         import { D } from './d'
         export const F = '[f]'
-    `
+    `,
+    'var.js': `
+        export var __Foo_x = '[foo]'
+    `,
 };
 
 //var Bundler;
@@ -68,6 +71,17 @@ UTest({
             Helpers.compareLines(main.content, expect);
 
 		});        
+    },
+    async 'should serialize simple var export' () {
+        let content = `export * from 'var.js';`;        
+        let code = await Helpers.$process(content);
+        let expect = `            
+            var __Foo_x;
+            (function(){            
+                __Foo_x = '[foo]'
+            }());               
+        `;
+        Helpers.compareLines(code, expect);
     },
 	async 'should serialize simple re-export' () {
         let content = `export * from 'e.js';`;        

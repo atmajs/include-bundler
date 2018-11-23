@@ -1,6 +1,5 @@
 import * as io from 'atma-io'
-import { Compiler } from 'atma-io-middleware-base'
-import { ModuleFile, ImportNode } from './ModuleFile';
+import { ModuleFile } from './ModuleFile';
 import { Resource } from '../../../class/Resource';
 import { Dictionary } from './Dictionary';
 
@@ -25,6 +24,8 @@ export namespace Builder {
             return cache[module.id];
         }
 
+        cache[module.id] = module;
+
         if (resource.dependencies) {
             let scoped = resource.dependencies.map(dep => {
                 //let res = new Resource(dep, resource, resource.solution);
@@ -34,14 +35,17 @@ export namespace Builder {
             scopedDict.add(...scoped);
 
             module.scoped = scopedDict;
-            module.imports = resource.dependencies.map(dep => {
-                let imp = dep.import;  
-                imp.module = Builder.getModuleFromResource(dep.resource);                
-                return imp;
-            });            
+            module.imports = resource
+                .dependencies
+                .filter(x => x.import != null)
+                .map(dep => {
+                    let imp = dep.import;  
+                    imp.module = Builder.getModuleFromResource(dep.resource);                
+                    return imp;
+                });            
         }
         
-        if (resource.meta.import.exports) {
+        if (resource.meta.import && resource.meta.import.exports) {
             module.exports = resource.meta.import.exports;
         }
 

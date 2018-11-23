@@ -60,13 +60,13 @@ export class ModuleFile {
             .map(x => x.replace(/[\s]*$/, ''))
             .join(newLine);
         
-
+        
         let content = this.content;
         
         // normalize exports
         this.exports.reverse().forEach(x => {
             switch (x.type) {
-                case 'const': 
+                case 'ref': 
                     content = String.replace(content, x.position, x.length, x.ref);
                     break;
                 case 'function': 

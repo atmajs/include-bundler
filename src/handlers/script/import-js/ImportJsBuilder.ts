@@ -1,13 +1,8 @@
 import { BaseScriptBuilder } from "../base/BaseScriptBuilder";
 import { OutputItem } from "../../../class/OutputResources";
 import { Resource } from "../../../class/Resource";
-import { class_Uri } from "atma-utils";
-import { path_isRelative } from "../../../utils/path";
-import { ModuleFile } from './ModuleFile';
 import { Builder } from './Builder';
-import { String } from './String'
-import { u_getNewLine } from './utils';
-import { io } from '../../../global'
+import { Templates } from '../common-js/templates/Templates';
 
 export class ImportJsBuilder extends BaseScriptBuilder {
 
@@ -21,6 +16,16 @@ export class ImportJsBuilder extends BaseScriptBuilder {
 
         let body = Builder.build(module, {});
 
+        var wrapper = this.solution.opts.package.moduleWrapper;
+		switch (wrapper) {
+			case 'custom':
+				body = this.wrapWithCustom(body);
+				break;
+			case 'script':
+				break;
+			default:
+				throw new Error(`Unsupported module wrapper "${wrapper}" for import`);
+		}
         outputRoot.content = body;
     }
 
@@ -96,6 +101,16 @@ export class ImportJsBuilder extends BaseScriptBuilder {
             module = 'import';
         }        
         return module === 'import';
+    }
+    
+    
+	wrapWithCustom (body) {
+		let opts = this.solution.opts.package;
+		let template = Templates.load(opts.moduleWrapperCustomPath);
+		
+		return template
+			.replace('/**MODULE**/', () => body)
+			;
 	}
 };
 

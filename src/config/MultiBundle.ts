@@ -25,7 +25,7 @@ export function ensureBundlesConfig(config: IMultiBundle | IBundle): IBundle[] {
             })
             .map(name => {
                 let obj: IBundle = <any>{ name };
-                obj_deepExtend(obj, common);
+                obj_deepExtend(obj, JSON.parse(JSON.stringify(common)));
                 obj_deepExtend(obj, config.apps[name]);
 
                 for (let key in config) {

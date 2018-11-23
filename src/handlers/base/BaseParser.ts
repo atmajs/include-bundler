@@ -12,7 +12,7 @@ export abstract class BaseParser {
 		assert(handler instanceof BaseHandler, 'BaseHandler expected for the Parser');
 	}
 
-	getDependencies (content, ownerResource): PromiseLike<ResourceInfo> {
+	getDependencies (content, ownerResource): ResourceInfo | PromiseLike<ResourceInfo> {
 		throw new Error('Not implemented');
 	}
 

@@ -19,7 +19,7 @@ export const Templates = {
 	load (path: string) {
 		let template = io.File.read(path);
 		if (!template) {
-			throw new Error(`Custom Wrapper Module not found: ${path}`)
+			throw new Error(`Custom module wrapper not found: ${path}`)
 		}
 		return template;
 	}
