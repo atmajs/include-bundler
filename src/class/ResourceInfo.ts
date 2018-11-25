@@ -1,4 +1,5 @@
 import { Resource } from './Resource';
+import { ModuleFile } from '../handlers/script/import-js/ModuleFile';
 
 export type ResourceType = 'js' | 'mask' | 'css' | 'html' | 'data' | 'asset' | 'load';
 
@@ -64,15 +65,17 @@ export class ImportNode<T = any> {
     str: string
     path: string
     refs: string[]
-    type: 'full' | 'refs'
+    type: 'full' | 'refs' | 'exportAll' | 'exportRefs'
     scopeLess: boolean
     module: T
     exportAll: boolean;
+    exportRefs: boolean;
 }
 export class ExportNode {
     position: number
     length: number
     str: string
     ref: string
-    type: 'ref' | 'function'
+    type: 'ref' | 'function' | 'named'
+    dependents: ModuleFile[] = []
 }

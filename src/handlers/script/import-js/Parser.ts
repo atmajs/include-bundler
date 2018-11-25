@@ -36,21 +36,45 @@ let Rgx = {
                 let $import = new ImportNode();
                 $import.position = match.index;
                 $import.length = match[0].length;
-                $import.type = 'full';
+                $import.type = 'exportAll';
                 $import.path = match[1];                
-                $import.exportAll = true;                
+                $import.exportAll = true;
                 return $import;
             }
         },
+        exportRefs: {
+            rgx: /^[ \t]*export\s*\{([^}]+)}\s*from\s*['"]([^'"]+)['"][\t ;]*[\r\n]{0,2}/gm,
+            map (match: RegExpMatchArray) {
+                let $import = new ImportNode();
+                $import.position = match.index;
+                $import.length = match[0].length;
+                $import.type = 'exportRefs';
+                $import.path = match[2];
+                $import.refs = match[1].split(',').map(x => x.trim());
+                $import.exportRefs = true;
+                return $import;
+            }
+        }
     },
     Exports: {
         ref: {
-            rgx: /^[ \t]*export\s*(const|let|var)\s+([\w\d_$]+)/gm,
+            rgx: /^[ \t]*export\s*(const|let|var)\s+([\w\d_$]+)(?=\s*[^;])/gm,
             map (match: RegExpMatchArray) {
                 let $export = new ExportNode();
                 $export.position = match.index;
                 $export.length = match[0].length;
                 $export.type = 'ref';
+                $export.ref = match[2];
+                return $export;
+            }
+        },
+        named: {
+            rgx: /^[ \t]*export\s*(const|let|var)\s+([\w\d_$]+)(?=\s*[;])/gm,
+            map (match: RegExpMatchArray) {
+                let $export = new ExportNode();
+                $export.position = match.index;
+                $export.length = match[0].length;
+                $export.type = 'named';
                 $export.ref = match[2];
                 return $export;
             }
@@ -92,6 +116,17 @@ export class Parser {
                 module.exports.push(x.map(match, content))
             }
         }
+
+        module.imports.filter(x => x.type === 'exportRefs').forEach(imp => {
+            imp.refs.forEach(ref => {
+                let exp = new ExportNode();
+                exp.position = 0;
+                exp.length = 0;
+                exp.ref = ref;
+                module.exports.push(exp);
+            })
+            
+        });
 
         module.imports.sort((a, b) => a.position < b.position ? -1 : 1);
         module.exports.sort((a, b) => a.position < b.position ? -1 : 1);

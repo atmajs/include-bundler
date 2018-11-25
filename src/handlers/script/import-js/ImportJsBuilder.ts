@@ -3,6 +3,7 @@ import { OutputItem } from "../../../class/OutputResources";
 import { Resource } from "../../../class/Resource";
 import { Builder } from './Builder';
 import { Templates } from '../common-js/templates/Templates';
+import { IImporterOptions } from './ModuleFile';
 
 export class ImportJsBuilder extends BaseScriptBuilder {
 
@@ -13,18 +14,21 @@ export class ImportJsBuilder extends BaseScriptBuilder {
 
         let root = outputRoot.source;        
         let module = Builder.getModuleFromResource(root);
+        let $package = this.solution.opts.package;
+        let options = $package.import || new IImporterOptions;
+        options.wrapper = $package.moduleWrapper as any;
 
-        let body = Builder.build(module, {});
+        let body = Builder.build(module, options);
 
-        var wrapper = this.solution.opts.package.moduleWrapper;
-		switch (wrapper) {
+		switch (options.wrapper) {
 			case 'custom':
 				body = this.wrapWithCustom(body);
 				break;
-			case 'script':
-				break;
-			default:
-				throw new Error(`Unsupported module wrapper "${wrapper}" for import`);
+            case 'script':
+            case 'iif':
+                break;
+            default:
+				throw new Error(`Unsupported module wrapper "${options.wrapper}" for import`);
 		}
         outputRoot.content = body;
     }

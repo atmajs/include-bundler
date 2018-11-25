@@ -32,7 +32,6 @@ var Files =  {
     `,
 };
 
-//var Bundler;
 UTest({
 	$before () {
 		TestHelper.registerFiles(Files);		
@@ -51,9 +50,10 @@ UTest({
         
         return Bundler.build('main.js', { 
             mainContent: `import 'e.js';`,
-            //silent: true,
-			package: {
-                module: 'import'
+            silent: true,
+      		package: {
+                module: 'import',
+                moduleWrapper: 'iif'
             },
 		}).done(resources => {
 			eq_(resources.length, 1);
@@ -140,7 +140,7 @@ UTest({
         Helpers.compareLines(code, expect);
     },
     async 'should serialize simple import and export' () {
-        let content = `import 'c.js';\nexport const Foo = C`;        
+        let content = `import 'c.js'; \n export const Foo = C`;        
         let code = await Helpers.$process(content);
         
         let letters = Helpers.$extractLetters(code);
@@ -227,19 +227,153 @@ UTest({
             }());   
         `;
         Helpers.compareLines(code, expect);
-
+    },
+    'should build cyclic':  {
+        $before () {
+            this.files = {
+                'foo.js': `
+                    import './bar'
+                    export const Foo = '[foo]'
+                `,
+                'bar.js': `
+                    import './foo'
+                    export const Bar = '[bar]'
+                `
+            };
+            TestHelper.registerFiles(this.files);
+        },
+        $after () {
+            TestHelper.clearFiles(this.files);
+        },
+        $teardown () {
+            Bundler.clearCache();
+        },
+        async 'cyclic scoped reference' () {
+            let content = `import './foo.js';`;
+            let code = await Helpers.$process(content);
+            let expect = `
+                (function(){
+                    var Foo;
+                    (function(){
+                        var Bar;
+                        (function(){                
+                            Bar = '[bar]'
+                        }());
+                        Foo = '[foo]'
+                    }());
+                }());
+            `;
+            Helpers.compareLines(code, expect);
+        },
+        async 'cyclic global reference' () {
+            let content = `import './foo.js'; \n import './bar.js';`;
+            let code = await Helpers.$process(content);
+            let expect = `
+                (function(){
+                    var Bar;
+                    (function(){
+                        Bar = '[bar]'
+                    }());
+                    var Foo;
+                    (function(){                
+                        Foo = '[foo]'
+                    }());
+                }());
+            `;
+            Helpers.compareLines(code, expect);
+        }
+    },
+    'should handle reexported import':  {
+        $before () {
+            this.files = {
+                'foo.js': `
+                    export { Bar } from './bar'
+                    export const Foo = '[foo]'
+                `,
+                'bar.js': `
+                    export const Bar = '[bar]'
+                `
+            };
+            TestHelper.registerFiles(this.files);
+        },
+        $after () {
+            TestHelper.clearFiles(this.files);
+        },
+        $teardown () {
+            Bundler.clearCache();
+        },
+        async 'reexport single' () {
+            let content = `import './foo.js';`;
+            let code = await Helpers.$process(content);
+            let expect = `
+                (function(){
+                    var Bar,
+                        Foo;
+                    (function(){
+                        (function(){                
+                            Bar = '[bar]'
+                        }());
+                        Foo = '[foo]'
+                    }());
+                }());
+            `;
+            Helpers.compareLines(code, expect);
+        }
+    },
+    'should skip unused export':  {
+        $before () {
+            this.files = {
+                'foo.js': `
+                    import { Bar } from './bar'
+                `,
+                'bar.js': `
+                    export const Bar = '[bar]'
+                    export var NotBar = ''
+                `
+            };
+            TestHelper.registerFiles(this.files);
+        },
+        $after () {
+            TestHelper.clearFiles(this.files);
+        },
+        $teardown () {
+            Bundler.clearCache();
+        },
+        async 'unused export' () {
+            let content = `import './foo.js';`;
+            let code = await Helpers.$process(content, { removeUnusedExports: true });
+            let expect = `
+                (function (){
+                    (function (){
+                        var Bar;
+                        (function(){
+                            Bar = '[bar]'
+                            var NotBar = ''          
+                        }());
+                    }());
+                }());
+            `;
+            Helpers.compareLines(code, expect);
+        }
     }
 })
 
 
 
 namespace Helpers {
-    export async function $process (str: string) {
+    export async function $process (str: string, { 
+        moduleWrapper = <'iif' | 'script'> 'iif',  
+        removeUnusedExports = false
+    } = {}) {
         let resources = await Bundler.build('main.js', { 
             mainContent: str,
             silent: true,
 			package: {
-                module: 'import'
+                module: 'import',
+                moduleWrapper,
+                import: {
+                    removeUnusedExports
+                }
             },
         });
         
@@ -270,12 +404,12 @@ namespace Helpers {
         `);
 
         for (let i = 0; i < aLines.length; i++) {
-            let aLine = aLines[i];
-            let bLine = bLines[i];
-            eq_(aLine.str, bLine.str, `
+            let aLine = aLines[i].str.replace(/\s+/g, '');
+            let bLine = bLines[i].str.replace(/\s+/g, '');
+            eq_(aLine, bLine, `
                 Lines are not equal at ${i}.
             `)
-            if (aLine.str !== bLine.str) {
+            if (aLine !== bLine) {
                 break;
             }
         }

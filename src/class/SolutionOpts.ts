@@ -8,6 +8,7 @@ import { VarDefinitions } from './VarDefinitions';
 import { Configuration } from '../config/Configuration';
 import { obj_deepDefaults } from '../utils/obj';
 import { ResourceType } from './ResourceInfo';
+import { IImporterOptions } from '../handlers/script/import-js/ModuleFile';
 
 
 
@@ -16,7 +17,8 @@ interface IPackageOptions {
 	type?: 'module' | 'bundle'
 	moduleWrapper?: 'umd' | 'iif' | 'script' | 'custom'
 	moduleWrapperCustomPath?: string
-	moduleName?: string
+    moduleName?: string,
+    import?: IImporterOptions
 	[key: string]: any
 }
 interface IExtensionTypes {
@@ -137,7 +139,8 @@ export class SolutionOpts extends SolutionOptsBase {
 
 				moduleWrapper: 'iif',
 				moduleWrappers: ['umd', 'iif', 'script', 'custom'],
-				moduleName: '',
+                moduleName: '',
+                import: null
 			},
 			extensions: {
 				'': { type: 'js'},

@@ -1,5 +1,5 @@
 import * as io from 'atma-io'
-import { ModuleFile } from './ModuleFile';
+import { ModuleFile, IImporterOptions } from './ModuleFile';
 import { Resource } from '../../../class/Resource';
 import { Dictionary } from './Dictionary';
 
@@ -8,6 +8,8 @@ let options = {
     withPathComments: true,
     extension: 'js'
 };
+
+
 
 export namespace Builder {
     export function clearCache () {
@@ -51,41 +53,60 @@ export namespace Builder {
 
         return module;
     }
-    export function build(root: ModuleFile, options: any) {
+    export function build(root: ModuleFile, options = new IImporterOptions) {
+        
         flattern(root);
         distinct(root);
         moveExportAllImprotsToOuter(root);
-        return root.toScript();
+        markUsedExports(root);
+        return root.toScript([], options);
     }    
 }
 
 
-export function flattern (module: ModuleFile) {
+export function flattern (module: ModuleFile, stack: ModuleFile[] = []) {
+    stack.push(module);
     module
         .imports
         .forEach(x => {
-            
-            flattern(x.module);
+            if (stack.includes(x.module) === false) {
+                flattern(x.module, stack);
+            }            
             module.scoped.add(x.module);
         });
 }
-export function distinct (module: ModuleFile, parents: ModuleFile[] = []) {
+export function distinct (module: ModuleFile, index: number = 0, parents: { index: number, module: ModuleFile }[] = [], stack: ModuleFile[] = []) {
+    if (stack.includes(module)) {
+        return;
+    }
+    stack.push(module);
+    module.outer.forEach((x, i) => distinct(x, i, [ ...parents, { index, module }], stack));
     module.outer.removeByFn(x => {
-        return parents.some(p => p.outer.has(x));
+        return parents.some(p => p.module.outer.has(x));
     });
-    module.outer.forEach(x => distinct(x, [ ...parents, module]));
+
+    module.scoped.forEach((x, i) => distinct(x, i, [ ...parents, { index,  module}], stack));
 
     module.scoped.removeByFn(x => {
-        let inOuter = parents.some(p => p.outer.has(x));
-        if (inOuter) {
+        let inOuter = parents.some(p => p.module.outer.has(x));        
+        if (inOuter) {            
             return true;
         }
-        let inScope = parents.some(p => p.scoped.has(x));
-        if (inScope) {
+        let parentsScope = parents.find(p => p.module.scoped.has(x));
+        if (parentsScope != null) {
+            let ancestor = parentsScope.module;
+            let foundIndex = ancestor.scoped.indexOf(x)
+            let selfIndex = parentsScope.index;
+            if (foundIndex > selfIndex) {
+                let x = ancestor.scoped.arr[foundIndex];
+                ancestor.scoped.arr.splice(foundIndex, 1);
+                ancestor.scoped.arr.splice(selfIndex, 0, x);
+            }
             return true;
         }
         for (let i = parents.length - 1; i > -1; i--) {
-            let p = parents[i];
+            let item = parents[i];
+            let p = item.module;
             let hasDeep = p.hasDeep(x, module);
             if (hasDeep) {
                 for (let i = 0; i < p.outer.arr.length; i++) {
@@ -110,7 +131,6 @@ export function distinct (module: ModuleFile, parents: ModuleFile[] = []) {
         
         return false;
     });
-    module.scoped.forEach(x => distinct(x, [ ...parents, module]));
 }
 
 function moveExportAllImprotsToOuter(module: ModuleFile) {
@@ -123,4 +143,32 @@ function moveExportAllImprotsToOuter(module: ModuleFile) {
         });
 
     module.scoped.forEach(moveExportAllImprotsToOuter);
+}
+function markUsedExports (module: ModuleFile) {
+    let modules = module.getAllModules();
+    let imports = module.getAllImports();
+
+    modules.forEach(module => {
+        
+        // Search all imports for module
+        imports.filter(x => x.module.id === module.id).forEach($import => {
+            if ($import.exportAll || $import.refs == null) {
+                module.exports.forEach(exp => {
+                    if (exp.dependents.includes(module) === false) {
+                        exp.dependents.push(module);
+                    }
+                });
+                return;
+            }
+            $import.refs.forEach(ref => {
+                let exp = module.exports.find(x => x.ref === ref);
+                if (exp == null) {
+                    throw new Error(`Imported reference ${ref} is not exported from ${module.id}`);
+                }
+                if (exp.dependents.includes(module) === false) {
+                    exp.dependents.push(module);
+                }
+            })
+        });
+    });
 }
