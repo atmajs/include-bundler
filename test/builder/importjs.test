@@ -320,6 +320,41 @@ UTest({
             Helpers.compareLines(code, expect);
         }
     },
+    'should export scoped vars':  {
+        $before () {
+            this.files = {
+                'foo.js': `
+                    import { Bar } from './bar'
+                `,
+                'bar.js': `
+                    var Bar = '[bar]'
+                    export { Bar }
+                `
+            };
+            TestHelper.registerFiles(this.files);
+        },
+        $after () {
+            TestHelper.clearFiles(this.files);
+        },
+        $teardown () {
+            Bundler.clearCache();
+        },
+        async 'unused export' () {
+            let content = `import './foo.js';`;
+            let code = await Helpers.$process(content);            
+            let expect = `
+                (function(){
+                    (function(){
+                        var Bar;
+                        (function(){
+                            Bar = '[bar]'
+                        }());
+                    }());
+                }());
+            `;
+            Helpers.compareLines(code, expect);
+        }
+    },
     'should skip unused export':  {
         $before () {
             this.files = {

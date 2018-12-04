@@ -34,29 +34,50 @@ export class Dictionary<T extends {id: string}> {
         let i = this.arr.findIndex(module => module.id === x.id);
         this.arr.splice(i, 1);
     }
-    removeByFnReversed (fn: (x: T) => boolean) {
-        for (let i = this.arr.length - 1; i > -1; i--) {
-            let x = this.arr[i];
-            if (fn(x)) {                
-                this.arr.splice(i, 1);
-                delete this.hash[x.id];
+    
+    removeByFn (fn: (x: T) => boolean) {
+        let handled = new Dictionary<T>();
+        while (true) {
+            
+            let i = -1,
+                length = this.arr.length;
+
+            while(++i < length) {
+                let x = this.arr[i];
+                if (handled.has(x)) {
+                    continue;
+                }
+                handled.add(x);
+                if (fn(x)) { 
+                    this.arr.splice(i, 1);
+                    delete this.hash[x.id];                                        
+                }
+                break;
             }
-        }    
-    }
-    removeByFn (fn: (x: T) => boolean) {        
-        for (let i = 0; i< this.arr.length; i++) {
-            let x = this.arr[i];
-            if (fn(x)) {                
-                this.arr.splice(i, 1);
-                delete this.hash[x.id];
-                i--;                
+            if (i === length) {
+                break;
             }
         }
     }
     forEach (fn: (x: T, i?: number) => void | any) {
-        for (let i = 0; i< this.arr.length; i++) {
-            let x = this.arr[i];
-            fn(x, i);
+        let handled = new Dictionary<T>();
+        while (true) {
+            
+            let i = -1,
+                length = this.arr.length;
+
+            while(++i < length) {
+                let x = this.arr[i];
+                if (handled.has(x)) {
+                    continue;
+                }
+                handled.add(x);
+                fn(x, i);
+                break;
+            }
+            if (i === length) {
+                break;
+            }
         }
     }
 }

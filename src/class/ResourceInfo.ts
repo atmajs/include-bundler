@@ -59,7 +59,7 @@ export class ResourceInfo {
 	}
 }
 
-export class ImportNode<T = any> {
+export class ImportNode<T = ModuleFile> {
     position: number
     length: number
     str: string
@@ -68,14 +68,27 @@ export class ImportNode<T = any> {
     type: 'full' | 'refs' | 'exportAll' | 'exportRefs'
     scopeLess: boolean
     module: T
+    parent: T
     exportAll: boolean;
     exportRefs: boolean;
+    isCyclic: boolean;
 }
 export class ExportNode {
     position: number
     length: number
     str: string
     ref: string
-    type: 'ref' | 'function' | 'named'
+    refs: string[]
+    type: 'ref' | 'function' | 'named' | 'scoped'
     dependents: ModuleFile[] = []
+
+    hasExport (ref: string) {
+        if (this.ref === ref) {
+            return true;
+        }
+        if (this.refs != null && this.refs.includes(ref)) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -37,42 +37,45 @@ export interface IAdditionOptions {
 	mask?: {
 		Module?: any,
 		[key: string]: any
-	}
+    }
+    include?: {
+        routes?: any
+    }
 }
 
 export interface ISolutionOptions {
 	
-		build?: string
-		type?: ResourceType
-		base?: string
-		version?: string
-		
-		mainPage?: string
-        mainBundle?: string
-        mainContent?: string
+    build?: string
+    type?: ResourceType
+    base?: string
+    version?: string
+    
+    mainPage?: string
+    mainBundle?: string
+    mainContent?: string
 
-		outputBase?: string
-		outputAppBase?: string
-		outputMain?: string
-		outputSources?: string
-		outputAssets?: string
-		outputShareBase?: boolean
-		package?: IPackageOptions
-		extensions?: IExtensionTypes
-		defaultExtensions?: IDefaultExtension 
-		mappers?: null
-		mappings?: null
-		middlewares?: null
-		varDefs?: null
-		parserIgnoreDependencies?: string[]
-		dynamicDependencies?: string[]
-		options?: IAdditionOptions
-		prebuild?: string[]
-		postbuild?: string []
-		silent?: boolean
-		watch?: boolean
-		minify?: boolean
-		copyFiles?: { [sourcePath: string]: string }
+    outputBase?: string
+    outputAppBase?: string
+    outputMain?: string
+    outputSources?: string
+    outputAssets?: string
+    outputShareBase?: boolean
+    package?: IPackageOptions
+    extensions?: IExtensionTypes
+    defaultExtensions?: IDefaultExtension 
+    mappers?: null
+    mappings?: null
+    middlewares?: null
+    varDefs?: null
+    parserIgnoreDependencies?: string[]
+    dynamicDependencies?: string[]
+    options?: IAdditionOptions
+    prebuild?: string[]
+    postbuild?: string []
+    silent?: boolean
+    watch?: boolean
+    minify?: boolean
+    copyFiles?: { [sourcePath: string]: string }
 }
 
 export class SolutionOptsBase {
@@ -291,7 +294,12 @@ export class SolutionOpts extends SolutionOptsBase {
 					for (let key in opts.mask) if (key !== 'Module') {						
 						mask.cfg(key, opts.mask.Module[key]);
 					}
-				}
+                }
+                if (opts.include) {
+                    if (opts.include.routes) {
+                        Include.prototype.routes(opts.include.routes);
+                    }
+                }
 				return opts;
 			}
 		}

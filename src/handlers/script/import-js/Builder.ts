@@ -54,38 +54,40 @@ export namespace Builder {
         return module;
     }
     export function build(root: ModuleFile, options = new IImporterOptions) {
-        
-        flattern(root);
-        distinct(root);
+        markCyclicImports(root);
+        moveImportsToScoped(root);
+        removeNestedScopedModules(root);
+        moveToCommonParent(root);
         moveExportAllImprotsToOuter(root);
+        distinctOuter(root);
         markUsedExports(root);
+
+        distinct(root);
+        
         return root.toScript([], options);
     }    
 }
 
 
-export function flattern (module: ModuleFile, stack: ModuleFile[] = []) {
-    stack.push(module);
+export function moveImportsToScoped (module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
     module
         .imports
         .forEach(x => {
-            if (stack.includes(x.module) === false) {
-                flattern(x.module, stack);
-            }            
+            if (x.isCyclic === true || handled.has(x.module)) {
+                return;
+            }
+            handled.add(x.module);
+
+            moveImportsToScoped(x.module, handled);  
             module.scoped.add(x.module);
         });
 }
-export function distinct (module: ModuleFile, index: number = 0, parents: { index: number, module: ModuleFile }[] = [], stack: ModuleFile[] = []) {
-    if (stack.includes(module)) {
+
+function removeNestedScopedModules (module: ModuleFile, parent: ModuleFile = null, parents: { module: ModuleFile, child: ModuleFile }[] = [], handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
         return;
     }
-    stack.push(module);
-    module.outer.forEach((x, i) => distinct(x, i, [ ...parents, { index, module }], stack));
-    module.outer.removeByFn(x => {
-        return parents.some(p => p.module.outer.has(x));
-    });
-
-    module.scoped.forEach((x, i) => distinct(x, i, [ ...parents, { index,  module}], stack));
+    handled.add(module);
 
     module.scoped.removeByFn(x => {
         let inOuter = parents.some(p => p.module.outer.has(x));        
@@ -96,7 +98,10 @@ export function distinct (module: ModuleFile, index: number = 0, parents: { inde
         if (parentsScope != null) {
             let ancestor = parentsScope.module;
             let foundIndex = ancestor.scoped.indexOf(x)
-            let selfIndex = parentsScope.index;
+            let selfIndex = ancestor.scoped.indexOf(parentsScope.child);
+            if (foundIndex === -1 || selfIndex === -1) {
+                throw new Error(`0_o. Parents conflict. Self: ${selfIndex}. Found: ${foundIndex}`);
+            }
             if (foundIndex > selfIndex) {
                 let x = ancestor.scoped.arr[foundIndex];
                 ancestor.scoped.arr.splice(foundIndex, 1);
@@ -104,49 +109,109 @@ export function distinct (module: ModuleFile, index: number = 0, parents: { inde
             }
             return true;
         }
+    });
+    module.scoped.forEach(x => removeNestedScopedModules(x, module, [...parents, { child: x, module: module}], handled));
+}
+function moveToCommonParent (module: ModuleFile, parent: ModuleFile = null, parents: { module: ModuleFile, child: ModuleFile }[] = [], handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
+
+    module.scoped.removeByFn(x => {
+        
+        let topCommonParent: ModuleFile;
         for (let i = parents.length - 1; i > -1; i--) {
             let item = parents[i];
             let p = item.module;
-            let hasDeep = p.hasDeep(x, module);
+            let hasDeep = p.hasDeep(x, item.child);
             if (hasDeep) {
-                for (let i = 0; i < p.outer.arr.length; i++) {
-                    let child = p.outer.arr[i];
-                    if (child.hasDeep(x)) {
-                        p.outer.insert(x, i);
-                        return true;
-                    }
-                }
-                for (let i = 0; i < p.scoped.arr.length; i++) {
-                    let child = p.scoped.arr[i];
-                    if (child.hasDeep(x)) {
-                        p.scoped.insert(x, i);
-                        return true;
-                    }
-                }
-                throw new Error('O_o: Child not found');
-                p.outer.add(x);
-                return true;
+                topCommonParent = p;
             }
+        }
+        if (topCommonParent) {
+            for (let i = 0; i < topCommonParent.outer.arr.length; i++) {
+                let child = topCommonParent.outer.arr[i];
+                if (child.hasDeep(x)) {
+                    topCommonParent.outer.insert(x, i);
+                    return true;
+                }
+            }
+            for (let i = 0; i < topCommonParent.scoped.arr.length; i++) {
+                let child = topCommonParent.scoped.arr[i];
+                if (child.hasDeep(x)) {
+                    topCommonParent.scoped.insert(x, i);
+                    return true;
+                }
+            }
+            throw new Error('O_o: Child not found');            
+            return true;
         }
         
         return false;
     });
+
+    module.scoped.forEach((x, i) => moveToCommonParent(x, module, [ ...parents, { child: x,  module}], handled));
+
+    
+}
+function distinctOuter (module: ModuleFile, index: number = 0, parents: { index: number, module: ModuleFile }[] = [], handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
+
+    module.outer.forEach((x, i) => distinctOuter(x, i, [ ...parents, { index, module }], handled));
+    module.outer.removeByFn(x => {
+        return parents.some(p => p.module.outer.has(x));
+    });
 }
 
-function moveExportAllImprotsToOuter(module: ModuleFile) {
+
+function distinct (module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
+
+    module.outer.removeByFn(x => {
+        if (handled.has(x)) {
+            return true;
+        }
+        distinct(x, handled);
+        return false;
+    });
+    module.scoped.removeByFn(x => {
+        if (handled.has(x)) {
+            console.log('Remove ', x.id);
+            return true;
+        }
+        distinct(x, handled);
+        return false;
+    });
+}
+
+
+function moveExportAllImprotsToOuter(module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
     module
         .imports
-        .filter(imp => imp.exportAll && module.scoped.has(imp.module))
+        .filter(imp => imp.exportAll && module.scoped.has(imp.module) && imp.isCyclic !== true)
         .forEach(imp => {
             module.outer.add(imp.module);
             module.scoped.remove(imp.module);
         });
 
-    module.scoped.forEach(moveExportAllImprotsToOuter);
+    module.scoped.forEach(m => {
+        moveExportAllImprotsToOuter(m, handled)
+    });
 }
 function markUsedExports (module: ModuleFile) {
     let modules = module.getAllModules();
-    let imports = module.getAllImports();
+    let imports = ModuleFile.getAllImports(modules);
 
     modules.forEach(module => {
         
@@ -161,14 +226,30 @@ function markUsedExports (module: ModuleFile) {
                 return;
             }
             $import.refs.forEach(ref => {
-                let exp = module.exports.find(x => x.ref === ref);
+                let exp = module.exports.find(x => x.hasExport(ref));
                 if (exp == null) {
-                    throw new Error(`Imported reference ${ref} is not exported from ${module.id}`);
+                    throw new Error(`Imported reference ${ref} in ${ $import.parent.id } is not exported from ${module.id}`);
                 }
                 if (exp.dependents.includes(module) === false) {
                     exp.dependents.push(module);
                 }
             })
         });
+    });
+}
+
+function markCyclicImports (module: ModuleFile, parentIds = {}, handled = new Dictionary<ModuleFile>()) {
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
+
+    let hash = { ...parentIds, [module.id]: 1};
+    module.imports.forEach(imp => {
+        if (imp.module.id in hash) {
+            imp.isCyclic = true;
+            return;
+        }
+        markCyclicImports(imp.module, hash, handled);
     });
 }

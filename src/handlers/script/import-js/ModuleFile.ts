@@ -60,18 +60,23 @@ export class ModuleFile {
         add(this);
         return dict.arr;
     }
-    getAllImports (): ImportNode[] {
-        function read (module: ModuleFile, stack: ModuleFile[] = []): ImportNode[] {
-            if (stack.includes(module) || module.imports == null) {
-                return [];
-            }
-            stack.push(module);
+    static getAllImports (modules: ModuleFile[]): ImportNode[] {
+
+        let arr = [];
+        modules.filter(x => x.imports != null).forEach(x => arr.push(...x.imports));
+        return arr;
+
+        // function read (module: ModuleFile, stack: ModuleFile[] = []): ImportNode[] {
+        //     if (stack.includes(module) || module.imports == null) {
+        //         return [];
+        //     }
+        //     stack.push(module);
             
-            let arr = [...module.imports];
-            module.imports.forEach(x => arr.push(...read(x.module, stack)));
-            return arr;
-        }
-        return read(this);
+        //     let arr = [...module.imports];
+        //     module.imports.forEach(x => arr.push(...read(x.module, stack)));
+        //     return arr;
+        // }
+        // return read(this);
     }
 
     toScript (parents: ModuleFile[] = [], options: IImporterOptions, indent: string = ''): string {
@@ -111,6 +116,11 @@ export class ModuleFile {
                 case 'named': 
                     content = String.replace(content, x.position, x.length, '');
                     break;
+                case 'scoped':
+                    if (x.length > 0) {
+                        content = String.replace(content, x.position, x.length, '');
+                    }
+                    break;
             }
         });
         // remove imports
@@ -133,8 +143,26 @@ export class ModuleFile {
                     }
                     return true;
                 })
+                .map(x => {
+                    /** Remove local scoped var declaration and make it global scoped */
+                    if (x.type === 'scoped') {
+                        let rgx = new RegExp(`\\b(var|let|const|function)\\s+${x.ref}`);
+                        content = content.replace(rgx, x.ref);
+                    }
+                    return x;
+                })
                 .filter(x => {
-                    let exportInOuter = parents.some(p => p.exports.some(e => e.ref == x.ref));
+                    let exportInOuter = parents
+                        .some(p => {
+                            let parentsExport = p.exports.find(e => e.hasExport(x.ref));
+                            if (parentsExport == null) {
+                                return false;
+                            }
+                            if (options.removeUnusedExports && parentsExport.dependents.length === 0) {
+                                return false;
+                            }
+                            return true;
+                        });
                     return exportInOuter === false
                 })                
                 .map(x => `    ${x.ref}`)
@@ -162,5 +190,39 @@ export class ModuleFile {
         .join(newLine);
 
         return u_makeIndent(content, indent, io);
+    }
+
+    toImportsJson () {
+        function toJSON (module: ModuleFile) {
+            var json = {
+                id: module.id,
+                imports: null
+            };
+            if (module.imports) {
+                json.imports = module.imports.map(x => toJSON(x.module));
+            }
+            return json;
+        }
+        
+        return toJSON(this);
+    }
+    toModulesJson () {
+        function toJSON (module: ModuleFile) {            
+            let json = {
+                id: module.id,
+                outer: module.outer.arr.map(x => toJSON(x)),
+                scoped: module.scoped.arr.map(x => toJSON(x))
+            };
+            if (json.outer.length === 0) {
+                delete json.outer;
+            }
+            if (json.scoped.length === 0) {
+                delete json.scoped;
+            }
+            
+            return json;
+        }
+        
+        return toJSON(this);
     }
 }

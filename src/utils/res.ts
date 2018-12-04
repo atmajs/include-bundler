@@ -84,33 +84,55 @@ function append(pckg: any, name: ResourceType | string, x: string | Resource) {
 
 
 export function res_flattern(resource) {
-	return ResFlatternUtils.distinct(ResFlatternUtils.toArray(resource, []))
+	return ResFlatternUtils.flattern(resource);
 };
 namespace ResFlatternUtils {
-	export function distinct(stack) {
-		for (var i = 0; i < stack.length; i++) {
-			for (var j = i + 1; j < stack.length; j++) {
-				if (stack[i].url === stack[j].url) {
-					takeModuleDescriptions(stack[i], stack[j]);
-					takePageDefinitions(stack[i], stack[j]);
-					stack.splice(j, 1);
-					j--;
-				}
-			}
-		}
-		return stack;
-	}
-	export function toArray(resource, out) {
+    export function flattern(resource: Resource, copyInfo = false, out = [], hash = {}) {
+        if (resource.url in hash) {
+            return out;
+        }
 		if (resource.resources) {
 			resource
 				.resources
 				.filter(x => x.isCyclic !== true)
-				.forEach(x => toArray(x, out));
-		}
-		out['push'](resource);
+				.forEach(x => flattern(x, copyInfo, out, hash));
+        }
+        let cached = hash[resource.url];
+        if (cached == null) {
+            hash[resource.url] = resource;
+            out.push(resource);
+        } else {
+            if (copyInfo) {
+                takeModuleDescriptions(cached, resource);
+				takePageDefinitions(cached, resource);
+            }
+        }
 		return out;
 	}
-	export function takeModuleDescriptions(resA, resB) {
+	// export function distinct(stack) {
+	// 	for (var i = 0; i < stack.length; i++) {
+	// 		for (var j = i + 1; j < stack.length; j++) {
+	// 			if (stack[i].url === stack[j].url) {
+	// 				takeModuleDescriptions(stack[i], stack[j]);
+	// 				takePageDefinitions(stack[i], stack[j]);
+	// 				stack.splice(j, 1);
+	// 				j--;
+	// 			}
+	// 		}
+	// 	}
+	// 	return stack;
+	// }
+	// export function toArray(resource, out) {
+	// 	if (resource.resources) {
+	// 		resource
+	// 			.resources
+	// 			.filter(x => x.isCyclic !== true)
+	// 			.forEach(x => toArray(x, out));
+	// 	}
+	// 	out['push'](resource);
+	// 	return out;
+	// }
+	function takeModuleDescriptions(resA, resB) {
 		if (resB.asModules == null || resB.asModules.length === 0) {
 			return;
 		}
@@ -119,7 +141,7 @@ namespace ResFlatternUtils {
 			.filter(name => resA.asModules.indexOf(name) === -1)
 			.forEach(name => resA.asModules.push(name));
 	}
-	export function takePageDefinitions(resA, resB) {
+	function takePageDefinitions(resA, resB) {
 		if (resB.inPages == null || resB.inPages.length === 0) {
 			return;
 		}
@@ -134,7 +156,7 @@ namespace ResFlatternUtils {
 
 /* Array of resources or root resource */
 export function res_getTreeInfo(mix) {
-	var arr = Array.isArray(mix) ? mix : ResGetTreeInfo.flattern(mix);
+	var arr = Array.isArray(mix) ? mix : ResFlatternUtils.flattern(mix);
 
 	var paths = arr.map(x => {
 		var pages = x.inPages.map(page => color(`bg_white<black<${page}>>`)).join(' ');
@@ -147,28 +169,31 @@ export function res_getTreeInfo(mix) {
 	};
 };
 namespace ResGetTreeInfo {
-	export function flattern(resource) {
-		return distinct(toArray(resource, []))
-	};
-	function distinct(stack) {
-		for (var i = 0; i < stack.length; i++) {
-			for (var j = i + 1; j < stack.length; j++) {
-				if (stack[i].url === stack[j].url) {
-					stack.splice(j, 1);
-					j--;
-				}
-			}
-		}
-		return stack;
-	}
-	function toArray(resource, out) {
+	// export function flattern(resource: Resource) {
+	// 	return toUniqueArray(resource, [], {});
+	// };
+	//- function distinct(stack) {
+	// 	for (var i = 0; i < stack.length; i++) {
+	// 		for (var j = i + 1; j < stack.length; j++) {
+	// 			if (stack[i].url === stack[j].url) {
+	// 				stack.splice(j, 1);
+	// 				j--;
+	// 			}
+	// 		}
+	// 	}
+	// 	return stack;
+	// }
+	function toUniqueArray(resource: Resource, out: Resource[], hash) {
 		if (resource.resources) {
 			resource
 				.resources
 				.filter(x => x.isCyclic !== true)
-				.forEach(x => toArray(x, out));
-		}
-		out['push'](resource);
+				.forEach(x => toUniqueArray(x, out, hash));
+        }
+        if (hash[resource.url] == null) {
+            hash[resource.url] = true;
+            out.push(resource);
+        }
 		return out;
 	}
 
