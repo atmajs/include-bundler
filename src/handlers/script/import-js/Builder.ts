@@ -2,13 +2,10 @@ import * as io from 'atma-io'
 import { ModuleFile, IImporterOptions } from './ModuleFile';
 import { Resource } from '../../../class/Resource';
 import { Dictionary } from './Dictionary';
+import { warnTransModuleChildDependencies } from '../ModuleTree';
+import { ImportNode } from '../../../class/ResourceInfo';
 
 let cache: { [id: string]: ModuleFile } = {};
-let options = {
-    withPathComments: true,
-    extension: 'js'
-};
-
 
 
 export namespace Builder {
@@ -54,11 +51,15 @@ export namespace Builder {
         return module;
     }
     export function build(root: ModuleFile, options = new IImporterOptions) {
+        markLazyImports(root, options);
         markCyclicImports(root);
+
+        warnTransModuleChildDependencies(root);
+        
         moveImportsToScoped(root);
         removeNestedScopedModules(root);
         moveToCommonParent(root);
-        moveExportAllImprotsToOuter(root);
+        moveExportAllImportsToOuter(root);
         distinctOuter(root);
         markUsedExports(root);
 
@@ -96,9 +97,15 @@ function removeNestedScopedModules (module: ModuleFile, parent: ModuleFile = nul
         }
         let parentsScope = parents.find(p => p.module.scoped.has(x));
         if (parentsScope != null) {
+            let imp = module.imports.find(x => x.module.id === x.module.id);
+            if (imp && imp.isLazy) {
+                return true;
+            }
+
             let ancestor = parentsScope.module;
             let foundIndex = ancestor.scoped.indexOf(x)
             let selfIndex = ancestor.scoped.indexOf(parentsScope.child);
+            
             if (foundIndex === -1 || selfIndex === -1) {
                 throw new Error(`0_o. Parents conflict. Self: ${selfIndex}. Found: ${foundIndex}`);
             }
@@ -118,7 +125,7 @@ function moveToCommonParent (module: ModuleFile, parent: ModuleFile = null, pare
     }
     handled.add(module);
 
-    module.scoped.removeByFn(x => {
+    module.scoped.forEach(x => {
         
         let topCommonParent: ModuleFile;
         for (let i = parents.length - 1; i > -1; i--) {
@@ -130,25 +137,35 @@ function moveToCommonParent (module: ModuleFile, parent: ModuleFile = null, pare
             }
         }
         if (topCommonParent) {
-            for (let i = 0; i < topCommonParent.outer.arr.length; i++) {
-                let child = topCommonParent.outer.arr[i];
-                if (child.hasDeep(x)) {
-                    topCommonParent.outer.insert(x, i);
-                    return true;
-                }
-            }
-            for (let i = 0; i < topCommonParent.scoped.arr.length; i++) {
-                let child = topCommonParent.scoped.arr[i];
-                if (child.hasDeep(x)) {
-                    topCommonParent.scoped.insert(x, i);
-                    return true;
-                }
-            }
-            throw new Error('O_o: Child not found');            
-            return true;
+            x.exports.forEach(exp => {
+                let clone = exp.clone();
+                exp.builder.movedToOuter = true;
+                clone.position = 0;
+                clone.length = 0;
+                
+                topCommonParent.scopedVars.push(clone);
+            })
+            
+
+            // for (let i = 0; i < topCommonParent.outer.arr.length; i++) {
+            //     let child = topCommonParent.outer.arr[i];
+            //     if (child.hasDeep(x)) {
+            //         topCommonParent.outer.insert(x, i);
+            //         return true;
+            //     }
+            // }
+            // for (let i = 0; i < topCommonParent.scoped.arr.length; i++) {
+            //     let child = topCommonParent.scoped.arr[i];
+            //     if (child.hasDeep(x)) {
+            //         topCommonParent.scoped.insert(x, i);
+            //         return true;
+            //     }
+            // }
+            // throw new Error('O_o: Child not found');            
+            // return true;
         }
         
-        return false;
+        //return false;
     });
 
     module.scoped.forEach((x, i) => moveToCommonParent(x, module, [ ...parents, { child: x,  module}], handled));
@@ -192,7 +209,7 @@ function distinct (module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
 }
 
 
-function moveExportAllImprotsToOuter(module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
+function moveExportAllImportsToOuter(module: ModuleFile, handled = new Dictionary<ModuleFile>()) {
     if (handled.has(module)) {
         return;
     }
@@ -206,7 +223,7 @@ function moveExportAllImprotsToOuter(module: ModuleFile, handled = new Dictionar
         });
 
     module.scoped.forEach(m => {
-        moveExportAllImprotsToOuter(m, handled)
+        moveExportAllImportsToOuter(m, handled)
     });
 }
 function markUsedExports (module: ModuleFile) {
@@ -236,6 +253,39 @@ function markUsedExports (module: ModuleFile) {
             })
         });
     });
+}
+
+
+function markLazyImports (module: ModuleFile, options: IImporterOptions, parentIds = {}, handled = new Dictionary<ModuleFile>()) {
+    if (!options || !options.lazy) {
+        return;
+    }
+    if (handled.has(module)) {
+        return;
+    }
+    handled.add(module);
+
+    let hash = { ...parentIds, [module.id]: 1};
+    module.imports.forEach(imp => {
+        mark(module, imp);
+        markLazyImports(imp.module, options, hash, handled);
+    });
+    function mark (owner: ModuleFile, imp: ImportNode<ModuleFile>) {
+        outer: for (let str in options.lazy) {
+            let rgx = new RegExp(str);
+            if (rgx.test(owner.id)) {
+                let paths = options.lazy[str];
+                for (let i = 0; i < paths.length; i++) {
+                    let rgxPath = new RegExp(paths[i]);
+                    if (rgxPath.test(imp.module.id)) {
+                        imp.isCyclic = true;
+                        imp.isLazy = true;
+                        break outer;
+                    }
+                }
+            }
+        }
+    }
 }
 
 function markCyclicImports (module: ModuleFile, parentIds = {}, handled = new Dictionary<ModuleFile>()) {

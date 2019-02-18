@@ -9,15 +9,20 @@ declare type File = InstanceType<typeof io.File>;
 export class IImporterOptions {
     removeUnusedExports?: boolean = true
     wrapper?: 'iif' | 'script' | 'custom' = 'iif'
+    lazy?: {
+        [rgx: string]: string[]
+    } = null
 }
 export class ModuleFile {
     id: string
     path: string
     outer = new Dictionary<ModuleFile>()
     scoped = new Dictionary<ModuleFile>()
-
+    
     imports: ImportNode[] = []
     exports: ExportNode[] = []
+
+    scopedVars: ExportNode[] = []
     
     constructor (public content: string, public file: File) {
         this.id = file.uri.toLocalFile();
@@ -95,6 +100,18 @@ export class ModuleFile {
             .map(x => x.replace(/[\s]*$/, ''))
             .join(newLine);
         
+        let scopedRefs = this
+            .scopedVars
+            .filter(x => !options.removeUnusedExports || x.dependents.length > 0) 
+            .map(x => `    ${x.ref}`)
+            .join(`,${newLine}`)
+            ;
+        
+        if (scopedRefs) {
+            scopedRefs = String.replace(scopedRefs, 0, 3, 'var');
+            scopedRefs += ';';
+            scopedContent = scopedRefs + newLine + scopedContent;
+        }
         
         let content = this.content;
         
@@ -128,19 +145,23 @@ export class ModuleFile {
             content = String.replace(content, x.position, x.length, '');
         });
         
+        // create var declaration
         let externalRefs = '';
         if (this.exports.length > 0) {
             externalRefs = this
                 .exports
                 .reverse()
                 .filter(x => {
+                    if (x.builder.movedToOuter) {
+                        return false;
+                    }
                     if (options.removeUnusedExports === false) {
                         return true;
                     }
                     if (x.dependents.length === 0) {
                         console.warn(`Module ${this.id} has unused export ${x.ref}`);
                         return false;
-                    }
+                    }                    
                     return true;
                 })
                 .map(x => {
@@ -173,9 +194,10 @@ export class ModuleFile {
                 externalRefs += ';';
             }
         }
-    
-        let indentScopedContent = `${u_makeIndent(scopedContent || '', '    ', io)}`;
-        let indentContent = `${u_makeIndent(content, '    ', io)}`; 
+        
+        const SPACE = '\t'
+        let indentScopedContent = `${u_makeIndent(scopedContent || '', SPACE, io)}`;
+        let indentContent = `${u_makeIndent(content, SPACE, io)}`; 
         let scopeLess = parents.length === 0 && options.wrapper !== 'iif';        
         
         content = [

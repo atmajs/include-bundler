@@ -72,6 +72,7 @@ export class ImportNode<T = ModuleFile> {
     exportAll: boolean;
     exportRefs: boolean;
     isCyclic: boolean;
+    isLazy: boolean
 }
 export class ExportNode {
     position: number
@@ -81,6 +82,20 @@ export class ExportNode {
     refs: string[]
     type: 'ref' | 'function' | 'named' | 'scoped'
     dependents: ModuleFile[] = []
+
+    builder = { movedToOuter: false }
+
+    clone () {
+        var node = new ExportNode();
+        node.position = this.position;
+        node.length = this.length;
+        node.str = this.str;
+        node.ref = this.ref;
+        node.refs = this.refs;
+        node.type = this.type;
+        node.dependents = this.dependents;
+        return node;
+    }
 
     hasExport (ref: string) {
         if (this.ref === ref) {

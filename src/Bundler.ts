@@ -35,8 +35,11 @@ export class Bundler extends class_EventEmitter {
 	}
 
 	constructor (path: string, opts: ISolutionOptions) {
-		super();
-		this.solution = new Solution(path, opts);
+        super();
+        
+        (global as any).__$bundler = this;
+        
+        this.solution = new Solution(path, opts);        
 	}
 
 	getResourceTree (opts?) {

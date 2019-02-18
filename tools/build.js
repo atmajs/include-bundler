@@ -8,10 +8,10 @@ build();
 
 
 function build () {
-    const file = lib === 'api' ? 'src/api.ts' : 'src/cli.ts'
+    const file = lib === 'api' ? '/src/api.ts' : '/src/cli.ts'
 	const options = {
         type: 'js',
-        outputMain: lib === 'api' ? 'lib/bundler.js' : 'lib/cli.js',
+        outputMain: lib === 'api' ? './lib/bundler.js' : './lib/cli.js',
         middlewares: {
             'ts': ['atma-io-middleware-importer:read', 'atma-loader-ts:read'],
             'js': ['atma-io-middleware-importer:read']

@@ -7,7 +7,6 @@ import * as assert from 'assert'
 import { Resource } from '../class/Resource';
 import { Configuration } from '../config/Configuration';
 import { Solution } from '../class/Solution';
-import { IDependency, IDependencies } from '../class/IDependency';
 import { color } from '../utils/color';
 import { ResourceInfo, ResourceType } from '../class/ResourceInfo';
 

@@ -70,6 +70,10 @@ export namespace Runner {
         validate(config);
         let path = config.file,
             opts = config;
+
+        //** Caution: rewrite passing options to middleware not via globals */
+        (global as any).config = (config as any).settings;
+
         if (opts.middlewares) {
             Bundler.Config.define('middlewares', opts.middlewares);
         }
