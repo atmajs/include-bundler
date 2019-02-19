@@ -52,7 +52,12 @@ export function path_normalize(path) {
 		.replace(/^\.\//, '')
 		// join 'xx/./xx'
 		.replace(/\/\.\//g, '/')
-		;
+        ;
+    
+    // use triple slashes by file protocol
+    if (/^file:\/\/[^\/]/.test(path_)) {
+        path_ = path_.replace('file://', 'file:///');
+    }
 	return path_collapse(path_);
 };
 export function path_resolveUrl(path, base) {
