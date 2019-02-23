@@ -148,6 +148,20 @@ export class ModuleFile {
         // create var declaration
         let externalRefs = '';
         if (this.exports.length > 0) {
+            this
+                .exports
+                .filter(x => {
+                    return x.dependents.length > 0 || options.removeUnusedExports === false;
+                })
+                .forEach(x => {
+                    /** Remove local scoped var declaration and make it global scoped */                    
+                    if (x.type === 'scoped') {
+                        let rgx = new RegExp(`\\b(var|let|const|function)\\s+${x.ref}`);
+                        content = content.replace(rgx, x.ref);
+                    }
+                    return x;
+                });
+
             externalRefs = this
                 .exports
                 .reverse()
@@ -163,15 +177,7 @@ export class ModuleFile {
                         return false;
                     }                    
                     return true;
-                })
-                .map(x => {
-                    /** Remove local scoped var declaration and make it global scoped */
-                    if (x.type === 'scoped') {
-                        let rgx = new RegExp(`\\b(var|let|const|function)\\s+${x.ref}`);
-                        content = content.replace(rgx, x.ref);
-                    }
-                    return x;
-                })
+                })                
                 .filter(x => {
                     let exportInOuter = parents
                         .some(p => {
