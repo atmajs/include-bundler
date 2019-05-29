@@ -1,6 +1,7 @@
 import * as config from 'appcfg'
 import { Runner } from './Runner';
 
+
 export = function run () {
     Config
         .load()

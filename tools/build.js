@@ -31,6 +31,7 @@ function build () {
             "assert",
             "maskjs",
             "atma-io",
+            "atma-class",
             "atma-logger",
             "appcfg",
             "cheerio",
