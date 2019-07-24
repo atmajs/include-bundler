@@ -46,10 +46,10 @@ function nodeModuleResolve(path, location_){
 	var current = location;
 	var root_ = current + '/node_modules/' + name + '/';
 	while (true)  {
-		var nodeModules = current + '/node_modules/' + name + '/';
+		var nodeModules = path_combine(current, '/node_modules/' + name + '/');
 		var pckg = nodeModules + 'package.json';
 		if (io.File.exists(pckg) === false) {
-			var next = current.replace(/[^\/\\]+$/, '');
+			var next = current.replace(/[^\/\\]+[\/\\]?$/, '');
 			if (next === current) {
 				return root_ + 'package.json';
 			}

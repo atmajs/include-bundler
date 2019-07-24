@@ -20,7 +20,7 @@ export class MaskParser extends BaseParser {
 		this._forEachImports(ast, imports => {
 			arr.push(...imports);
 		});		
-		return async_resolve({ dependencies: arr }) as PromiseLike<{dependencies: ResourceInfo[]}>;
+		return async_resolve({ dependencies: arr }) as PromiseLike<ResourceInfo>;
 	}
 
 	accepts (type) {

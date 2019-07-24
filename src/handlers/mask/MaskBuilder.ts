@@ -2,6 +2,7 @@ import { BaseBuilder } from '../base/BaseBuilder';
 import { OutputItem } from '../../class/OutputResources';
 import { ResourceInfo } from '../../class/ResourceInfo';
 import { Resource } from '../../class/Resource';
+import { MaskScriptable } from './MaskScriptable';
 export class MaskBuilder extends BaseBuilder {
 
 	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
@@ -31,6 +32,11 @@ export class MaskBuilder extends BaseBuilder {
 	}
 
 	buildRoot (resource: Resource, dependencies: Resource[]) {
+        if (this.solution.opts.package.type === 'bundle') {
+            let scriptable = new MaskScriptable(this.solution);
+            resource.content = scriptable.convert(resource.content, resource, dependencies)
+            return;
+        }
 
 		var maskDeps = dependencies.filter(x => x.type === 'mask');
 

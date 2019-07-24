@@ -143,7 +143,8 @@ export class SolutionOpts extends SolutionOptsBase {
 				moduleWrapper: 'iif',
 				moduleWrappers: ['umd', 'iif', 'script', 'custom'],
                 moduleName: '',
-                import: null
+                import: null,
+                
 			},
 			extensions: {
 				'': { type: 'js'},

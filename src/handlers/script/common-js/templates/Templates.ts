@@ -16,6 +16,9 @@ export const Templates = {
 	UMD: `
 // import ./UMD.js
 `,
+    Style: `
+// import ./Style.js
+`,
 	load (path: string) {
 		let template = io.File.read(path);
 		if (!template) {

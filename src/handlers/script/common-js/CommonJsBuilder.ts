@@ -4,6 +4,8 @@ import { Solution } from '../../../class/Solution';
 import { Templates } from './templates/Templates';
 import { BaseScriptBuilder } from '../base/BaseScriptBuilder';
 import { Resource } from '../../../class/Resource';
+import { OutputResources, OutputItem } from '../../../class/OutputResources';
+import { template_stringifyContent, template_interpolate } from '../../../utils/template';
 
 export class CommonJsBuilder extends BaseScriptBuilder {
 
@@ -65,12 +67,18 @@ export class CommonJsBuilder extends BaseScriptBuilder {
 			.replace('%ROOT_DIR%', () => mainUrl);
 	}
 
-	buildRoot (root, outputDependencies) {
+	buildRoot (root: Resource, outputDependencies: Resource[]) {
 		outputDependencies.forEach(x => x.embed = true);
 
-		var content = this.getRootContent(root, outputDependencies);
-		var body = outputDependencies
-			.map(x => x.content)
+		let content = this.getRootContent(root, outputDependencies);
+		let body = outputDependencies
+			.map(x => {
+                let content = x.content;
+                if (x.type === 'css') {
+                    content = template_interpolate(Templates.Style, { body: template_stringifyContent(content), url: x.url });
+                }
+                return content;
+            })
 			.concat([ content ])
 			.join('\n');
 
