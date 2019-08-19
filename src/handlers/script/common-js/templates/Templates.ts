@@ -19,6 +19,9 @@ export const Templates = {
     Style: `
 // import ./Style.js
 `,
+    Mask: `
+// import ./Mask.js
+`,
 	load (path: string) {
 		let template = io.File.read(path);
 		if (!template) {
