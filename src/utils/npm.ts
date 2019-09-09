@@ -15,7 +15,7 @@ export namespace Npm {
             if (io.File.exists(pckg)) {
                 let json = io.File.read(pckg);
                 if (json) {
-                    return combineMain(currentLocation, json.main);
+                    return combineMain(dirname, json.main);
                 }
             }
             let next = currentLocation.replace(/[^\/]+\/?$/, '');
