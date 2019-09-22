@@ -76,7 +76,7 @@
     },
     "devDependencies": {
         "@types/node": "^8.5.2",
-        "atma": "^0.11.7",
+        "atma": "^0.12.7",
         "atma-io-middleware-importer": "^1.1.34",
         "selenium-query": "^0.50.35",
         "tslib": "^1.9.3"
