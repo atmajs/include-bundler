@@ -121,6 +121,11 @@ export class Resource {
         if (Include.PathResolver.isNpm(includeData.url)) {
             this.aliases.push(includeData.url);
             url = Npm.resolveAppUrl(includeData.url, parent && parent.location, solution.opts.base);
+
+            if (url == null) {
+                // Fix. `resolveAppUrl` returns undefined on native nodejs modules
+                url = includeData.url;
+            }
         }
 
         this.hash = path_sliceHash(url);
