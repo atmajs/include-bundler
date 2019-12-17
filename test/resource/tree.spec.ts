@@ -1,3 +1,6 @@
+import { TestHelper } from '../TestHelper';
+import { Bundler } from '../../src/Bundler'
+
 var Files =  {
 	'foo-include.js': `
 		include.js('./folder/bar-commonjs.js');

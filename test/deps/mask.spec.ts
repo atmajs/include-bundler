@@ -1,3 +1,6 @@
+import { Bundler } from '../../src/Bundler'
+import { class_Dfr } from 'atma-utils'
+
 UTest({
 	'should parse imports' : {
 		'should parse mask, js and css imports' () {
@@ -23,8 +26,8 @@ UTest({
 });
 
 function parse (code, expect) {
-	var dfr = new Class.Deferred();
-	Bundler.Parser.getDependencies(code, 'mask').then(result => {
+	var dfr = new class_Dfr();
+	Bundler.Parser.getDependencies(code, { type: 'mask' }).then(result => {
 		var deps = result.dependencies;
 		eq_(deps.length, expect.length)
 

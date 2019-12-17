@@ -1,3 +1,5 @@
+import { TestHelper } from '../TestHelper';
+import { Bundler } from '../../src/Bundler'
 
 UTest({
 	$before () {
@@ -93,7 +95,7 @@ UTest({
 					var iFoo = arr[2].content.indexOf('"main_foo.js"');
 					var iBar = arr[2].content.indexOf('"main_bar.js"');
 
-					assert.lt_(iFoo, iBar);
+					(assert as any).lt_(iFoo, iBar);
 				});
 		}
 	},

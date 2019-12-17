@@ -8,8 +8,8 @@
     },
     "scripts": {
         "test": "atma test",
-        "watch": "atma custom tools/build --watch",
-        "build": "atma custom tools/build && atma custom tools/build --cli",
+        "watch": "atma run tools/build --watch",
+        "build": "atma run tools/build && atma run tools/build --cli",
         "release": "atma bump && npm run build && git add -A && git commit -am \"bump\" && npm publish && git push",
         "server": "atma server"
     },
@@ -39,7 +39,7 @@
         "atma-logger": "^1.0.2",
         "atma-utils": "^0.1.13",
         "cheerio": "^0.20.0",
-        "includejs": "^0.15.13",
+        "includejs": "^0.15.32",
         "maskjs": "^0.64.41",
         "uglify-es": "^3.3.0"
     },
@@ -54,11 +54,18 @@
                     "js": "ts"
                 }
             },
+            "io": {
+                "extensions": {
+                    "js": [
+                        "atma-io-middleware-importer:read"
+                    ],
+                    "ts": [
+                        "atma-io-middleware-importer:read",
+                        "atma-loader-ts:read"
+                    ]
+                }
+            },
             "atma-loader-ts": {
-                "extensions": [
-                    "ts",
-                    "test"
-                ],
                 "typescript": {
                     "compilerOptions": {
                         "noEmitHelpers": true,

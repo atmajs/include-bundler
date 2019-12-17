@@ -1,8 +1,10 @@
+import { Directory } from 'atma-io'
+
 const OUTPUT_DIR = 'test/cli/fixtures/build/';
 
 UTest({
     $before () {
-        io.Directory.remove(OUTPUT_DIR)
+        Directory.remove(OUTPUT_DIR)
     },
     'should run builder' (done) {
 

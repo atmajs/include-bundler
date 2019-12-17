@@ -1,3 +1,7 @@
+import { TestHelper } from '../TestHelper'
+import { Bundler } from '../../src/Bundler'
+import { File } from 'atma-io'
+
 var Files =  {
 	'main.mask': `
 		import Letter from './compos/Letter';
@@ -296,8 +300,8 @@ UTest({
 				]);
 
 				var styles = [
-					io.File.read('button.css'),
-					io.File.read('compos/clickable.css')
+					File.read('button.css'),
+					File.read('compos/clickable.css')
 				].join('\n');
 
 				eq_(resources[0].content, styles);

@@ -1,3 +1,5 @@
+import { Bundler } from '../../src/Bundler'
+
 UTest({
 	'should parse single commonjs' () {
         let code = `

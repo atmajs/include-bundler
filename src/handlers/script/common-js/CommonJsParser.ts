@@ -6,54 +6,52 @@ import { ResourceInfo } from '../../../class/ResourceInfo';
 
 export class CommonJsParser extends BaseParser {
 
-	getDependencies (ast, ownerResource) {
-		
-		let info = {
-			dependencies: []
-		};
+    getDependencies(ast, ownerResource) {
+        let info = {
+            dependencies: []
+        };
+        AstUtil.each(ast, AstUtil.is.commonJsFunction, (node, descend) => {
+            let scope = node.scope || ast;
+            let deps = this._process(node, scope);
+            if (deps) {
+                info.dependencies.push(...deps);
+            }
+            return true;
+        });
 
-		AstUtil.each(ast, AstUtil.is.commonJsFunction, (node, descend) => {
-			let scope = node.scope || ast;
-			let deps = this._process(node, scope);
-			if (deps) {
-				info.dependencies.push(...deps);
-			}
-			return true;
-		});
+        info.dependencies.forEach(x => x.module = 'commonjs');
+        return new class_Dfr().resolve(info) as PromiseLike<ResourceInfo>;
+    }
 
-		info.dependencies.forEach(x => x.module = 'commonjs');
-		return new class_Dfr().resolve(info) as PromiseLike<ResourceInfo>;
-	}
+    _process(node, scope) {
+        if (node.args.length !== 1) {
+            return null;
+        }
 
-	_process (node, scope) {
-		if (node.args.length !== 1) {
-			return null;
-		}
+        let args = AstUtil.getArguments(node.args, scope);
+        let include = new Include();
+        let path = args[0];
+        if (typeof path !== 'string') {
+            throw new Error('Path should be a string: ' + path);
+        }
+        if (this._isNodeJsNative(path)) {
+            //@TODO: Should we provide the shims for browser builds?
+            return null;
+        }
+        let groups = Include.groupByType([path], this.solution.opts);
+        for (let type in groups) {
+            include[type].apply(include, groups[type]);
+        }
+        let includes = include.includes;
+        includes.forEach((x, i) => {
+            let arg = node.args[i];
 
-		let args = AstUtil.getArguments(node.args, scope);
-		let include = new Include();
-		let path = args[0];
-		if (typeof path !== 'string') {
-			throw new Error('Path should be a string: ' + path);
-		}
-		if (this._isNodeJsNative(path)) {
-			//@TODO: Should we provide the shims for browser builds?
-			return null;
-		}
-		let groups = Include.groupByType([ path ], this.solution.opts);
-		for(let type in groups) {
-			include[type].apply(include, groups[type]);
-		}
-		let includes = include.includes;
-		includes.forEach((x, i) => {
-			let arg = node.args[i];
+            x.pos = arg.start.pos;
+        })
+        return include.includes;
+    }
 
-			x.pos = arg.start.pos;
-		})
-		return include.includes;
-	}
-
-	_isNodeJsNative (path) {
-		return false;
-	}
+    _isNodeJsNative(path) {
+        return false;
+    }
 };

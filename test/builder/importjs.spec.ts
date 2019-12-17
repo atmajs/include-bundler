@@ -1,8 +1,6 @@
 import { TestHelper } from '../TestHelper'
 import { Bundler } from '../../src/Bundler'
 
-declare var UTest, eq_, deepEq_, has_;
-
 var Files =  {
     'a.js': `
         import './b'
@@ -204,19 +202,20 @@ UTest({
         let content = `import './b'; \nimport './lf';`;        
         let code = await Helpers.$process(content);
         let letters = Helpers.$extractLetters(code);
-        deepEq_(letters, ['d', 'e', 'b', 'f']);
+        deepEq_(letters, ['e', 'd', 'b', 'f']);
 
         let expect = `
             (function(){
-                var D;
-                (function(){
-                    D = '[d]'
-                }());
+                var D,
+                    D;
                 var B;
                 (function(){
                     var E;
                     (function(){
                         E = '[e]'
+                    }());
+                    (function(){
+                        D = '[d]'
                     }());
                     B = '[b]'
                 }());
@@ -270,13 +269,13 @@ UTest({
             let code = await Helpers.$process(content);
             let expect = `
                 (function(){
-                    var Bar;
-                    (function(){
-                        Bar = '[bar]'
-                    }());
                     var Foo;
                     (function(){                
                         Foo = '[foo]'
+                    }());
+                    var Bar;
+                    (function(){
+                        Bar = '[bar]'
                     }());
                 }());
             `;

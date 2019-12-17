@@ -15,7 +15,7 @@ import { HandlersUtils } from './HandlersUtils';
 import { ResourceInfo, ResourceMeta, ResourceType } from './ResourceInfo';
 import { Npm } from '../utils/npm';
 
-
+debugger;
 export class Resource {
 
     resources: Resource[] = []

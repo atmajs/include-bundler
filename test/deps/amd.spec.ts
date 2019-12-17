@@ -1,3 +1,6 @@
+import { Bundler } from '../../src/Bundler'
+import { class_Dfr } from 'atma-utils'
+
 UTest({
 	'should parse defines' : {
 		'should parse single amd' () {
@@ -43,7 +46,7 @@ UTest({
 });
 
 function parse (code, expect) {
-	var dfr = new Class.Deferred();
+	var dfr = new class_Dfr();
 	Bundler.Parser.getDependencies(code).then(result => {
 		var deps = result.dependencies;
 		

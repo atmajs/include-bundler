@@ -1,3 +1,6 @@
+import { TestHelper } from '../TestHelper';
+import { Bundler } from '../../src/Bundler'
+
 var Files =  {
 	'root.js': `
 		include

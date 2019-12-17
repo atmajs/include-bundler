@@ -15,187 +15,187 @@ import { Builder } from './builder/Builder';
 import { color } from './utils/color';
 
 export class Bundler extends class_EventEmitter {
-	solution: Solution
+    solution: Solution
 
-	static clearCache() {
-		Loader.clearCache();
+    static clearCache() {
+        Loader.clearCache();
 
-		if (io.File.middleware) {
-			for (let key in io.File.middleware) {
-				let midd = io.File.middleware[key];
-				if (midd.clearTemp) {
-					midd.clearTemp();
-				}
-			}
-		}
-		return Bundler;
-	}		
-	static get Config () {
-		return Configuration.Instance;
-	}
+        if (io.File.middleware) {
+            for (let key in io.File.middleware) {
+                let midd = io.File.middleware[key];
+                if (midd.clearTemp) {
+                    midd.clearTemp();
+                }
+            }
+        }
+        return Bundler;
+    }
+    static get Config() {
+        return Configuration.Instance;
+    }
 
-	constructor (path: string, opts: ISolutionOptions) {
+    constructor(path: string, opts: ISolutionOptions) {
         super();
-        
+
         (global as any).__$bundler = this;
-        
-        this.solution = new Solution(path, opts);        
-	}
 
-	getResourceTree (opts?) {
-		var solution = this.solution,
-			type = solution.opts.type,
-			path = solution.path;
-			
-		return Loader
-			.load(type, path, opts, solution)
-			.then(x => x.toJSON());
-	}
+        this.solution = new Solution(path, opts);
+    }
 
-	static getResourceTree(path: string, opts: ISolutionOptions) {
-		return new Bundler(path, opts).getResourceTree();
-	}
+    getResourceTree(opts?) {
+        var solution = this.solution,
+            type = solution.opts.type,
+            path = solution.path;
 
-	getResources (opts?) {
-		var solution = this.solution,
-			type = solution.opts.type,
-			path = solution.path;
-		
-		return Loader.load(type, path, opts, solution).then(resource => {
-			return res_flattern(resource).map(x => x);
-		});
-	}
-	static getResources(path, opts) {
-		return new Bundler(path, opts).getResources();
-	}
+        return Loader
+            .load(type, path, opts, solution)
+            .then(x => x.toJSON());
+    }
 
-	build (opts) {
-		var solution = this.solution,
-			type = solution.opts.type,
-			path = solution.path,
-			shouldRebuild = false,
-			isBuilding = false,
-			isRebuilding = false,
-			rootResource = null,
-			self = this;
+    static getResourceTree(path: string, opts: ISolutionOptions) {
+        return new Bundler(path, opts).getResourceTree();
+    }
 
-		
-		function build(resource) {
-			isBuilding = true;
-			var resources = res_flattern(resource);				
-			return tree_async({
-				resources,
-				reporter: solution.reporter,
-				action: () => 
-					Builder.build(resources, solution),
-				message: (treeInfo, seconds) => 
-					color(`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`)
-			}).done(buildComplete).fail(buildFailed);
-		}
-		function buildComplete (resources) {
-			isBuilding = false;
-			if (shouldRebuild) {
-				shouldRebuild = false;
-				isRebuilding = true;
-				build(rootResource);
-				return;
-			}
-			if (isRebuilding) {
-				isRebuilding = false;
-				self.emit('rebuild', resources);
-			}
-		}
-		function buildFailed (error) {
-			isBuilding = false;
-			if (isRebuilding) {
-				solution.reporter.error(color('red<Build Failed>'));
-				solution.reporter.error(error);
-				isRebuilding = false;
-			}				
-			if (shouldRebuild) {
-				shouldRebuild = false;
-				isRebuilding = true;
-				build(rootResource);
-				return;	
-			}
-		}
-		function rebuild() {
-			if (isBuilding) {
-				shouldRebuild = true;
-				return;
-			}
-			isRebuilding = true;
-			solution.iteration = {};
-			build(rootResource);
-		}
-		function start () {
-			return Loader
-				.load(type, path, opts, solution)
-				.then(resource => {
-					rootResource = resource;
-					if (opts && opts.watch === true) {
-						Watcher
-							.watch(resource, solution)
-							.on('changed', rebuild);
-					}
-					return build(resource)
-						.then((result) => solution.onBuildReady(result))
-						.then((result) => solution.runScripts('postbuild', result))
-				});
-		}
-		return solution
-			.runScripts('prebuild')
-			.then(start);			
-	}
+    getResources(opts?) {
+        var solution = this.solution,
+            type = solution.opts.type,
+            path = solution.path;
 
-	static build (path: string, opts: ISolutionOptions) {
-		return new Bundler(path, opts).build(opts);
-	}
+        return Loader.load(type, path, opts, solution).then(resource => {
+            return res_flattern(resource).map(x => x);
+        });
+    }
+    static getResources(path, opts) {
+        return new Bundler(path, opts).getResources();
+    }
 
-	static process (path: string, opts: ISolutionOptions) {
-		var bundler = new Bundler(path, opts);
-		var solution = bundler.solution;
+    build(opts?) {
+        var solution = this.solution,
+            type = solution.opts.type,
+            path = solution.path,
+            shouldRebuild = false,
+            isBuilding = false,
+            isRebuilding = false,
+            rootResource = null,
+            self = this;
 
-		function builderComplete (resources) {
-			resources.forEach(res => {
-				io.File.write(res.filename, res.content);
-			});
-			return solution
-				.assetsManager
-				.flush()
-				.then(() => {
-					return Promise.resolve(solution) 
-				});
-		}
-		if (opts && opts.watch === true) {
-			bundler.on('rebuild', builderComplete);
-		}			
-		return bundler
-			.build(opts)
-			.then(builderComplete);
-	}
 
-	defineMiddleware (name, fn) {
-		_middlewares.define(name, fn);
-	}
+        function build(resource) {
+            isBuilding = true;
+            var resources = res_flattern(resource);
+            return tree_async({
+                resources,
+                reporter: solution.reporter,
+                action: () =>
+                    Builder.build(resources, solution),
+                message: (treeInfo, seconds) =>
+                    color(`Created bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`)
+            }).done(buildComplete).fail(buildFailed);
+        }
+        function buildComplete(resources) {
+            isBuilding = false;
+            if (shouldRebuild) {
+                shouldRebuild = false;
+                isRebuilding = true;
+                build(rootResource);
+                return;
+            }
+            if (isRebuilding) {
+                isRebuilding = false;
+                self.emit('rebuild', resources);
+            }
+        }
+        function buildFailed(error) {
+            isBuilding = false;
+            if (isRebuilding) {
+                solution.reporter.error(color('red<Build Failed>'));
+                solution.reporter.error(error);
+                isRebuilding = false;
+            }
+            if (shouldRebuild) {
+                shouldRebuild = false;
+                isRebuilding = true;
+                build(rootResource);
+                return;
+            }
+        }
+        function rebuild() {
+            if (isBuilding) {
+                shouldRebuild = true;
+                return;
+            }
+            isRebuilding = true;
+            solution.iteration = {};
+            build(rootResource);
+        }
+        function start() {
+            return Loader
+                .load(type, path, opts, solution)
+                .then(resource => {
+                    rootResource = resource;
+                    if (opts && opts.watch === true) {
+                        Watcher
+                            .watch(resource, solution)
+                            .on('changed', rebuild);
+                    }
+                    return build(resource)
+                        .then((result) => solution.onBuildReady(result))
+                        .then((result) => solution.runScripts('postbuild', result))
+                });
+        }
+        return solution
+            .runScripts('prebuild')
+            .then(start);
+    }
 
-	static get Parser () {
-		return { 
-			getDependencies (content, opts: ISolutionOptions = { type : 'js'}) {
-				if (typeof opts === 'string') opts = { type: opts };
+    static build(path: string, opts: ISolutionOptions) {
+        return new Bundler(path, opts).build(opts);
+    }
 
-				var solution = new Solution('', opts);
-				var resource = new Resource({ type: opts.type, content: content}, null, solution);
-				return Parser.getDependencies(resource, solution);
-			}
-		}
-	}
+    static process(path: string, opts: ISolutionOptions) {
+        var bundler = new Bundler(path, opts);
+        var solution = bundler.solution;
 
-	static get io () {
-		return io;
-	}
+        function builderComplete(resources) {
+            resources.forEach(res => {
+                io.File.write(res.filename, res.content);
+            });
+            return solution
+                .assetsManager
+                .flush()
+                .then(() => {
+                    return Promise.resolve(solution)
+                });
+        }
+        if (opts && opts.watch === true) {
+            bundler.on('rebuild', builderComplete);
+        }
+        return bundler
+            .build(opts)
+            .then(builderComplete);
+    }
 
-	static get AssetsManager () { return AssetsManager }
-	static get Resource () { return Resource }
-	static get Solution () { return Solution }		
+    defineMiddleware(name, fn) {
+        _middlewares.define(name, fn);
+    }
+
+    static get Parser() {
+        return {
+            getDependencies(content, opts: ISolutionOptions = { type: 'js' }) {
+                if (typeof opts === 'string') opts = { type: opts };
+
+                var solution = new Solution('', opts);
+                var resource = new Resource({ type: opts.type, content: content }, null, solution);
+                return Parser.getDependencies(resource, solution);
+            }
+        }
+    }
+
+    static get io() {
+        return io;
+    }
+
+    static get AssetsManager() { return AssetsManager }
+    static get Resource() { return Resource }
+    static get Solution() { return Solution }
 };

@@ -6,6 +6,7 @@ import { BaseScriptBuilder } from '../base/BaseScriptBuilder';
 import { Resource } from '../../../class/Resource';
 import { OutputResources, OutputItem } from '../../../class/OutputResources';
 import { template_stringifyContent, template_interpolate } from '../../../utils/template';
+import { ModuleWrapper } from './ModuleWrapper';
 
 export class CommonJsBuilder extends BaseScriptBuilder {
 
@@ -25,10 +26,10 @@ export class CommonJsBuilder extends BaseScriptBuilder {
         if (resource.type !== 'js') {
             return false;
         }
-        var module = resource.getModule();
-        if (module == null || module === 'root')
+        let module = resource.getModule();
+        if (module == null || module === 'root') {
             module = this.solution.opts.package.module;
-
+        }
         return module === 'commonjs';
     }
 
@@ -86,51 +87,11 @@ export class CommonJsBuilder extends BaseScriptBuilder {
             .join('\n');
 
 
-        var wrapper = this.solution.opts.package.moduleWrapper;
-        switch (wrapper) {
-            case 'iif':
-                body = this.wrapWithIIF(body);
-                break;
-            case 'umd':
-                body = this.wrapWithUMD(body);
-                break;
-            case 'custom':
-                body = this.wrapWithCustom(body);
-                break;
-            case 'script':
-                break;
-            default:
-                throw new Error('Uknown module wrapper: ' + wrapper);
-        }
-
-        root.content = body;
+        var wrapper = new ModuleWrapper(this.solution);
+        root.content = wrapper.wrap(body);
     }
 
     getRootContent(root, outputDependencies?) {
         return root.content;
-    }
-
-    wrapWithIIF(body) {
-        return Templates
-            .RootModule
-            .replace('%BUNDLE%', () => body);
-    }
-
-    wrapWithUMD(body) {
-        var opts = this.solution.opts.package;
-        var name = opts.moduleName || '';
-        return Templates
-            .UMD
-            .replace('%MODULE%', () => body)
-            .replace('%NAME%', () => name)
-            ;
-    }
-    wrapWithCustom(body) {
-        let opts = this.solution.opts.package;
-        let template = Templates.load(opts.moduleWrapperCustomPath);
-
-        return template
-            .replace('/**MODULE**/', () => body)
-            ;
     }
 };

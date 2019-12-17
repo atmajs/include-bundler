@@ -1,3 +1,7 @@
+import { Bundler } from '../../src/Bundler'
+import { TestHelper } from '../TestHelper';
+import { class_Dfr } from 'atma-utils'
+
 UTest({
 	'should parse imports' : {
 		'should parse script and styles from html' () {
@@ -98,9 +102,8 @@ UTest({
 	}
 });
 
-function parse (code, expect, opts) {
-	var dfr = new Class.Deferred();
-	opts = opts || {};
+function parse (code, expect, opts: any = {}) {
+	var dfr = new class_Dfr();
 	opts.type = 'html';
 	Bundler.Parser.getDependencies(code, opts).then(result => {
 		var deps = result.dependencies;

@@ -19,10 +19,12 @@ export class ScriptParser extends BaseParser {
 
 	
 	getDependencies (content, ownerResource) {
+        if (!content) {
+            throw new Error(`Content is undefined for ${ownerResource.filename}`);
+        }
 		let opts = {
 			filename: ownerResource.filename
         };
-
         let asTextDfrs = this
             .parsers
             .filter(x => x.asText === true)

@@ -1,3 +1,6 @@
+import { Bundler } from '../../src/Bundler'
+import { class_Dfr } from 'atma-utils'
+
 UTest({
 	'should parse single include' () {
 		return parse(`include.js("foo")`, [ 
@@ -34,7 +37,7 @@ UTest({
 });
 
 function parse (code, expect) {
-	var dfr = new Class.Deferred();
+	var dfr = new class_Dfr();
 	Bundler.Parser.getDependencies(code).then(result => {
 		var deps = result.dependencies;
 		eq_(deps.length, expect.length)

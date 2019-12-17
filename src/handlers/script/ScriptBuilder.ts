@@ -45,8 +45,9 @@ export class ScriptBuilder extends BaseBuilder {
 
 	buildRoot (resource: Resource, dependencies) {
 		var builder = this.builders.find(x => x.accepts(resource));
-		if (builder == null)
-			throw new Error('Root Builder not found for ' + resource.url);
+		if (builder == null) {
+            throw new Error(`Root Builder not found for ${resource.url} (${resource.getModule()})`);
+        }
 
 		return builder.buildRoot(resource, dependencies);
 	}
