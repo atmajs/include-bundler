@@ -2,7 +2,7 @@ import { path_combine } from './path';
 import { io } from '../global'
 
 export namespace Npm {
-    export function resolveAppUrl (path, currentLocation, base) {
+    export function resolveAppUrl (path: string, currentLocation: string, base: string) {
         
         let name = /^(@?[^\\\/]+)/.exec(path)[0];
         let resource = path.substring(name.length + 1);
@@ -15,7 +15,14 @@ export namespace Npm {
             if (io.File.exists(pckg)) {
                 let json = io.File.read(pckg);
                 if (json) {
-                    return combineMain(dirname, json.main);
+                    let filename = combineMain(dirname, json.main);
+                    if (base) {
+                        let relative = io.env.currentDir.toRelativeString(base);
+                        if (relative) {
+                            filename = path_combine(relative, filename);
+                        }
+                    }
+                    return filename;
                 }
             }
             let next = currentLocation.replace(/[^\/]+\/?$/, '');
