@@ -1,6 +1,6 @@
 {
     "name": "app-bundler",
-    "version": "0.0.80",
+    "version": "0.0.81",
     "description": "",
     "main": "lib/bundler.js",
     "bin": {
@@ -10,8 +10,8 @@
         "test": "atma test",
         "watch": "atma run tools/build --watch",
         "build": "atma run tools/build && atma run tools/build --cli",
-        "release": "atma bump && npm run build && git add -A && git commit -am \"bump\" && npm publish && git push",
-        "server": "atma server"
+        "server": "atma server",
+        "release": "echo \"Run atma pub -m \"message\"\""
     },
     "repository": {
         "type": "git",

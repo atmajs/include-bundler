@@ -1,5 +1,7 @@
 var %VAR_ID%;
 (function () {
+    // ensure AMD is not active for the model, so that any UMD exports as commonjs
+    var define = null;
 	var exports = {};
 	var module = { exports: exports };
 	%MODULE%;
