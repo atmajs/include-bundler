@@ -17,6 +17,11 @@ export namespace Npm {
                 if (json) {
                     let filename = combineMain(dirname, json.main);
                     if (base) {
+                        if (base.endsWith('/') === false) {
+                            // Base path must be a folder
+                            base += '/';
+                        }
+                        // in-case CWD path is not equal to BASE path, make sure resolved FS module path is relative to BASE folder
                         let relative = io.env.currentDir.toRelativeString(base);
                         if (relative) {
                             filename = path_combine(relative, filename);

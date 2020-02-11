@@ -1,6 +1,6 @@
 {
     "name": "app-bundler",
-    "version": "0.0.79",
+    "version": "0.0.80",
     "description": "",
     "main": "lib/bundler.js",
     "bin": {
