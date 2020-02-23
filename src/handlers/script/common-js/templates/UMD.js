@@ -10,7 +10,6 @@
 
     if (typeof module === 'object' && module.exports) {
         module.exports = _module.exports;
-        return;
     }
 
     if (typeof define === 'function' && define.amd) {
