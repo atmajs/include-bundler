@@ -1,6 +1,6 @@
 {
     "name": "app-bundler",
-    "version": "0.0.84",
+    "version": "0.0.85",
     "description": "",
     "main": "lib/bundler.js",
     "bin": {
@@ -40,7 +40,7 @@
         "atma-logger": "^1.0.2",
         "atma-utils": "^0.1.13",
         "cheerio": "^0.20.0",
-        "includejs": "^0.15.37",
+        "includejs": "^0.15.41",
         "maskjs": "^0.64.41",
         "uglify-es": "^3.3.0"
     },
