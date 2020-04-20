@@ -70,4 +70,15 @@ export class Solution extends class_EventEmitter {
         }
         return result;
     }
+
+    mapUrl(url: string): string {
+        let maps = this.opts.rewrites;
+        if (maps == null) {
+            return url;
+        }
+        if (url in maps) {
+            return maps[url];
+        }
+        return url;
+    }
 };

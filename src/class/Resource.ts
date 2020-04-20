@@ -105,15 +105,15 @@ export class Resource {
             includeData.url = solution.opts.mappings[includeData.url];
         }
 
-        var url;
-        
-        var pathResolver = HandlersUtils.findPathResolver(solution.handlers, includeData);
+        let url: string;
+
+        let pathResolver = HandlersUtils.findPathResolver(solution.handlers, includeData);
         if (pathResolver) {
             url = pathResolver.resolve(includeData, parent || {
                 location: solution.opts.base
             });
         }
-        if (url == null) {            
+        if (url == null) {
             url = Include.PathResolver.resolveBasic(includeData.url, includeData.type, parent || {
                 location: solution.opts.base
             });
@@ -127,6 +127,8 @@ export class Resource {
                 url = includeData.url;
             }
         }
+
+        url = this.solution.mapUrl(url);
 
         this.hash = path_sliceHash(url);
         if (this.hash) {

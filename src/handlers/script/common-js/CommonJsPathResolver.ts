@@ -64,7 +64,6 @@ function nodeModuleResolve(path, location_){
 		if (resource) {
 			return nodeModules + resource;
 		}
-		console.log(json.main, '>', path_combine(nodeModules, json.main))
 		if (json.main) {
 			return path_combine(nodeModules, json.main)
 		}		

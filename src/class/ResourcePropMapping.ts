@@ -7,7 +7,7 @@ export type ResourceMappingTransform = {
 	[P in keyof Resource]?:  Resource[P] | ((value: Resource[P]) => Resource[P])
 }
 
-export class ResourceMapping {
+export class ResourcePropMapping {
 	constructor (public resA: ResourceMappingMatch, public resB: ResourceMappingTransform) {
 		
 	}

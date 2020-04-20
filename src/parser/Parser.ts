@@ -6,6 +6,7 @@ import { Solution } from "../class/Solution";
 
 import * as assert from 'assert';
 import { ResourceInfo } from '../class/ResourceInfo';
+import { Resource } from '../class/Resource';
 
 export const Parser = {
 	getDependencies(resource, solution): PromiseLike<ResourceInfo> {
@@ -20,7 +21,8 @@ export const Parser = {
 			;
 
 		function _runMiddlewares(deps) {
-			getDependenciesExternal(deps, resource, solution)
+            getDependenciesExternal(deps, resource, solution)
+                .then((deps) => mapDeps(deps, solution))
 				.then((deps) => filterDynamicDeps(deps, solution))
 				.done(deps => dfr.resolve(deps))
 				.fail(error => dfr.reject(error))
@@ -30,7 +32,7 @@ export const Parser = {
 	}
 };
 
-function getDependenciesInternal(resource, solution) {
+function getDependenciesInternal(resource: Resource, solution: Solution) {
 	assert(typeof resource.url === 'string', 'Path is expected');
 
 	var ext = path_getExtension(resource.url);
@@ -55,4 +57,10 @@ function filterDynamicDeps(info, solution) {
 function isDynamicDependency(dep, solution) {
 	var arr = solution.opts.dynamicDependencies;
 	return arr.length !== 0 && arr.some(rgx => rgx.test(dep.url));
+}
+function mapDeps(info: ResourceInfo, solution: Solution) {
+    info.dependencies.forEach(dep => {
+        // @TODO do we need to map at this level?
+    })
+    return info;
 }

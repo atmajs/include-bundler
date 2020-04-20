@@ -1,6 +1,6 @@
 {
     "name": "app-bundler",
-    "version": "0.0.83",
+    "version": "0.0.84",
     "description": "",
     "main": "lib/bundler.js",
     "bin": {
@@ -36,6 +36,7 @@
         "appcfg": "^0.2.42",
         "atma-class": "^1.1.83",
         "atma-io": "^1.2.16",
+        "atma-loader-ts": "^1.1.12",
         "atma-logger": "^1.0.2",
         "atma-utils": "^0.1.13",
         "cheerio": "^0.20.0",
@@ -86,6 +87,6 @@
         "atma": "^0.12.7",
         "atma-io-middleware-importer": "^1.1.34",
         "selenium-query": "^0.50.35",
-        "tslib": "^1.9.3"
+        "tslib": "^1.11.1"
     }
 }

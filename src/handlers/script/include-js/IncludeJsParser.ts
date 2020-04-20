@@ -1,6 +1,6 @@
 import { AstUtil } from '../utils/AstUtil';
 import { Include } from '../../../class/Include';
-import { ResourceMapping } from '../../../class/ResourceMapping';
+import { ResourcePropMapping } from '../../../class/ResourcePropMapping';
 import { BaseParser } from "../../base/BaseParser";
 import { class_Dfr } from 'atma-utils';
 import { ResourceInfo } from '../../../class/ResourceInfo';
@@ -175,7 +175,7 @@ export class IncludeJsParser extends BaseParser {
 
 
 var IncludeJsMappings = [
-	new ResourceMapping({
+	new ResourcePropMapping({
 		asModules: (arr) => arr.indexOf('mask') > -1
 	}, {
 		asModules: (arr) => {
@@ -184,7 +184,7 @@ var IncludeJsMappings = [
 			return arr;
 		}
 	}),
-	new ResourceMapping({
+	new ResourcePropMapping({
 		asModules: (arr) => arr.indexOf('amd') > -1
 	}, {
 		asModules: (arr) => {
@@ -193,7 +193,7 @@ var IncludeJsMappings = [
 			return arr;
 		}
 	}),
-	new ResourceMapping({
+	new ResourcePropMapping({
 		type: 'mask'
 	}, {
 		type: 'load'

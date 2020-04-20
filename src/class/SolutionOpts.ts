@@ -1,5 +1,5 @@
 import { Solution } from './Solution';
-import { ResourceMapping } from './ResourceMapping';
+import { ResourcePropMapping } from './ResourcePropMapping';
 import { path_getExtension, path_toAbsolute, path_resolveCurrent, path_toRelative, path_combine } from "../utils/path";
 import { obj_getProperty } from 'atma-utils';
 import { Include } from './Include';
@@ -99,6 +99,7 @@ export class SolutionOptsBase {
     extensions: IExtensionTypes
     defaultExtensions: IDefaultExtension
     mappings: any
+    rewrites: { [appUrl: string]: string }
     middlewares: any
     varDefs: VarDefinitions
     parserIgnoreDependencies: (string | RegExp)[]
@@ -108,7 +109,7 @@ export class SolutionOptsBase {
     silent: boolean
     watch: boolean
     minify: boolean
-    mappers: ResourceMapping[] = []
+    mappers: ResourcePropMapping[] = []
     options?: IAdditionOptions = {}
     copyFiles: { [source: string]: string } = null;
 }
@@ -176,6 +177,7 @@ export class SolutionOpts extends SolutionOptsBase {
         },
         mappers: null,
         mappings: null,
+        rewrites: null,
         middlewares: null,
         varDefs: null,
         parserIgnoreDependencies: [
