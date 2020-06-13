@@ -28,9 +28,9 @@ export class MaskRewriter extends BaseRewriter {
 
 						x.path = currentUrl;//targetUrl;
 					});
-	
+
 			}
-			
+
 			var page = parser._getPageForNode(node.nodes[0]);
 			if (page == null) {
 				return;
@@ -41,17 +41,18 @@ export class MaskRewriter extends BaseRewriter {
 				.solution
 				.outputResources
 				.getForPage(page)
-				.sort((a, b) => {
-					if (a.type === b.type) {
-						return 0;
-					}
-					if (a.type === 'js') {
-						return 1;
-					}
+				.sort((x,y) => {
+					if (x.type === 'js') return 1;
+					if (y.type === 'js') return -1;
+					return 0;
+				})
+				.sort((x,y) => {
+					if (x.type === 'css') return -1;
+					if (y.type === 'css') return 1;
 					return 0;
 				})
 				.map(x => {
-					let url = x.url; //x.toRelative(ownerResource); 
+					let url = x.url; //x.toRelative(ownerResource);
 					return `import sync from '${url}';`
 				})
 				.join('');
@@ -63,7 +64,7 @@ export class MaskRewriter extends BaseRewriter {
 			return;
 		}
 		return mask.stringify(ast, {
-			indent: this.solution.opts.minify ? 0 : 4 
+			indent: this.solution.opts.minify ? 0 : 4
 		});
 	}
 

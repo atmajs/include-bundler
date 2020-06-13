@@ -5,7 +5,7 @@ import { Resource } from '../../class/Resource';
 import { MaskScriptable } from './MaskScriptable';
 export class MaskBuilder extends BaseBuilder {
 
-	createModule (outputItem: OutputItem, otherOutputItems: OutputItem[]) {
+	createModule(outputItem: OutputItem, otherOutputItems: OutputItem[]) {
 		var out = [], arr;
 
 		otherOutputItems.forEach(item => {
@@ -21,51 +21,61 @@ export class MaskBuilder extends BaseBuilder {
 			*/
 			//-let url = resource.toRelative(outputItem.resource);
 			let url = resource.url;
-			return `module path="${url}" { 
+			return `module path="${url}" {
 				${resource.content}
 			}`
 		});
 		out.push(...arr);
 
-		
+
 		outputItem.resource.content = out.join('\n');
 	}
 
-	buildRoot (resource: Resource, dependencies: Resource[]) {
-        if (this.solution.opts.package.type === 'bundle') {
-            let scriptable = new MaskScriptable(this.solution);
-            resource.content = scriptable.convert(resource.content, resource, dependencies)
-            return;
-        }
+	buildRoot(resource: Resource, dependencies: Resource[]) {
+		if (this.solution.opts.package.type === 'bundle') {
+			let scriptable = new MaskScriptable(this.solution);
+			resource.content = scriptable.convert(resource.content, resource, dependencies)
+			return;
+		}
 
 		var maskDeps = dependencies.filter(x => x.type === 'mask');
 
 		maskDeps.forEach(x => x.embed = true);
-		
+
 		var body = maskDeps.map(x => x.content).join('\n');
 		var imports = dependencies
 			.filter(x => x.type !== 'mask')
 			.filter(x => Boolean(x.content))
+			.sort((x,y) => {
+				if (x.type === 'js') return 1;
+				if (y.type === 'js') return -1;
+				return 0;
+			})
+			.sort((x,y) => {
+				if (x.type === 'css') return -1;
+				if (y.type === 'css') return 1;
+				return 0;
+			})
 			.map(x => {
-				var url = x.toRelative(resource);				
+				var url = x.toRelative(resource);
 				return `import sync from '${url}';`;
 			})
 			.join('\n');
 
-		
-		
+
+
 		resource.content = `${body}\n${imports}\n${resource.content}`;
 	}
 
-	accepts (type) {
+	accepts(type) {
 		return type === 'mask';
 	}
 
-	registerStyles (resources) {
+	registerStyles(resources) {
 		return resources.filter(x => x.getModule() === 'mask').map(resource => {
 			return `module path="${resource.url}";`
 		});
 	}
-	
+
 };
 
