@@ -2,6 +2,12 @@ export function obj_deepDefaults (target: any, defaults: any) {
     if (target == null) {
         return defaults;
     }
+    if (defaults == null) {
+        return target;
+    }
+    if (typeof target !== 'object' || typeof defaults !== 'object') {
+        return target ?? defaults;
+    }
     for (let key in defaults) {
         if (target[key] == null) {
             target[key] = defaults[key];
@@ -21,17 +27,17 @@ export function obj_deepExtend (target: any, source: any) {
     for (let key in source) {
         let targetValue = target[key];
         let sourceValue = source[key];
-        if (sourceValue != null && targetValue != null 
-            && typeof targetValue === 'object' 
-            && typeof sourceValue === 'object' 
-            && false === Array.isArray(targetValue) 
+        if (sourceValue != null && targetValue != null
+            && typeof targetValue === 'object'
+            && typeof sourceValue === 'object'
+            && false === Array.isArray(targetValue)
             && false === Array.isArray(sourceValue)) {
 
             obj_deepExtend(targetValue, sourceValue);
             continue;
-        }   
-        target[key] = sourceValue;     
-        
+        }
+        target[key] = sourceValue;
+
     }
     return target;
 }

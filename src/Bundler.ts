@@ -62,7 +62,7 @@ export class Bundler extends class_EventEmitter {
             path = solution.path;
 
         return Loader.load(type, path, opts, solution).then(resource => {
-            return res_flattern(resource).map(x => x);
+            return res_flattern(resource, solution.opts.dependencies).map(x => x);
         });
     }
     static getResources(path, opts) {
@@ -82,7 +82,7 @@ export class Bundler extends class_EventEmitter {
 
         function build(resource) {
             isBuilding = true;
-            var resources = res_flattern(resource);
+            var resources = res_flattern(resource, solution.opts.dependencies);
             return tree_async({
                 resources,
                 reporter: solution.reporter,

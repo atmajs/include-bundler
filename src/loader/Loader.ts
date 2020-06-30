@@ -17,13 +17,13 @@ export const Loader = {
     load(type: ResourceType, path: string, opts, solution: Solution) {
         this.opts = opts;
         this.solution = solution;
-        
 
-        let includeData: ResourceInfo = { 
-            type: type, 
-            url: path, 
-            module: 'root', 
-            page: solution.opts.mainPage 
+
+        let includeData: ResourceInfo = {
+            type: type,
+            url: path,
+            module: 'root',
+            page: solution.opts.mainPage
         };
 
         let start = Date.now();
@@ -125,7 +125,7 @@ namespace ResourceLoader {
             res.inPages.push(name);
         });
     }
-    export function tryGetCyclicRoot(resource) {
+    export function tryGetCyclicRoot(resource: Resource) {
         var x = resource.parent;
         while (x != null) {
             if (x.filename === resource.filename) {

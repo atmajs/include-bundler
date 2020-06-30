@@ -21,8 +21,9 @@ export class Solution extends class_EventEmitter {
 
     constructor(path: string, opts: ISolutionOptions = <any>{}) {
         super();
-        
+
         this.path = path;
+
         this.opts = new SolutionOpts(this, opts);
         this.assetsManager = new AssetsManager(this);
         this.outputResources = new OutputResources(this);

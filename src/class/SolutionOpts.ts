@@ -76,6 +76,8 @@ export interface ISolutionOptions {
     watch?: boolean
     minify?: boolean
     copyFiles?: { [sourcePath: string]: string }
+
+    dependencies?: { [sourcePath: string]: string }
 }
 
 export class SolutionOptsBase {
@@ -112,6 +114,7 @@ export class SolutionOptsBase {
     mappers: ResourcePropMapping[] = []
     options?: IAdditionOptions = {}
     copyFiles: { [source: string]: string } = null;
+    dependencies?: { resource: RegExp, dependency: RegExp }[]
 }
 
 
@@ -204,7 +207,8 @@ export class SolutionOpts extends SolutionOptsBase {
                 }
             }
         },
-        copyFiles: null
+        copyFiles: null,
+        dependencies: null
     }
     resolvers = {
         base(basePath) {
@@ -304,6 +308,19 @@ export class SolutionOpts extends SolutionOptsBase {
                 }
             }
             return opts;
+        },
+        dependencies (val) {
+            if (val == null) {
+                return null;
+            }
+            let arr = [];
+            for (let key in val) {
+                arr.push({
+                    resource: new RegExp(key),
+                    dependency: new RegExp(val[key])
+                })
+            }
+            return arr;
         }
     }
 
@@ -314,9 +331,11 @@ export class SolutionOpts extends SolutionOptsBase {
         super();
         this.paths = [solution.path];
         let opts = opts_ || {};
+
         for (let key in this.defaults) {
             this[key] = obj_deepDefaults(opts[key], this.defaults[key]);
         }
+
         for (let key in this.resolvers) {
             this[key] = this.resolvers[key].call(this, this[key], this);
         }

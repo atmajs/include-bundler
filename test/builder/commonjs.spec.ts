@@ -1,6 +1,7 @@
 import { TestHelper } from '../TestHelper';
 import { Bundler } from '../../src/Bundler'
 
+
 var Files = {
     'main.js': `
 		module.exports = {
@@ -18,7 +19,7 @@ var Files = {
 	`,
     'index.html': `
 		<!doctype html>
-		
+
 		<script src='jquery.js' data-bundler='ignore'></script>
 		<script src='global.js'></script>
 	`
@@ -50,8 +51,8 @@ UTest({
 
             eq_(main.url, '/build/release/main.js');
 
-            var module = {} as any;
-            eval(main.content);
+            var module = global.module = {} as any;
+            global.eval(main.content);
             deepEq_(module.exports.letters, ['a', 'b']);
         });
     },
@@ -84,7 +85,7 @@ UTest({
             eq_(resources.length, 2);
             eq_(resources[0].type, 'js');
             var script = resources[0];
-            var getData;
+
 
             global.eval(script.content);
             eq_(typeof getData, 'function');
@@ -108,5 +109,75 @@ UTest({
             eq_(resources[1].url, '/index.release.html');
             has_(resources[1].content, 'src="build/release/main_index.js"');
         });
-    }
+    },
+    'should build cyclic':  {
+        $before () {
+            this.files = {
+                'foo.js': `
+                    const bar = require('./bar');
+
+                    let barExport = bar.ForFoo();
+                    module.exports =  {
+                        Foo1 () {
+                            return barExport;
+                        }
+                    };
+                `,
+                'bar.js': `
+                    const foo = require('./foo');
+                    module.exports = {
+                        ForFoo () {
+                            return 'bar';
+                        },
+                        ForExport () {
+                            return foo.Foo1();
+                        }
+                    };
+                `
+            };
+            TestHelper.registerFiles(this.files);
+        },
+        $after () {
+            TestHelper.clearFiles(this.files);
+        },
+        $teardown () {
+            Bundler.clearCache();
+        },
+        async 'cyclic scoped reference' () {
+            let content = `module.exports = require('./bar');`;
+            let code = await Helpers.$process(content, {
+                dependencies: {
+                    'foo.js': 'bar.js'
+                }
+            });
+            let result = Helpers.$eval(code);
+            eq_(result.ForExport(), 'bar');
+        }
+    },
 })
+
+
+
+namespace Helpers {
+    export async function $process (str: string, opts = {}) {
+        let resources = await Bundler.build('main.js', {
+            mainContent: str,
+            silent: true,
+			package: {
+                module: 'commonjs',
+                commonjs: {
+                    output: 'simplified'
+                }
+            },
+            ...opts
+        });
+
+        return resources[0].content;
+    }
+    export function $eval(code): any {
+        let module = { exports: {} };
+        let fn = new Function('module', code);
+        fn(module);
+        return module.exports;
+    }
+}
