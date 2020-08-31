@@ -43,6 +43,7 @@ export class Resource {
     inPages: string[] = null
 
     isCyclic: boolean = false
+    isMapped: boolean = false
 
     meta?: ResourceMeta = null
     dependencies: ResourceInfo[]
@@ -54,9 +55,9 @@ export class Resource {
             return;
 
         if (includeData == null) {
-            includeData = <ResourceInfo> { 
-                type: solution && solution.opts.type || null, 
-                url: null 
+            includeData = <ResourceInfo> {
+                type: solution && solution.opts.type || null,
+                url: null
             };
         }
         if (includeData.type == null) {
@@ -66,7 +67,7 @@ export class Resource {
                 includeData.type = solution && solution.opts.type || null;
             }
         }
-        
+
         this.parent = parent;
         this.type = includeData.type;
         this.content = includeData.content;
@@ -87,7 +88,7 @@ export class Resource {
             this.meta = includeData.meta;
         }
         if (includeData.page) {
-            this.inPages = [ includeData.page ];    
+            this.inPages = [ includeData.page ];
         } else {
             var owner = parent;
             while(owner != null && owner.inPages.length === 0) {
@@ -128,7 +129,13 @@ export class Resource {
             }
         }
 
-        url = this.solution.mapUrl(url);
+        let mappedUrl = this.solution.mapUrl(url);
+        if (mappedUrl != url) {
+            console.log(`URL mapped: ${url} => ${mappedUrl}`);
+            url = mappedUrl;
+            this.isMapped = true;
+        }
+
 
         this.hash = path_sliceHash(url);
         if (this.hash) {
@@ -148,14 +155,14 @@ export class Resource {
         this.location = path_getDir(this.url);
 
         if (this.query) {
-            this.url += this.query;            
+            this.url += this.query;
         }
         if (this.hash) {
-            this.url += this.hash;            
+            this.url += this.hash;
         }
 
         var mapped = solution.opts.mapResource(this);
-        if (mapped) {            
+        if (mapped) {
             return mapped;
         }
 
@@ -189,7 +196,7 @@ export class Resource {
         var resource = settings && settings.targetType === 'static'
             ? this._toStaticTarget(solution, settings)
             : this._toOutputTarget(solution, settings);
-        
+
 
         resource.content = this.content;
         resource.asModules = this.asModules;
@@ -209,11 +216,11 @@ export class Resource {
 
         var filename = path_removeQuery(url);
         var resource = new Resource({ type: this.type, url: null }, this, solution);
-        
+
         if (settings == null || settings.relative !== true) {
             url = path_combine(solution.opts.outputAppBase, url);
         }
-        
+
 
         resource.url = url;
         resource.location = path_getDir(url);
@@ -229,9 +236,9 @@ export class Resource {
             url = opts.outputMain;
         } else {
             url = path_combine(
-                opts.getOutputFolder(this.type), 
+                opts.getOutputFolder(this.type),
                 path_removeQuery(this.url)
-            );            
+            );
         }
 
         var filename = path_combine(opts.outputBase, url);
@@ -290,7 +297,7 @@ export class Resource {
         if (modules == null || modules.length === 0) {
             return null;
         }
-                
+
         if (modules.length === 1) {
             return modules[0];
         }

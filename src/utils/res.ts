@@ -87,19 +87,35 @@ function append(pckg: any, name: ResourceType | string, x: string | Resource) {
 export function res_flattern(resource, dependencies: SolutionOptsBase['dependencies']) {
     let arr = ResFlatternUtils.flattern(resource);
     if (dependencies) {
-        for (let i = 0; i < arr.length; i++) {
+        outer: for (let i = 0; i < arr.length; i++) {
             let a = arr[i];
             let deps = dependencies.filter(x => x.resource.test(a.url));
             if (deps.length === 0) {
                 continue;
             }
+            let indexes = [ i ];
             for (let j = i + 1; j < arr.length; j++) {
                 let b = arr[j];
+                if (b == null) {
+                    continue;
+                }
+                let isSame = deps.some(x => x.resource.test(b.url));
+                if (isSame) {
+                    indexes.push(j);
+                    continue;
+                }
+
                 let isDependency = deps.some(x => x.dependency.test(b.url));
                 if (isDependency) {
-                    arr.splice(j + 1, 0, a);
-                    arr.splice(i, 1);
+                    let cursor = j;
+                    indexes.forEach(idx => {
+                        arr.splice(++cursor, 0, arr[idx]);
+                    });
+                    indexes.reverse().forEach(idx => {
+                        arr.splice(idx, 1);
+                    });
                     i--;
+                    continue outer;
                 }
             }
         }

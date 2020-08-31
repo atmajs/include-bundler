@@ -29,6 +29,7 @@ function build () {
         },
         dynamicDependencies: [
             "assert",
+            "alot",
             "maskjs",
             "atma-io",
             "atma-class",
@@ -49,7 +50,7 @@ function build () {
 			process.exit(1);
 		})
 		.done(x => {
-			
+
 			logger.log(lib, `Done`.green)
 		});
 }

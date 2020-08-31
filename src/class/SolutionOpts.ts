@@ -76,6 +76,7 @@ export interface ISolutionOptions {
     watch?: boolean
     minify?: boolean
     copyFiles?: { [sourcePath: string]: string }
+    rewrites?: { [appUrl: string]: string }
 
     dependencies?: { [sourcePath: string]: string }
 }

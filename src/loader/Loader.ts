@@ -1,3 +1,4 @@
+import alot from 'alot'
 import { class_Dfr, obj_extend } from 'atma-utils'
 import { res_getTreeInfo, res_walk } from '../utils/res';
 import { path_getExtension } from '../utils/path';
@@ -74,7 +75,7 @@ var types = {
 };
 
 namespace ResourceLoader {
-    export function load(includeData: ResourceInfo, parent: Resource, opts, solution: Solution) {
+    export function load(includeData: ResourceInfo, parent: Resource, opts, solution: Solution): Promise<TreeLoader> {
         var resource = new Resource(includeData, parent, solution);
         var loader = __loaders[resource.filename];
         if (loader == null) {
@@ -85,16 +86,16 @@ namespace ResourceLoader {
             var res = tryGetCyclicRoot(resource);
             if (res != null) {
                 solution.reporter.warn(`Caution. Cyclic dependency detected. '${includeData.url}' in '${parent.url}'`);
-                return async_resolve({ resource: res })
+                return Promise.resolve(<TreeLoader>{ resource: res })
             }
         }
         if (includeData.page) {
-            loader.done(() => {
+            loader.promise.done(() => {
                 this.definePageForAll(includeData.page, loader.resource);
             });
         }
 
-        return loader;
+        return loader.promise;
     }
     export function loadResource(resource, opts, solution) {
         var loader = __loaders[resource.filename];
@@ -138,9 +139,11 @@ namespace ResourceLoader {
         return null;
     }
 
-    class TreeLoader extends class_Dfr {
+    class TreeLoader {
+        promise = new class_Dfr as (class_Dfr & Promise<TreeLoader>)
+
         constructor(public resource: Resource, public opts, public solution: Solution) {
-            super();
+
         }
         process() {
             this
@@ -169,38 +172,66 @@ namespace ResourceLoader {
                 this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
                 this.resource.content = content;
                 this.processChildren();
-            }).fail(error => this.reject(error));
+            }).fail(error => this.promise.reject(error));
         }
         private processChildren() {
             if (this.shouldSkipChildren()) {
-                this.resolve(this);
+                this.promise.resolve(this);
                 return;
             }
             Parser
                 .getDependencies(this.resource, this.solution)
-                .then(result => this.loadChildren(result), error => this.reject(error));
+                .then(result => this.loadChildren(result), error => this.promise.reject(error));
         }
-        private loadChildren(result: ResourceInfo) {
+        private async loadChildren(result: ResourceInfo) {
 
             assert(Array.isArray(result.dependencies), `Expects array of dependencies for ${this.resource.url}`);
 
             this.resource.meta = obj_extend(this.resource.meta, result.meta);
             this.resource.dependencies = result.dependencies;
 
-            var deps = result.dependencies;
-            async_waterfall(deps, dep => {
-                return ResourceLoader
-                    .load(dep, this.resource, this.opts, this.solution)
-                    .then(loader => {
-                        dep.resource = loader.resource;
-                        return loader.resource;
-                    });
+            const deps = result.dependencies;
+            const resources = await alot(deps).mapAsync(async dep => {
+                let loader: TreeLoader = await ResourceLoader.load(
+                    dep
+                    , this.resource
+                    , this.opts
+                    , this.solution
+                );
+                let res = loader.resource;
+                dep.resource = res;
+                return res;
+            }).toArrayAsync({ threads: 1 });
+
+            resources.forEach((res, i) => {
+                let dep = deps[i];
+                if (res.isMapped) {
+                    let str = this.resource.content.replace(dep.url, res.url);
+                    if (str === this.resource.content) {
+                        throw new Error(`Mapped url was not replaced: ${dep.url}`);
+                    }
+
+                    this.resource.content = str;
+                    dep.url = res.url;
+                }
             })
-                .fail(error => this.reject(error))
-                .done(resources => {
-                    this.resource.resources.push(...resources);
-                    this.resolve(this);
-                });
+
+            this.resource.resources.push(...resources);
+            this.promise.resolve(this);
+
+            // async_waterfall(deps, dep => {
+            //     return ResourceLoader
+            //         .load(dep, this.resource, this.opts, this.solution)
+            //         .then(loader => {
+            //             dep.resource = loader.resource;
+            //             return loader.resource;
+            //         });
+            // })
+            //     .fail(error => this.promise.reject(error))
+            //     .done(resources => {
+            //         this.resource.resources.push(...resources);
+            //         this.promise.resolve(this);
+            //     });
         }
         private shouldSkipChildren() {
             var arr = this.solution.opts.parserIgnoreDependencies;

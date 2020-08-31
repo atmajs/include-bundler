@@ -60,6 +60,7 @@ function isDynamicDependency(dep, solution) {
 }
 function mapDeps(info: ResourceInfo, solution: Solution) {
     info.dependencies.forEach(dep => {
+
         // @TODO do we need to map at this level?
     })
     return info;
