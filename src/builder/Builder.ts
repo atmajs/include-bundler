@@ -3,6 +3,7 @@ import { path_getExtension } from '../utils/path';
 import { async_map, async_run, async_whenAll } from '../utils/async';
 import { Solution } from '../class/Solution';
 import { Resource } from '../class/Resource';
+import alot = require('alot');
 
 export const Builder = {
 	build(resources: Resource[], solution: Solution) {
@@ -59,7 +60,7 @@ export const Builder = {
 
 		function buildOutputItems() {
 			var items = solution.outputResources.items;
-			return async_map(items, item => {
+			return alot(items).mapAsync(item => {
 				var otherOutputItems = items.filter(x => {
 					if (x === item) return false;
 					if (x.page != item.page) return false;
@@ -67,7 +68,7 @@ export const Builder = {
 					return true;
 				});
 				return buildBundle(item, otherOutputItems);
-			});
+			}).toArrayAsync();
 		}
 		function buildBundle(outputItem, otherOutputItems) {
 			return _middlewares

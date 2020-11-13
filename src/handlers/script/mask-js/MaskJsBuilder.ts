@@ -9,17 +9,18 @@ export class MaskJsBuilder extends BaseScriptBuilder {
 			.replace('%URL%', () => resource.url)
 			.replace('%CONTENT%', () => resource.content);
 	}
-	
-	accepts (resource: Resource) {		
+
+	accepts (resource: Resource) {
 		return resource.type === 'js' && resource.getModule() === 'mask';
 	}
-	
+
 };
 
 var Templates = {
 	module: `
-	var module = { exports: {} };
-	
+	var exports = {};
+	var module = { exports: exports };
+
 	%CONTENT%
 
 	;(function(exports, Module){
