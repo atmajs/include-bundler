@@ -45,6 +45,7 @@ export const Loader = {
     loadResource(resource) {
         return ResourceLoader
             .loadResource(resource, this.opts, this.solution)
+            .promise
             .then(loader => loader.resource);
     },
     clearCache() {
