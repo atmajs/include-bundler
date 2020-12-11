@@ -2,7 +2,7 @@ import { BaseHandler } from '../../base/BaseHandler';
 import { CommonJsBuilderSimplified } from './CommonJsBuilderSimplified';
 import { Solution } from '../../../class/Solution';
 import { Templates } from './templates/Templates';
-import { BaseScriptBuilder } from '../base/BaseScriptBuilder';
+import { BaseScriptBuilder, IBaseScriptBuilderOpts } from '../base/BaseScriptBuilder';
 import { Resource } from '../../../class/Resource';
 import { OutputResources, OutputItem } from '../../../class/OutputResources';
 import { template_stringifyContent, template_interpolate } from '../../../utils/template';
@@ -33,7 +33,7 @@ export class CommonJsBuilder extends BaseScriptBuilder {
         return module === 'commonjs';
     }
 
-    wrapModule(resource: Resource) {
+    wrapModule(resource: Resource, outputItem, outputItems, setts: IBaseScriptBuilderOpts) {
         var opts = this.solution.iteration;
         if (opts.commonjs == null) {
             opts.commonjs = {
@@ -54,7 +54,8 @@ export class CommonJsBuilder extends BaseScriptBuilder {
         var module = Templates
             .Module
             .replace('%MODULE_PATH%', () => url)
-            .replace('%MODULE%', () => content);
+            .replace('%MODULE%', () => content)
+            .replace('%FOOTER%', () => (setts?.partials?.footer ?? ''));
 
 
         return body + module;

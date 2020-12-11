@@ -168,12 +168,17 @@ namespace ResourceLoader {
 
             var start = Date.now();
             var reader = Configuration.Instance.get('readFile');
-            reader(this.resource.filename, this.opts).done(content => {
-                var end = Date.now();
-                this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
-                this.resource.content = content;
-                this.processChildren();
-            }).fail(error => this.promise.reject(error));
+            reader(this.resource.filename, this.opts).then(
+                content => {
+                    var end = Date.now();
+                    this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
+                    this.resource.content = content;
+                    this.processChildren();
+                },
+                error => {
+                    this.promise.reject(error);
+                }
+            );
         }
         private processChildren() {
             if (this.shouldSkipChildren()) {

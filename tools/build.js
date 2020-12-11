@@ -38,7 +38,9 @@ function build () {
             "cheerio",
             "includejs",
             "uglify-es",
-            "atma-utils"
+            "atma-utils",
+            "^memd$",
+            "^axios$",
         ],
         watch: process.argv.some(x => /watch/.test(x))
     };

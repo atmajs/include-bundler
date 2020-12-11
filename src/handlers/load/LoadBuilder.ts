@@ -1,28 +1,31 @@
+import { path_getExtension } from '../../utils/path';
 import { BaseBuilder } from '../base/BaseBuilder';
 export class LoadBuilder extends BaseBuilder {
 
-	createModule (outputItem, otherOutputItems) {
-		var html = outputItem
-			.resources
-			.map(resource => {
-				var url = resource.toTargetUrl(this.solution);
-				return `<script type='text/plain' data-bundler-path='${url}'>			
-					${resource.content}
-				</script>`
-			})
-			.join('\n');
+    createModule (outputItem, otherOutputItems) {
+        var html = outputItem
+            .resources
+            .map(resource => {
+                this.solution.assetsManager.rewriteAssets(resource, outputItem.resource, this.solution);
 
-		outputItem.resource.content = html;
-		outputItem.resource.type = 'html';
-	}
+                let url = resource.toTargetUrl(this.solution);
+                return `<script type='text/plain' data-bundler-path='${url}'>
+                    ${resource.content}
+                </script>`
+            })
+            .join('\n');
 
-	buildRoot (resource, dependencies) {		
-		throw new Error('Right now only rewriter is supported')	
-	}
+        outputItem.resource.content = html;
+        outputItem.resource.type = 'html';
+    }
 
-	accepts (type) {
-		return type === 'load';
-	}
-	
+    buildRoot (resource, dependencies) {
+        throw new Error('Right now only rewriter is supported')
+    }
+
+    accepts (type) {
+        return type === 'load';
+    }
+
 };
 

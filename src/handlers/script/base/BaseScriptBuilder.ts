@@ -4,7 +4,7 @@ import { OutputItem } from "../../../class/OutputResources";
 import { Solution } from "../../../class/Solution";
 
 export abstract class BaseScriptBuilder extends BaseBuilder {
-    /** When a module has no js script, only other resource imports. 
+    /** When a module has no js script, only other resource imports.
      *  You may want to add some resource registration code
      */
     wrapScriptlessModule (otherOutputItems: OutputItem[]) {
@@ -13,11 +13,11 @@ export abstract class BaseScriptBuilder extends BaseBuilder {
 	isMainBuilder(solution: Solution): boolean {
 		return false;
     }
-    
+
     createModule(outputItem: OutputItem, otherOutputItems: OutputItem[]): void {
 		throw new Error("Method not implemented.");
 	}
-    wrapModule(resource: Resource, outputItem: OutputItem = null, otherOutputItems: OutputItem[] = null): string {
+    wrapModule(resource: Resource, outputItem: OutputItem = null, otherOutputItems: OutputItem[] = null, opts: IBaseScriptBuilderOpts = null): string {
         throw Error('Not implemented');
     }
     buildRoot(resource, dependencies) {
@@ -25,3 +25,8 @@ export abstract class BaseScriptBuilder extends BaseBuilder {
     }
 };
 
+export interface IBaseScriptBuilderOpts {
+    partials?: {
+        footer?: string
+    }
+}

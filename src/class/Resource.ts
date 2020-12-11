@@ -15,7 +15,6 @@ import { HandlersUtils } from './HandlersUtils';
 import { ResourceInfo, ResourceMeta, ResourceType } from './ResourceInfo';
 import { Npm } from '../utils/npm';
 
-debugger;
 export class Resource {
 
     resources: Resource[] = []
@@ -90,7 +89,7 @@ export class Resource {
         if (includeData.page) {
             this.inPages = [ includeData.page ];
         } else {
-            var owner = parent;
+            let owner = parent;
             while(owner != null && owner.inPages.length === 0) {
                 owner = owner.parent;
             }
@@ -161,7 +160,7 @@ export class Resource {
             this.url += this.hash;
         }
 
-        var mapped = solution.opts.mapResource(this);
+        let mapped = solution.opts.mapResource(this);
         if (mapped) {
             return mapped;
         }
@@ -171,7 +170,7 @@ export class Resource {
         return this;
     }
     clone () {
-        var res = new Resource();
+        let res = new Resource();
         res.resources = this.resources;
         res.parent = this.parent;
         res.filename = this.filename;
@@ -191,9 +190,9 @@ export class Resource {
         res.aliases = this.aliases;
         return res;
     }
-    toTarget (solution: Solution, settings?: {targetType: string}) {
+    toTarget (solution: Solution, settings?: {targetType?: string, relative?: boolean }) {
 
-        var resource = settings && settings.targetType === 'static'
+        let resource = settings?.targetType === 'static'
             ? this._toStaticTarget(solution, settings)
             : this._toOutputTarget(solution, settings);
 
@@ -204,23 +203,22 @@ export class Resource {
         resource.bundle = this.bundle;
         resource.aliases = this.aliases;
 
-        if (solution.opts.version) {
+        if (solution.opts.version && this.parent?.type !== 'load') {
             resource.url += '?v=' + solution.opts.version;
         }
 
         return resource;
     }
-    _toStaticTarget (solution, settings) {
-        var opts = solution.opts;
-        var url = this.url;
+    private _toStaticTarget (solution, settings?: { relative?: boolean }) {
+        let opts = solution.opts;
+        let url = this.url;
 
-        var filename = path_removeQuery(url);
-        var resource = new Resource({ type: this.type, url: null }, this, solution);
+        let filename = path_removeQuery(url);
+        let resource = new Resource({ type: this.type, url: null }, this, solution);
 
         if (settings == null || settings.relative !== true) {
             url = path_combine(solution.opts.outputAppBase, url);
         }
-
 
         resource.url = url;
         resource.location = path_getDir(url);
@@ -229,9 +227,9 @@ export class Resource {
         resource.source = this;
         return resource;
     }
-    _toOutputTarget (solution: Solution, settings) {
-        var opts = solution.opts;
-        var url;
+    private _toOutputTarget (solution: Solution, settings?: { relative?: boolean }) {
+        let opts = solution.opts;
+        let url;
         if (solution.isMainResource(this)) {
             url = opts.outputMain;
         } else {
@@ -241,8 +239,8 @@ export class Resource {
             );
         }
 
-        var filename = path_combine(opts.outputBase, url);
-        var resource = new Resource({ type: this.type }, this, solution);
+        let filename = path_combine(opts.outputBase, url);
+        let resource = new Resource({ type: this.type }, this, solution);
 
         if (settings == null || settings.relative !== true && url.indexOf(solution.opts.outputAppBase) === -1) {
             url = path_combine(solution.opts.outputAppBase, url);
@@ -256,11 +254,11 @@ export class Resource {
         return resource;
     }
     toRelative (resource) {
-        var url = path_toRelative(this.filename, resource.filename);
+        let url = path_toRelative(this.filename, resource.filename);
         return url;
     }
     toTargetUrl (solution) {
-        var url = this.url;
+        let url = this.url;
         if (url.indexOf(solution.opts.outputAppBase) === -1)
             url = path_combine(solution.opts.outputAppBase, url);
 
@@ -293,7 +291,7 @@ export class Resource {
     }
 
     getModule (solution?: Solution) {
-        var modules = this.asModules;
+        let modules = this.asModules;
         if (modules == null || modules.length === 0) {
             return null;
         }
@@ -302,8 +300,8 @@ export class Resource {
             return modules[0];
         }
 
-        var arr = ['global', 'commonjs', 'amd', 'includejs', 'import'];
-        var name = arr.find(name => modules.indexOf(name) !== -1);
+        let arr = ['global', 'commonjs', 'amd', 'includejs', 'import'];
+        let name = arr.find(name => modules.indexOf(name) !== -1);
         if (name == null) {
             name = modules[0];
         }

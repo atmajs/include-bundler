@@ -3,7 +3,6 @@ import { class_Uri } from 'atma-utils'
 import { mask } from '../global'
 
 
-debugger;
 
 var lib = require('includejs/lib/include.node.module.js');
 var Routes = lib.includeLib.Routes();
