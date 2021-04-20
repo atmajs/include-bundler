@@ -31,10 +31,10 @@ export const Loader = {
         return ResourceLoader
             .load(includeData, null, opts, solution)
             .then(loader => {
-                var end = Date.now();
-                var seconds = ((end - start) / 1000).toFixed(2);
-                var treeInfo = res_getTreeInfo(loader.resource);
-                var reporter = solution.reporter;
+                let end = Date.now();
+                let seconds = ((end - start) / 1000).toFixed(2);
+                let treeInfo = res_getTreeInfo(loader.resource);
+                let reporter = solution.reporter;
                 reporter
                     .info(color(`Loaded bold<yellow<${treeInfo.count}>> files in bold<yellow<${seconds}>> sec.`));
                 reporter
@@ -57,8 +57,8 @@ export const Loader = {
         return this;
     },
     getTypeFromPath(path) {
-        var ext = path_getExtension(path);
-        var type = Object.keys(types).find(type => {
+        let ext = path_getExtension(path);
+        let type = Object.keys(types).find(type => {
             return types[type].indexOf(` ${ext} `) !== -1
         });
         if (type == null) {
@@ -68,7 +68,7 @@ export const Loader = {
     }
 };
 
-var types = {
+let types = {
     'js': ' es6 js ',
     'mask': ' mask ',
     'html': ' html ',
@@ -77,14 +77,14 @@ var types = {
 
 namespace ResourceLoader {
     export function load(includeData: ResourceInfo, parent: Resource, opts, solution: Solution): Promise<TreeLoader> {
-        var resource = new Resource(includeData, parent, solution);
-        var loader = __loaders[resource.filename];
+        let resource = new Resource(includeData, parent, solution);
+        let loader = __loaders[resource.filename];
         if (loader == null) {
             loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
             loader.process();
         } else {
             // Try to find the resource in ancestors
-            var res = tryGetCyclicRoot(resource);
+            let res = tryGetCyclicRoot(resource);
             if (res != null) {
                 solution.reporter.warn(`Caution. Cyclic dependency detected. '${includeData.url}' in '${parent.url}'`);
                 return Promise.resolve(<TreeLoader>{ resource: res })
@@ -99,7 +99,7 @@ namespace ResourceLoader {
         return loader.promise;
     }
     export function loadResource(resource, opts, solution) {
-        var loader = __loaders[resource.filename];
+        let loader = __loaders[resource.filename];
         if (loader == null) {
             loader = __loaders[resource.filename] = new TreeLoader(resource, opts, solution);
             loader.process();
@@ -120,7 +120,7 @@ namespace ResourceLoader {
         res_walk(resource, res => {
             if (res.page) return false;
 
-            var arr = res.inPages;
+            let arr = res.inPages;
             if (arr.indexOf(name) !== -1)
                 return;
 
@@ -128,7 +128,7 @@ namespace ResourceLoader {
         });
     }
     export function tryGetCyclicRoot(resource: Resource) {
-        var x = resource.parent;
+        let x = resource.parent;
         while (x != null) {
             if (x.filename === resource.filename) {
                 let res = x.clone();
@@ -153,8 +153,8 @@ namespace ResourceLoader {
                 .print('Load ' + toMessage(this.resource.url));
 
             function toMessage(path) {
-                var parts = path.replace(/^\/+/, '').split('/');
-                var name = parts.pop();
+                let parts = path.replace(/^\/+/, '').split('/');
+                let name = parts.pop();
                 parts = parts.map(x => color(`bold<${x}>`));
                 name = color(`green<${name}>`);
                 parts.push(name);
@@ -166,11 +166,11 @@ namespace ResourceLoader {
                 return;
             }
 
-            var start = Date.now();
-            var reader = Configuration.Instance.get('readFile');
+            let start = Date.now();
+            let reader = Configuration.Instance.get('readFile');
             reader(this.resource.filename, this.opts).then(
                 content => {
-                    var end = Date.now();
+                    let end = Date.now();
                     this.solution.reporter.print(color(` cyan<${end - start}> ms \n`));
                     this.resource.content = content;
                     this.processChildren();
@@ -187,7 +187,11 @@ namespace ResourceLoader {
             }
             Parser
                 .getDependencies(this.resource, this.solution)
-                .then(result => this.loadChildren(result), error => this.promise.reject(error));
+                .then(result => {
+                    this.loadChildren(result).catch(err => {
+                        this.promise.reject(err);
+                    });
+                }, error => this.promise.reject(error));
         }
         private async loadChildren(result: ResourceInfo) {
 
@@ -207,7 +211,7 @@ namespace ResourceLoader {
                 let res = loader.resource;
                 dep.resource = res;
                 return res;
-            }).toArrayAsync({ threads: 1 });
+            }).toArrayAsync({ threads: 1, errors: 'reject' });
 
             resources.forEach((res, i) => {
                 let dep = deps[i];
@@ -240,13 +244,13 @@ namespace ResourceLoader {
             //     });
         }
         private shouldSkipChildren() {
-            var arr = this.solution.opts.parserIgnoreDependencies;
-            var shouldSkip = arr.some(rgx => (rgx as RegExp).test(this.resource.filename));
+            let arr = this.solution.opts.parserIgnoreDependencies;
+            let shouldSkip = arr.some(rgx => (rgx as RegExp).test(this.resource.filename));
             if (shouldSkip) {
                 return true;
             }
 
-            var meta = this.resource.meta;
+            let meta = this.resource.meta;
             if (meta && meta.skipDependencies) {
                 return true;
             }
@@ -254,5 +258,5 @@ namespace ResourceLoader {
         }
     }
 
-    var __loaders: { [key: string]: TreeLoader } = {};
+    let __loaders: { [key: string]: TreeLoader } = {};
 }
