@@ -12,9 +12,9 @@ export const CommonJsBuilderSimplified = {
         content = replaceWithVarIds(content, resource, this.solution);
         content = Templates
             .ModuleSimplified
-            .replace(/__VAR_ID__/g, () => varId)
-            .replace(/__MODULE__/g, () => content)
-            .replace(/__FOOTER__/g, () => (setts?.partials?.footer ?? ''));
+            .replace(/___VAR_ID___/g, () => varId)
+            .replace(/___MODULE___/g, () => content)
+            .replace(/___FOOTER___/g, () => (setts?.partials?.footer ?? ''));
             ;
         var opts = this.solution.iteration;
         if (opts.commonjs == null) {

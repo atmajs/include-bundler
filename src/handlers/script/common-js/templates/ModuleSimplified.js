@@ -16,5 +16,5 @@ var ___VAR_ID___;
         ___VAR_ID___ = module.exports;
     }
 
-    __FOOTER__;
+    ___FOOTER___;
 }());
