@@ -65,7 +65,10 @@ export class AssetsManager {
             io
                 .File
                 .copyToAsync(asset.filename, target.filename)
-                .then(next, error => dfr.reject(`AssetsManager can't copy a file ${asset.filename} to ${target.filename}`));
+                .then(next, error => {
+                    console.error(`AssetsManager can't copy a file ${asset.filename} to ${target.filename}`);
+                    next();
+                });
         }
         next();
         return dfr;
